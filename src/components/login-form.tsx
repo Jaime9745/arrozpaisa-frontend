@@ -1,6 +1,12 @@
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
@@ -10,56 +16,86 @@ export function LoginForm({
 }: React.ComponentProps<"div">) {
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card className="overflow-hidden p-0">
-        <CardContent className="grid p-0 md:grid-cols-2">
-          <form className="p-6 md:p-8">
-            <div className="flex flex-col gap-6">
-              <div className="flex flex-col items-center text-center">
-                <h1 className="text-2xl font-bold">Bienvenido de vuelta</h1>
-                <p className="text-muted-foreground text-balance">
-                  Inicia sesión en tu cuenta
-                </p>
-              </div>
-              <div className="grid gap-3">
-                <Label htmlFor="email">Correo electrónico</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="correo@ejemplo.com"
-                  required
-                />
-              </div>
-              <div className="grid gap-3">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Contraseña</Label>
-                  <a
-                    href="#"
-                    className="ml-auto text-sm underline-offset-2 hover:underline"
+      <Card className="min-h-[600px] w-full" style={{ borderRadius: "30px" }}>
+        <CardHeader className="text-center px-6 py-8">
+          <CardDescription
+            className="text-lg mb-12"
+            style={{ color: "#7c838a" }}
+          >
+            ¡Nos alegra tenerte de vuelta!
+          </CardDescription>
+          <CardTitle className="text-3xl mb-0">Iniciar Sesión</CardTitle>
+        </CardHeader>
+        <CardContent className="px-6 pb-8">
+          <form>
+            <div className="grid gap-8">
+              <div className="grid gap-6 mx-auto w-full max-w-[420px]">
+                <div className="grid gap-1">
+                  <Label
+                    htmlFor="email"
+                    className="text-lg mb-0"
+                    style={{ color: "#7c838a" }}
                   >
-                    ¿Olvidaste tu contraseña?
-                  </a>
+                    Usuario
+                  </Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="correo@ejemplo.com"
+                    className="text-lg px-4"
+                    style={{
+                      background: "#B0BAC366",
+                      borderRadius: "20px",
+                      width: "100%",
+                      height: "45px",
+                      maxWidth: "419px",
+                      color: "#000",
+                    }}
+                    required
+                  />
                 </div>
-                <Input id="password" type="password" required />
+                <div className="grid gap-1">
+                  <div className="flex items-center">
+                    <Label
+                      htmlFor="password"
+                      className="text-lg mb-0"
+                      style={{ color: "#7c838a" }}
+                    >
+                      Contraseña
+                    </Label>
+                  </div>
+                  <Input
+                    id="password"
+                    type="password"
+                    className="text-lg px-4"
+                    style={{
+                      background: "#B0BAC366",
+                      borderRadius: "20px",
+                      width: "100%",
+                      height: "45px",
+                      maxWidth: "419px",
+                      color: "#000",
+                    }}
+                    required
+                  />
+                </div>
+                <div></div>
+                <Button
+                  type="submit"
+                  className="h-12 text-xl font-semibold mt-6 mx-auto"
+                  style={{
+                    backgroundColor: "#F3FF18",
+                    color: "#000",
+                    width: "300px",
+                  }}
+                >
+                  Ingresar
+                </Button>
               </div>
-              <Button type="submit" className="w-full">
-                Iniciar sesión
-              </Button>
             </div>
           </form>
-          <div className="bg-muted relative hidden md:block">
-            <img
-              src="/placeholder.svg"
-              alt="Image"
-              className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
-            />
-          </div>
         </CardContent>
       </Card>
-      <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">
-        Al hacer clic en continuar, aceptas nuestros{" "}
-        <a href="#">Términos de Servicio</a> y{" "}
-        <a href="#">Política de Privacidad</a>.
-      </div>
     </div>
   );
 }

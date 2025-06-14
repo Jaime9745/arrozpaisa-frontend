@@ -1,4 +1,10 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
 export default function MenuManagement() {
@@ -17,13 +23,13 @@ export default function MenuManagement() {
         <h1 className="text-3xl font-bold text-gray-900">Gestión de Menú</h1>
         <Button>Agregar Plato</Button>
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {menuItems.map((dish, index) => (
-          <Card 
-            key={index} 
+          <Card
+            key={index}
             className="hover:shadow-lg transition-shadow duration-200"
-            style={{ borderRadius: '30px' }}
+            style={{ borderRadius: "30px" }}
           >
             <CardHeader>
               <CardTitle>{dish.name}</CardTitle>
@@ -31,10 +37,16 @@ export default function MenuManagement() {
             </CardHeader>
             <CardContent>
               <div className="flex justify-between items-center">
-                <span className="text-2xl font-bold text-green-600">{dish.price}</span>
+                <span className="text-2xl font-bold text-green-600">
+                  {dish.price}
+                </span>
                 <div className="space-x-2">
-                  <Button variant="outline" size="sm">Editar</Button>
-                  <Button variant="destructive" size="sm">Eliminar</Button>
+                  <Button variant="outline" size="sm">
+                    Editar
+                  </Button>
+                  <Button variant="destructive" size="sm">
+                    Eliminar
+                  </Button>
                 </div>
               </div>
             </CardContent>

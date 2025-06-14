@@ -1,4 +1,10 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Clock, DollarSign, Table, Users } from "lucide-react";
 import StatsCard from "./StatsCard";
 
@@ -31,7 +37,15 @@ export default function DashboardHome() {
       description: "Turno actual",
       icon: Users,
       trend: "neutral" as const,
-    }
+    },
+  ];
+
+  // Static mock data for recent orders to avoid hydration issues
+  const recentOrders = [
+    { id: 1, table: 5, orderNum: 1001, price: "34.50" },
+    { id: 2, table: 6, orderNum: 1002, price: "42.20" },
+    { id: 3, table: 7, orderNum: 1003, price: "28.90" },
+    { id: 4, table: 8, orderNum: 1004, price: "56.75" },
   ];
 
   return (
@@ -45,21 +59,27 @@ export default function DashboardHome() {
 
       {/* Recent Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card style={{ borderRadius: '30px' }}>
+        <Card style={{ borderRadius: "30px" }}>
           <CardHeader>
             <CardTitle>Órdenes Recientes</CardTitle>
             <CardDescription>Últimas órdenes del restaurante</CardDescription>
           </CardHeader>
           <CardContent>
+            {" "}
             <div className="space-y-4">
-              {[1, 2, 3, 4].map((order) => (
-                <div key={order} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              {recentOrders.map((order) => (
+                <div
+                  key={order.id}
+                  className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                >
                   <div>
-                    <p className="font-medium">Mesa {order + 4}</p>
-                    <p className="text-sm text-gray-600">Orden #{1000 + order}</p>
+                    <p className="font-medium">Mesa {order.table}</p>
+                    <p className="text-sm text-gray-600">
+                      Orden #{order.orderNum}
+                    </p>
                   </div>
                   <div className="text-right">
-                    <p className="font-medium">${(Math.random() * 50 + 20).toFixed(2)}</p>
+                    <p className="font-medium">${order.price}</p>
                     <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">
                       En preparación
                     </span>
@@ -70,7 +90,7 @@ export default function DashboardHome() {
           </CardContent>
         </Card>
 
-        <Card style={{ borderRadius: '30px' }}>
+        <Card style={{ borderRadius: "30px" }}>
           <CardHeader>
             <CardTitle>Estado de Mesas</CardTitle>
             <CardDescription>Vista rápida del estado actual</CardDescription>
@@ -82,8 +102,8 @@ export default function DashboardHome() {
                   key={i}
                   className={`p-3 rounded-lg text-center text-sm font-medium ${
                     i < 15
-                      ? 'bg-red-100 text-red-800'
-                      : 'bg-green-100 text-green-800'
+                      ? "bg-red-100 text-red-800"
+                      : "bg-green-100 text-green-800"
                   }`}
                 >
                   {i + 1}

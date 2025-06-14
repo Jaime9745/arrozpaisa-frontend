@@ -6,16 +6,22 @@ interface StatsCardProps {
   value: string;
   description: string;
   icon: React.ComponentType<{ className?: string }>;
-  trend: 'up' | 'neutral' | 'down';
+  trend: "up" | "neutral" | "down";
 }
 
-export default function StatsCard({ title, value, description, icon, trend }: StatsCardProps) {
+export default function StatsCard({
+  title,
+  value,
+  description,
+  icon,
+  trend,
+}: StatsCardProps) {
   const IconComponent = icon;
-  
+
   return (
-    <Card 
-      className="hover:shadow-lg transition-shadow duration-200" 
-      style={{ borderRadius: '30px' }}
+    <Card
+      className="hover:shadow-lg transition-shadow duration-200"
+      style={{ borderRadius: "30px" }}
     >
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium text-gray-600">
@@ -25,8 +31,12 @@ export default function StatsCard({ title, value, description, icon, trend }: St
       </CardHeader>
       <CardContent>
         <div className="text-2xl font-bold text-gray-900">{value}</div>
-        <p className={`text-xs ${trend === 'up' ? 'text-green-600' : 'text-gray-600'} flex items-center gap-1`}>
-          {trend === 'up' && <TrendingUp className="h-3 w-3" />}
+        <p
+          className={`text-xs ${
+            trend === "up" ? "text-green-600" : "text-gray-600"
+          } flex items-center gap-1`}
+        >
+          {trend === "up" && <TrendingUp className="h-3 w-3" />}
           {description}
         </p>
       </CardContent>

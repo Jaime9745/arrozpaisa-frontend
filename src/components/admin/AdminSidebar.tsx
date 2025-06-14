@@ -20,15 +20,16 @@ export default function AdminSidebar({
   activeSection,
   onSectionChange,
 }: AdminSidebarProps) {
-  return (    <Card
+  return (
+    <Card
       className="w-80 bg-white shadow-xl border-0 flex flex-col"
       style={{ borderRadius: "30px" }}
     >
       <div className="p-6 flex items-center gap-2">
-        <Image 
-          src="/images/logo.webp" 
-          alt="Logo" 
-          width={120} 
+        <Image
+          src="/images/logo.webp"
+          alt="Logo"
+          width={120}
           height={120}
           className="rounded-lg"
         />
@@ -36,7 +37,6 @@ export default function AdminSidebar({
           ¡Hola Jhon!
         </div>
       </div>
-
       <nav className="flex-1 mt-2">
         {sidebarItems.map((item) => {
           const IconComponent = item.icon;
@@ -55,7 +55,8 @@ export default function AdminSidebar({
             </button>
           );
         })}
-      </nav>      <div className="p-6 pt-0">
+      </nav>{" "}
+      <div className="p-6 pt-0">
         <Button
           variant="outline"
           className="w-full"

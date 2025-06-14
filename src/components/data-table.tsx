@@ -1,9 +1,11 @@
 import * as React from "react";
 import {
   ColumnDef,
+  ColumnFiltersState,
   SortingState,
   flexRender,
   getCoreRowModel,
+  getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
@@ -17,19 +19,26 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { ChevronUp, ChevronDown, ChevronsUpDown, Search } from "lucide-react";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  globalFilter: string;
+  onGlobalFilterChange: (value: string) => void;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  globalFilter,
+  onGlobalFilterChange,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
-
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    []
+  );
   const table = useReactTable({
     data,
     columns,
@@ -37,8 +46,13 @@ export function DataTable<TData, TValue>({
     getPaginationRowModel: getPaginationRowModel(),
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
+    onColumnFiltersChange: setColumnFilters,
+    getFilteredRowModel: getFilteredRowModel(),
+    onGlobalFilterChange: onGlobalFilterChange,
     state: {
       sorting,
+      columnFilters,
+      globalFilter,
     },
   });
 
@@ -52,7 +66,6 @@ export function DataTable<TData, TValue>({
     }
     return <ChevronsUpDown className="ml-2 h-4 w-4 text-gray-400" />;
   };
-
   return (
     <div className="space-y-4">
       <div className="rounded-md border">

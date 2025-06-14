@@ -8,8 +8,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { DataTable } from "@/components/data-table";
 import { ColumnDef } from "@tanstack/react-table";
+import { Plus, Search } from "lucide-react";
+import { useState } from "react";
 
 interface Waiter {
   id: number;
@@ -106,11 +109,31 @@ const columns: ColumnDef<Waiter>[] = [
 ];
 
 export default function WaiterManagement() {
+  const [searchTerm, setSearchTerm] = useState("");
+
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-900">Gestión de Meseros</h1>
-        <Button>Agregar Mesero</Button>
+      {/* Search Input Where Title Was */}
+      <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4 sm:gap-2">
+        <div className="flex-1 w-full sm:max-w-2xl relative">
+          <Input
+            type="text"
+            placeholder="Buscar meseros por nombre, identificación, celular o usuario..."
+            value={searchTerm}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setSearchTerm(e.target.value)
+            }
+            className="w-full bg-white border-gray-200 pl-4 pr-12 py-3 rounded-xl shadow-sm"
+          />
+          <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+        </div>
+        <Button
+          className="px-8 py-3 w-full sm:min-w-[180px] sm:w-auto text-white font-semibold flex items-center gap-2 justify-center"
+          style={{ background: "#EB3123" }}
+        >
+          <Plus className="h-5 w-5" />
+          Agregar Mesero
+        </Button>
       </div>
 
       {/* Data Table Card Container */}
@@ -122,10 +145,15 @@ export default function WaiterManagement() {
           <CardDescription>
             Gestiona todos los meseros del restaurante
           </CardDescription>
-        </CardHeader>
-
+        </CardHeader>{" "}
         <CardContent>
-          <DataTable columns={columns} data={waiters} />
+          {" "}
+          <DataTable<Waiter, any>
+            columns={columns}
+            data={waiters}
+            globalFilter={searchTerm}
+            onGlobalFilterChange={setSearchTerm}
+          />
         </CardContent>
       </Card>
     </div>

@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Settings } from "lucide-react";
+import { LogOut } from "lucide-react";
+import Image from "next/image";
 
 interface SidebarItem {
   id: string;
@@ -19,14 +20,21 @@ export default function AdminSidebar({
   activeSection,
   onSectionChange,
 }: AdminSidebarProps) {
-  return (
-    <Card
-      className="w-64 bg-white shadow-xl border-0 flex flex-col"
+  return (    <Card
+      className="w-80 bg-white shadow-xl border-0 flex flex-col"
       style={{ borderRadius: "30px" }}
     >
-      <div className="p-6">
-        <h2 className="text-xl font-bold text-gray-900">Arroz Paisa Admin</h2>
-        <p className="text-sm text-gray-600">Panel de Control</p>
+      <div className="p-6 flex items-center gap-2">
+        <Image 
+          src="/images/logo.webp" 
+          alt="Logo" 
+          width={120} 
+          height={120}
+          className="rounded-lg"
+        />
+        <div className="text-lg font-bold text-gray-900 whitespace-nowrap">
+          ¡Hola Jhon!
+        </div>
       </div>
 
       <nav className="flex-1 mt-2">
@@ -47,16 +55,14 @@ export default function AdminSidebar({
             </button>
           );
         })}
-      </nav>
-
-      <div className="p-6 pt-0">
+      </nav>      <div className="p-6 pt-0">
         <Button
           variant="outline"
           className="w-full"
           onClick={() => (window.location.href = "/")}
         >
-          <Settings className="h-4 w-4 mr-2" />
-          Configuración
+          <LogOut className="h-4 w-4 mr-2" />
+          Cerrar Sesión
         </Button>
       </div>
     </Card>

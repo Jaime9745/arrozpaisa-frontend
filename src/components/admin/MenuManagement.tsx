@@ -57,6 +57,78 @@ const menuItems: MenuItem[] = [
     price: "$21.000",
     category: "Platos Chinos",
   },
+  {
+    id: 13,
+    name: "Arepa de Huevo",
+    price: "$8.000",
+    category: "Entradas",
+  },
+  {
+    id: 14,
+    name: "Dim Sum Variado",
+    price: "$24.000",
+    category: "Platos Chinos",
+  },
+  {
+    id: 15,
+    name: "Cazuela de Mariscos",
+    price: "$32.000",
+    category: "Platos Principales",
+  },
+  {
+    id: 16,
+    name: "Dumplings de Cerdo",
+    price: "$16.500",
+    category: "Entradas",
+  },
+  {
+    id: 17,
+    name: "Mondongo",
+    price: "$19.500",
+    category: "Sopas",
+  },
+  {
+    id: 18,
+    name: "Pato Pekín",
+    price: "$36.000",
+    category: "Platos Chinos",
+  },
+  {
+    id: 19,
+    name: "Chuleta Valluna",
+    price: "$23.000",
+    category: "Platos Principales",
+  },
+  {
+    id: 20,
+    name: "Rollos de Primavera",
+    price: "$12.500",
+    category: "Entradas",
+  },
+  {
+    id: 21,
+    name: "Caldo de Costilla",
+    price: "$15.000",
+    category: "Sopas",
+  },
+  {
+    id: 22,
+    name: "Chop Suey",
+    price: "$20.000",
+    category: "Platos Chinos",
+  },
+  {
+    id: 23,
+    name: "Lechona Tolimense",
+    price: "$28.000",
+    category: "Platos Principales",
+  },
+  {
+    id: 24,
+    name: "Sushi Rolls",
+    price: "$26.000",
+    category: "Platos Chinos",
+  },
 ];
 
 export default function MenuManagement() {
@@ -102,17 +174,22 @@ export default function MenuManagement() {
             Lista de Platos
           </CardTitle>
           <CardDescription>Gestiona todos los platos del menú</CardDescription>
-        </CardHeader>
-
+        </CardHeader>{" "}
         {/* Scrollable Content Area */}
-        <CardContent className="px-0 pb-0 h-full overflow-y-auto">
+        <CardContent
+          className="px-0 pb-0 h-full overflow-y-auto custom-scrollbar"
+          style={{
+            scrollbarWidth: "thin",
+            scrollbarColor: "#C83636",
+          }}
+        >
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pr-2">
             {filteredMenuItems.length > 0 ? (
               filteredMenuItems.map((dish) => (
                 <Card
                   key={dish.id}
                   className="hover:shadow-lg transition-shadow duration-200"
-                  style={{ borderRadius: "30px" }}
+                  style={{ borderRadius: "30px", backgroundColor: "#F1EFEF" }}
                 >
                   <CardHeader>
                     <CardTitle>{dish.name}</CardTitle>
@@ -120,7 +197,11 @@ export default function MenuManagement() {
                   </CardHeader>
                   <CardContent>
                     <div className="flex justify-between items-center">
-                      <span className="text-2xl font-bold text-green-600">
+                      {" "}
+                      <span
+                        className="text-base font-normal"
+                        style={{ color: "#C83636" }}
+                      >
                         {dish.price}
                       </span>
                       <div className="space-x-2">

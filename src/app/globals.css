@@ -122,4 +122,18 @@
     background: linear-gradient(126.22deg, #f3ff18 4.79%, #dfaa30 54.4%);
     backdrop-filter: blur(4px);
   }
+
+  /* Custom scrollbar styling */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #c83636;
+    border-radius: 20px;
+  }
 }

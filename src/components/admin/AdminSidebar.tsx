@@ -51,11 +51,12 @@ export default function AdminSidebar({
                 e.preventDefault(); // Prevent default to use our custom navigation
                 onSectionChange(item.id);
               }}
-              className={`w-full flex items-center px-6 py-3 text-left hover:bg-gray-100 transition-colors duration-200 rounded-lg mx-3 my-1 ${
+              className={`w-full flex items-center px-4 py-3 text-left hover:bg-gray-100 transition-colors duration-200 mx-4 my-1 ${
                 activeSection === item.id
-                  ? "bg-yellow-100 text-yellow-800 font-medium shadow-sm"
+                  ? "bg-gray-200 text-gray-800 font-medium shadow-sm"
                   : "text-gray-700"
               }`}
+              style={{ borderRadius: "30px" }}
             >
               <IconComponent className="h-5 w-5 mr-3" />
               {item.label}

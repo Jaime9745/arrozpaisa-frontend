@@ -7,23 +7,24 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
+import Image from "next/image";
 
 // Define the tableData array that will be used by both TableStatus and DashboardHome
 export const tableData = [
-  { number: 1, status: "Ocupada" },
-  { number: 2, status: "Servida" },
-  { number: 3, status: "Libre" },
-  { number: 4, status: "Ocupada" },
-  { number: 5, status: "Libre" },
-  { number: 6, status: "Servida" },
-  { number: 7, status: "Ocupada" },
-  { number: 8, status: "Ocupada" },
-  { number: 9, status: "Libre" },
-  { number: 10, status: "Servida" },
-  { number: 11, status: "Libre" },
-  { number: 12, status: "Libre" },
+  { number: 14, status: "Ocupada" },
   { number: 13, status: "Servida" },
-  { number: 14, status: "Libre" },
+  { number: 12, status: "Libre" },
+  { number: 11, status: "Ocupada" },
+  { number: 10, status: "Servida" },
+  { number: 9, status: "Libre" },
+  { number: 8, status: "Ocupada" },
+  { number: 7, status: "Servida" },
+  { number: 6, status: "Libre" },
+  { number: 5, status: "Ocupada" },
+  { number: 4, status: "Servida" },
+  { number: 3, status: "Libre" },
+  { number: 2, status: "Ocupada" },
+  { number: 1, status: "Servida" },
 ];
 
 export default function TableStatus() {
@@ -45,57 +46,152 @@ export default function TableStatus() {
           <Plus className="h-5 w-5" />
           Agregar Mesa
         </Button>
-      </div>
-
+      </div>{" "}
       {/* Big General Card Container */}
       <Card
         className="p-6 border-0"
-        style={{ borderRadius: "30px", height: "calc(100vh - 200px)" }}
+        style={{ borderRadius: "30px", height: "calc(100vh - 135px)" }}
       >
-        <CardHeader className="px-0 pt-0">
-          <CardTitle className="text-xl text-gray-800">
-            Lista de Mesas
-          </CardTitle>
-          <CardDescription>
-            Gestiona el estado de todas las mesas del restaurante
-          </CardDescription>
-        </CardHeader>
-
+        {" "}
         {/* Scrollable Content Area */}
         <CardContent className="px-0 pb-0 h-full overflow-y-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 pr-2">
-            {tableData.map((table) => (
-              <Card
-                key={table.number}
-                className="hover:shadow-lg transition-shadow duration-200"
-                style={{ borderRadius: "30px" }}
-              >
-                {" "}
-                <CardHeader>
-                  <CardTitle className="text-center">
-                    Mesa {table.number}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="text-center">
+          <div className="flex justify-between w-full px-6">
+            {" "}
+            {/* First Column - 4 tables */}
+            <div className="flex flex-col gap-4 flex-1 items-center">
+              {tableData.slice(0, 4).map((table, index) => {
+                const getImageSrc = () => {
+                  // No small versions for first column
+                  switch (table.status) {
+                    case "Libre":
+                      return "/images/tables/tableFree.webp";
+                    case "Ocupada":
+                      return "/images/tables/tableOccupied.webp";
+                    case "Servida":
+                      return "/images/tables/tableServed.webp";
+                    default:
+                      return "/images/tables/tableFree.webp";
+                  }
+                };
+                return (
                   <div
-                    className={`inline-block px-4 py-2 rounded-full text-sm font-medium mb-4 ${
-                      table.status === "Libre"
-                        ? "bg-gray-100 text-gray-800"
-                        : table.status === "Ocupada"
-                        ? "bg-red-100 text-red-800"
-                        : "bg-green-100 text-green-800" // For "Servida"
-                    }`}
+                    key={table.number}
+                    className="relative cursor-pointer group"
+                    style={{ width: "170px", height: "170px" }}
                   >
-                    {table.status}
+                    <Image
+                      src={getImageSrc()}
+                      alt={`Mesa ${table.number} - ${table.status}`}
+                      width={170}
+                      height={170}
+                      className="hover:scale-105 transition-transform duration-200 object-contain w-full h-full"
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-sm font-bold text-gray-800">
+                        {table.number}
+                      </span>
+                    </div>
                   </div>
-                  <div className="mt-4 space-x-2">
-                    <Button variant="outline" size="sm">
-                      Cambiar Estado
-                    </Button>
+                );
+              })}
+            </div>{" "}
+            {/* Second Column - 6 tables */}
+            <div className="flex flex-col gap-1 flex-1 items-center">
+              {tableData.slice(4, 10).map((table, index) => {
+                const getImageSrc = () => {
+                  // Use small version for the first, fifth, and sixth tables (index 0, 4, and 5)
+                  const useSmall = index === 0 || index === 4 || index === 5;
+                  switch (table.status) {
+                    case "Libre":
+                      return useSmall
+                        ? "/images/tables/tableFreeSmall.webp"
+                        : "/images/tables/tableFree.webp";
+                    case "Ocupada":
+                      return useSmall
+                        ? "/images/tables/tableOccupiedSmall.webp"
+                        : "/images/tables/tableOccupied.webp";
+                    case "Servida":
+                      return useSmall
+                        ? "/images/tables/tableServedSmall.webp"
+                        : "/images/tables/tableServed.webp";
+                    default:
+                      return useSmall
+                        ? "/images/tables/tableFreeSmall.webp"
+                        : "/images/tables/tableFree.webp";
+                  }
+                };
+                return (
+                  <div
+                    key={table.number}
+                    className="relative cursor-pointer group"
+                    style={{
+                      width:
+                        index === 0 || index === 4 || index === 5
+                          ? "100px"
+                          : "170px",
+                      height:
+                        index === 0 || index === 4 || index === 5
+                          ? "100px"
+                          : "170px",
+                    }}
+                  >
+                    <Image
+                      src={getImageSrc()}
+                      alt={`Mesa ${table.number} - ${table.status}`}
+                      width={
+                        index === 0 || index === 4 || index === 5 ? 100 : 170
+                      }
+                      height={
+                        index === 0 || index === 4 || index === 5 ? 100 : 170
+                      }
+                      className="hover:scale-105 transition-transform duration-200 object-contain w-full h-full"
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-sm font-bold text-gray-800">
+                        {table.number}
+                      </span>
+                    </div>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
+                );
+              })}
+            </div>{" "}
+            {/* Third Column - 4 tables */}
+            <div className="flex flex-col gap-4 flex-1 items-center">
+              {tableData.slice(10, 14).map((table) => {
+                const getImageSrc = () => {
+                  switch (table.status) {
+                    case "Libre":
+                      return "/images/tables/tableFree.webp";
+                    case "Ocupada":
+                      return "/images/tables/tableOccupied.webp";
+                    case "Servida":
+                      return "/images/tables/tableServed.webp";
+                    default:
+                      return "/images/tables/tableFree.webp";
+                  }
+                };
+                return (
+                  <div
+                    key={table.number}
+                    className="relative cursor-pointer group"
+                    style={{ width: "170px", height: "170px" }}
+                  >
+                    <Image
+                      src={getImageSrc()}
+                      alt={`Mesa ${table.number} - ${table.status}`}
+                      width={170}
+                      height={170}
+                      className="hover:scale-105 transition-transform duration-200 object-contain w-full h-full"
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-sm font-bold text-gray-800">
+                        {table.number}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </CardContent>
       </Card>

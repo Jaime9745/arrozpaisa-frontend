@@ -49,7 +49,7 @@ export default function TableStatus() {
 
       {/* Big General Card Container */}
       <Card
-        className="p-6 shadow-xl border-0"
+        className="p-6 border-0"
         style={{ borderRadius: "30px", height: "calc(100vh - 200px)" }}
       >
         <CardHeader className="px-0 pt-0">

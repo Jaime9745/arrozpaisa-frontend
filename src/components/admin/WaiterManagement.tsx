@@ -141,7 +141,7 @@ export default function WaiterManagement() {
       </div>
 
       {/* Data Table Card Container */}
-      <Card className="shadow-xl border-0" style={{ borderRadius: "30px" }}>
+      <Card className="border-0" style={{ borderRadius: "30px" }}>
         <CardHeader>
           <CardTitle className="text-xl text-gray-800">
             Lista de Meseros

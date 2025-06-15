@@ -170,11 +170,10 @@ export default function MenuManagement() {
           Agregar Plato
         </Button>
       </div>
-
-      {/* Big General Card Container */}
+      {/* Big General Card Container */}{" "}
       <Card
-        className="p-6 shadow-xl border-0"
-        style={{ borderRadius: "30px", height: "calc(100vh - 200px)" }}
+        className="p-6 border-0"
+        style={{ borderRadius: "30px", height: "calc(100vh - 110px)" }}
       >
         {/* Scrollable Content Area */}{" "}
         <CardContent
@@ -189,7 +188,7 @@ export default function MenuManagement() {
               filteredMenuItems.map((dish) => (
                 <Card
                   key={dish.id}
-                  className="hover:shadow-lg transition-shadow duration-200"
+                  className="transition-colors duration-200"
                   style={{ borderRadius: "30px", backgroundColor: "#F1EFEF" }}
                 >
                   <CardHeader>

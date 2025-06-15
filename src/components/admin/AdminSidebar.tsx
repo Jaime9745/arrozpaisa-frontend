@@ -24,7 +24,7 @@ export default function AdminSidebar({
 }: AdminSidebarProps) {
   return (
     <Card
-      className="w-80 bg-white shadow-xl border-0 flex flex-col"
+      className="w-80 bg-white border-0 flex flex-col"
       style={{ borderRadius: "30px" }}
     >
       <div className="p-6 flex items-center gap-2">

@@ -57,16 +57,15 @@ export function DataTable<TData, TValue>({
       globalFilter,
     },
   });
-
   const getSortIcon = (column: any) => {
     const sortDirection = column.getIsSorted();
     if (sortDirection === "asc") {
-      return <ChevronUp className="ml-2 h-4 w-4" />;
+      return <ChevronUp className="ml-2 h-6 w-6" />;
     }
     if (sortDirection === "desc") {
-      return <ChevronDown className="ml-2 h-4 w-4" />;
+      return <ChevronDown className="ml-2 h-6 w-6" />;
     }
-    return <ChevronsUpDown className="ml-2 h-4 w-4 text-gray-400" />;
+    return <ChevronsUpDown className="ml-2 h-6 w-6 text-gray-400" />;
   };
   return (
     <div className="space-y-4">
@@ -89,7 +88,13 @@ export function DataTable<TData, TValue>({
                     onClick={header.column.getToggleSortingHandler()}
                   >
                     {" "}
-                    <span style={{ color: "#030229", fontWeight: 400, opacity: 0.7 }}>
+                    <span
+                      style={{
+                        color: "#030229",
+                        fontWeight: 400,
+                        opacity: 0.7,
+                      }}
+                    >
                       {flexRender(
                         header.column.columnDef.header,
                         header.getContext()

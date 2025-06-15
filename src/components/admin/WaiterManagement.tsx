@@ -110,8 +110,8 @@ const columns: ColumnDef<Waiter>[] = [
               <Image
                 src="/images/dropMenuBtn.svg"
                 alt="Menu"
-                width={36}
-                height={36}
+                width={48}
+                height={48}
               />
             </Button>
           </DropdownMenuTrigger>

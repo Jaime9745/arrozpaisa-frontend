@@ -7,24 +7,7 @@ import {
 } from "@/components/ui/card";
 import { Clock, DollarSign, Table, Users } from "lucide-react";
 import StatsCard from "./StatsCard";
-
-// Import the same table data that's used in TableStatus component
-const tableData = [
-  { number: 1, capacity: 4, status: "Ocupada", waiter: "María", time: 25 },
-  { number: 2, capacity: 2, status: "Servida", waiter: "Carlos", time: 45 },
-  { number: 3, capacity: 6, status: "Libre", waiter: null, time: null },
-  { number: 4, capacity: 4, status: "Ocupada", waiter: "Ana", time: 30 },
-  { number: 5, capacity: 2, status: "Libre", waiter: null, time: null },
-  { number: 6, capacity: 4, status: "Servida", waiter: "Pedro", time: 15 },
-  { number: 7, capacity: 2, status: "Ocupada", waiter: "María", time: 40 },
-  { number: 8, capacity: 6, status: "Ocupada", waiter: "Carlos", time: 20 },
-  { number: 9, capacity: 4, status: "Libre", waiter: null, time: null },
-  { number: 10, capacity: 2, status: "Servida", waiter: "Ana", time: 35 },
-  { number: 11, capacity: 4, status: "Libre", waiter: null, time: null },
-  { number: 12, capacity: 2, status: "Libre", waiter: null, time: null },
-  { number: 13, capacity: 6, status: "Servida", waiter: "Pedro", time: 50 },
-  { number: 14, capacity: 4, status: "Libre", waiter: null, time: null },
-];
+import { tableData } from "./TableStatus"; // Import tableData from TableStatus component
 
 export default function DashboardHome() {
   const dashboardStats = [
@@ -62,26 +45,17 @@ export default function DashboardHome() {
       icon: Users,
       trend: "neutral" as const,
     },
-  ];
-  // Static mock data for recent orders based on tables with "Servida" or "Ocupada" status
-  const recentOrders = [
-    {
-      id: 1,
-      table: 1,
-      orderNum: 1001,
-      price: "34.50",
-      status: "En preparación",
-    },
-    { id: 2, table: 2, orderNum: 1002, price: "42.20", status: "Entregado" },
-    {
-      id: 3,
-      table: 4,
-      orderNum: 1003,
-      price: "28.90",
-      status: "En preparación",
-    },
-    { id: 4, table: 6, orderNum: 1004, price: "56.75", status: "Entregado" },
-  ];
+  ]; // Static mock data for recent orders based on tables with "Servida" or "Ocupada" status
+  const recentOrders = tableData
+    .filter((table) => table.status === "Servida" || table.status === "Ocupada")
+    .slice(0, 4)
+    .map((table, index) => ({
+      id: index + 1,
+      table: table.number,
+      orderNum: 1001 + index,
+      price: (Math.random() * 50 + 20).toFixed(2),
+      status: table.status === "Servida" ? "Entregado" : "En preparación",
+    }));
 
   return (
     <div className="space-y-6">

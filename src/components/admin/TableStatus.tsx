@@ -8,24 +8,26 @@ import {
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 
+// Define the tableData array that will be used by both TableStatus and DashboardHome
+export const tableData = [
+  { number: 1, status: "Ocupada" },
+  { number: 2, status: "Servida" },
+  { number: 3, status: "Libre" },
+  { number: 4, status: "Ocupada" },
+  { number: 5, status: "Libre" },
+  { number: 6, status: "Servida" },
+  { number: 7, status: "Ocupada" },
+  { number: 8, status: "Ocupada" },
+  { number: 9, status: "Libre" },
+  { number: 10, status: "Servida" },
+  { number: 11, status: "Libre" },
+  { number: 12, status: "Libre" },
+  { number: 13, status: "Servida" },
+  { number: 14, status: "Libre" },
+];
+
 export default function TableStatus() {
   // Static mock data with only 14 tables and 3 statuses: Libre (Free/Gray), Ocupada (Occupied/Red), Servida (Served/Green)
-  const tableData = [
-    { number: 1, capacity: 4, status: "Ocupada", waiter: "María", time: 25 },
-    { number: 2, capacity: 2, status: "Servida", waiter: "Carlos", time: 45 },
-    { number: 3, capacity: 6, status: "Libre", waiter: null, time: null },
-    { number: 4, capacity: 4, status: "Ocupada", waiter: "Ana", time: 30 },
-    { number: 5, capacity: 2, status: "Libre", waiter: null, time: null },
-    { number: 6, capacity: 4, status: "Servida", waiter: "Pedro", time: 15 },
-    { number: 7, capacity: 2, status: "Ocupada", waiter: "María", time: 40 },
-    { number: 8, capacity: 6, status: "Ocupada", waiter: "Carlos", time: 20 },
-    { number: 9, capacity: 4, status: "Libre", waiter: null, time: null },
-    { number: 10, capacity: 2, status: "Servida", waiter: "Ana", time: 35 },
-    { number: 11, capacity: 4, status: "Libre", waiter: null, time: null },
-    { number: 12, capacity: 2, status: "Libre", waiter: null, time: null },
-    { number: 13, capacity: 6, status: "Servida", waiter: "Pedro", time: 50 },
-    { number: 14, capacity: 4, status: "Libre", waiter: null, time: null },
-  ];
 
   return (
     <div className="space-y-6">
@@ -68,16 +70,13 @@ export default function TableStatus() {
                 className="hover:shadow-lg transition-shadow duration-200"
                 style={{ borderRadius: "30px" }}
               >
+                {" "}
                 <CardHeader>
                   <CardTitle className="text-center">
                     Mesa {table.number}
                   </CardTitle>
-                  <CardDescription className="text-center">
-                    Capacidad: {table.capacity} personas
-                  </CardDescription>
                 </CardHeader>
                 <CardContent className="text-center">
-                  {" "}
                   <div
                     className={`inline-block px-4 py-2 rounded-full text-sm font-medium mb-4 ${
                       table.status === "Libre"
@@ -89,14 +88,6 @@ export default function TableStatus() {
                   >
                     {table.status}
                   </div>
-                  {(table.status === "Ocupada" || table.status === "Servida") &&
-                    table.waiter &&
-                    table.time && (
-                      <div className="space-y-2 text-sm text-gray-600">
-                        <p>Mesero: {table.waiter}</p>
-                        <p>Tiempo: {table.time} min</p>
-                      </div>
-                    )}
                   <div className="mt-4 space-x-2">
                     <Button variant="outline" size="sm">
                       Cambiar Estado

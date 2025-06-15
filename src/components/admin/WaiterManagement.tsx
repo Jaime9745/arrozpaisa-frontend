@@ -100,8 +100,12 @@ const columns: ColumnDef<Waiter>[] = [
         <Button variant="outline" size="sm">
           Editar
         </Button>
-        <Button variant="outline" size="sm">
-          Ver Detalles
+        <Button
+          variant="outline"
+          size="sm"
+          className="text-red-600 border-red-200 hover:bg-red-50"
+        >
+          Eliminar
         </Button>
       </div>
     ),

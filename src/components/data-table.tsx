@@ -27,6 +27,7 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
   globalFilter: string;
   onGlobalFilterChange: (value: string) => void;
+  useCardStyle?: boolean;
 }
 
 export function DataTable<TData, TValue>({
@@ -34,6 +35,7 @@ export function DataTable<TData, TValue>({
   data,
   globalFilter,
   onGlobalFilterChange,
+  useCardStyle = false,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -68,69 +70,143 @@ export function DataTable<TData, TValue>({
   };
   return (
     <div className="space-y-4">
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
+      {useCardStyle ? (
+        <div className="space-y-4">
+          {/* Header row for sorting */}
+          <div className="hidden sm:flex px-6 py-3 border-b">
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder ? null : (
-                        <div
-                          className={`flex items-center space-x-2 ${
-                            header.column.getCanSort()
-                              ? "cursor-pointer select-none hover:text-gray-900"
-                              : ""
-                          }`}
-                          onClick={header.column.getToggleSortingHandler()}
-                        >
-                          <span>
-                            {flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
-                          </span>
-                          {header.column.getCanSort() &&
-                            getSortIcon(header.column)}
-                        </div>
+              <div key={headerGroup.id} className="flex w-full">
+                {headerGroup.headers.map((header) => (
+                  <div
+                    key={header.id}
+                    className={`flex items-center ${
+                      header.id === "actions" ? "w-20 justify-center" : "flex-1"
+                    } ${
+                      header.column.getCanSort()
+                        ? "cursor-pointer select-none hover:text-gray-900"
+                        : ""
+                    }`}
+                    onClick={header.column.getToggleSortingHandler()}
+                  >
+                    {" "}
+                    <span style={{ color: "#030229", fontWeight: 400, opacity: 0.7 }}>
+                      {flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
                       )}
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
+                    </span>
+                    {header.column.getCanSort() && getSortIcon(header.column)}
+                  </div>
+                ))}
+              </div>
             ))}
-          </TableHeader>
-          <TableBody>
+          </div>
+
+          {/* Card rows */}
+          <div className="space-y-4">
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow
+                <div
                   key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
+                  className="rounded-xl shadow-sm p-6 flex items-center"
+                  style={{ backgroundColor: "#ffffff" }}
                 >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
+                  {row.getVisibleCells().map((cell) => {
+                    // Special styling for the actions column
+                    if (cell.column.id === "actions") {
+                      return (
+                        <div key={cell.id} className="w-20 flex justify-center">
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </div>
+                      );
+                    }
+                    // Regular columns
+                    return (
+                      <div key={cell.id} className="flex-1">
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               ))
             ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No hay resultados.
-                </TableCell>
-              </TableRow>
+              <div className="text-center py-10">No hay resultados.</div>
             )}
-          </TableBody>
-        </Table>
-      </div>
+          </div>
+        </div>
+      ) : (
+        // Original table view
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => {
+                    return (
+                      <TableHead key={header.id}>
+                        {header.isPlaceholder ? null : (
+                          <div
+                            className={`flex items-center space-x-2 ${
+                              header.column.getCanSort()
+                                ? "cursor-pointer select-none hover:text-gray-900"
+                                : ""
+                            }`}
+                            onClick={header.column.getToggleSortingHandler()}
+                          >
+                            <span>
+                              {flexRender(
+                                header.column.columnDef.header,
+                                header.getContext()
+                              )}
+                            </span>
+                            {header.column.getCanSort() &&
+                              getSortIcon(header.column)}
+                          </div>
+                        )}
+                      </TableHead>
+                    );
+                  })}
+                </TableRow>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && "selected"}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={columns.length}
+                    className="h-24 text-center"
+                  >
+                    No hay resultados.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      )}
+
       <div className="flex items-center justify-end space-x-2 py-4">
         <Button
           variant="outline"

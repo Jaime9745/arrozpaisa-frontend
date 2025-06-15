@@ -164,13 +164,18 @@ export default function WaiterManagement() {
       </div>
 
       {/* Data Table Card Container */}
-      <Card className="border-0" style={{ borderRadius: "30px" }}>
+      <Card
+        className="border-0"
+        style={{ borderRadius: "30px", backgroundColor: "#fcfeff" }}
+      >
         <CardContent>
+          {" "}
           <DataTable<Waiter, any>
             columns={columns}
             data={waiters}
             globalFilter={searchTerm}
             onGlobalFilterChange={setSearchTerm}
+            useCardStyle={true}
           />
         </CardContent>
       </Card>

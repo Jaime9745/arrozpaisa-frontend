@@ -46,9 +46,8 @@ export default function AdminSidebar({
           return (
             <Link
               key={item.id}
-              href={item.path}
-              onClick={(e) => {
-                e.preventDefault();
+              href={item.path}              onClick={(e) => {
+                e.preventDefault(); // Prevent default to use our custom navigation
                 onSectionChange(item.id);
               }}
               className={`w-full flex items-center px-6 py-3 text-left hover:bg-gray-100 transition-colors duration-200 rounded-lg mx-3 my-1 ${
@@ -62,16 +61,16 @@ export default function AdminSidebar({
             </Link>
           );
         })}
-      </nav>{" "}
-      <div className="p-6 pt-0">
-        <Button
-          variant="outline"
-          className="w-full"
-          onClick={() => (window.location.href = "/")}
-        >
-          <LogOut className="h-4 w-4 mr-2" />
-          Cerrar Sesión
-        </Button>
+      </nav>{" "}      <div className="p-6 pt-0">
+        <Link href="/">
+          <Button
+            variant="outline"
+            className="w-full"
+          >
+            <LogOut className="h-4 w-4 mr-2" />
+            Cerrar Sesión
+          </Button>
+        </Link>
       </div>
     </Card>
   );

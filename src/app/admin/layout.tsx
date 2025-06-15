@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Home, ChefHat, Users, Table } from "lucide-react";
 import AdminSidebar from "@/components/admin/AdminSidebar";
 
@@ -18,6 +18,7 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
 
   // Define sidebar items with paths
   const sidebarItems: SidebarItem[] = [
@@ -49,11 +50,12 @@ export default function AdminLayout({
   useEffect(() => {
     setActiveSection(getActiveSectionFromPath(pathname));
   }, [pathname]);
-  // Handle section change by navigating
+  
+  // Handle section change by navigating using router.push for client-side navigation
   const handleSectionChange = (section: string) => {
     const item = sidebarItems.find((item) => item.id === section);
     if (item) {
-      window.location.href = item.path;
+      router.push(item.path);
     }
   };
 

@@ -46,6 +46,7 @@ export default function DashboardHome() {
       trend: "neutral" as const,
     },
   ]; // Static mock data for recent orders based on tables with "Servida" or "Ocupada" status
+  const staticPrices = ["34.50", "42.20", "28.90", "56.75"]; // Static prices to avoid hydration issues
   const recentOrders = tableData
     .filter((table) => table.status === "Servida" || table.status === "Ocupada")
     .slice(0, 4)
@@ -53,7 +54,7 @@ export default function DashboardHome() {
       id: index + 1,
       table: table.number,
       orderNum: 1001 + index,
-      price: (Math.random() * 50 + 20).toFixed(2),
+      price: staticPrices[index] || "35.00",
       status: table.status === "Servida" ? "Entregado" : "En preparación",
     }));
 

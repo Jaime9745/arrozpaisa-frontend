@@ -9,28 +9,22 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 
 export default function TableStatus() {
-  // Static mock data to avoid hydration issues
+  // Static mock data with only 14 tables and 3 statuses: Libre (Free/Gray), Ocupada (Occupied/Red), Servida (Served/Green)
   const tableData = [
     { number: 1, capacity: 4, status: "Ocupada", waiter: "María", time: 25 },
-    { number: 2, capacity: 2, status: "Ocupada", waiter: "Carlos", time: 45 },
-    { number: 3, capacity: 6, status: "Reservada", waiter: null, time: null },
+    { number: 2, capacity: 2, status: "Servida", waiter: "Carlos", time: 45 },
+    { number: 3, capacity: 6, status: "Libre", waiter: null, time: null },
     { number: 4, capacity: 4, status: "Ocupada", waiter: "Ana", time: 30 },
-    { number: 5, capacity: 2, status: "Limpieza", waiter: null, time: null },
-    { number: 6, capacity: 4, status: "Ocupada", waiter: "Pedro", time: 15 },
+    { number: 5, capacity: 2, status: "Libre", waiter: null, time: null },
+    { number: 6, capacity: 4, status: "Servida", waiter: "Pedro", time: 15 },
     { number: 7, capacity: 2, status: "Ocupada", waiter: "María", time: 40 },
     { number: 8, capacity: 6, status: "Ocupada", waiter: "Carlos", time: 20 },
-    { number: 9, capacity: 4, status: "Reservada", waiter: null, time: null },
-    { number: 10, capacity: 2, status: "Ocupada", waiter: "Ana", time: 35 },
-    { number: 11, capacity: 4, status: "Ocupada", waiter: "Pedro", time: 50 },
-    { number: 12, capacity: 2, status: "Ocupada", waiter: "María", time: 25 },
-    { number: 13, capacity: 6, status: "Limpieza", waiter: null, time: null },
-    { number: 14, capacity: 4, status: "Ocupada", waiter: "Carlos", time: 60 },
-    { number: 15, capacity: 2, status: "Ocupada", waiter: "Ana", time: 18 },
-    { number: 16, capacity: 4, status: "Disponible", waiter: null, time: null },
-    { number: 17, capacity: 2, status: "Disponible", waiter: null, time: null },
-    { number: 18, capacity: 6, status: "Disponible", waiter: null, time: null },
-    { number: 19, capacity: 4, status: "Disponible", waiter: null, time: null },
-    { number: 20, capacity: 2, status: "Disponible", waiter: null, time: null },
+    { number: 9, capacity: 4, status: "Libre", waiter: null, time: null },
+    { number: 10, capacity: 2, status: "Servida", waiter: "Ana", time: 35 },
+    { number: 11, capacity: 4, status: "Libre", waiter: null, time: null },
+    { number: 12, capacity: 2, status: "Libre", waiter: null, time: null },
+    { number: 13, capacity: 6, status: "Servida", waiter: "Pedro", time: 50 },
+    { number: 14, capacity: 4, status: "Libre", waiter: null, time: null },
   ];
 
   return (
@@ -83,25 +77,26 @@ export default function TableStatus() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="text-center">
+                  {" "}
                   <div
                     className={`inline-block px-4 py-2 rounded-full text-sm font-medium mb-4 ${
-                      table.status === "Disponible"
-                        ? "bg-green-100 text-green-800"
+                      table.status === "Libre"
+                        ? "bg-gray-100 text-gray-800"
                         : table.status === "Ocupada"
                         ? "bg-red-100 text-red-800"
-                        : table.status === "Reservada"
-                        ? "bg-blue-100 text-blue-800"
-                        : "bg-yellow-100 text-yellow-800"
+                        : "bg-green-100 text-green-800" // For "Servida"
                     }`}
                   >
                     {table.status}
                   </div>
-                  {table.status === "Ocupada" && table.waiter && table.time && (
-                    <div className="space-y-2 text-sm text-gray-600">
-                      <p>Mesero: {table.waiter}</p>
-                      <p>Tiempo: {table.time} min</p>
-                    </div>
-                  )}
+                  {(table.status === "Ocupada" || table.status === "Servida") &&
+                    table.waiter &&
+                    table.time && (
+                      <div className="space-y-2 text-sm text-gray-600">
+                        <p>Mesero: {table.waiter}</p>
+                        <p>Tiempo: {table.time} min</p>
+                      </div>
+                    )}
                   <div className="mt-4 space-x-2">
                     <Button variant="outline" size="sm">
                       Cambiar Estado

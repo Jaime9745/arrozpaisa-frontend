@@ -50,7 +50,7 @@ export default function AdminLayout({
   useEffect(() => {
     setActiveSection(getActiveSectionFromPath(pathname));
   }, [pathname]);
-  
+
   // Handle section change by navigating using router.push for client-side navigation
   const handleSectionChange = (section: string) => {
     const item = sidebarItems.find((item) => item.id === section);

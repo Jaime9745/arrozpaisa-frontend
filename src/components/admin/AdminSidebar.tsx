@@ -46,7 +46,8 @@ export default function AdminSidebar({
           return (
             <Link
               key={item.id}
-              href={item.path}              onClick={(e) => {
+              href={item.path}
+              onClick={(e) => {
                 e.preventDefault(); // Prevent default to use our custom navigation
                 onSectionChange(item.id);
               }}
@@ -61,12 +62,10 @@ export default function AdminSidebar({
             </Link>
           );
         })}
-      </nav>{" "}      <div className="p-6 pt-0">
+      </nav>{" "}
+      <div className="p-6 pt-0">
         <Link href="/">
-          <Button
-            variant="outline"
-            className="w-full"
-          >
+          <Button variant="outline" className="w-full">
             <LogOut className="h-4 w-4 mr-2" />
             Cerrar Sesión
           </Button>

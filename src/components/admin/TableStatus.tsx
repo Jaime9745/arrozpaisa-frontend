@@ -28,29 +28,48 @@ export const tableData = [
 ];
 
 export default function TableStatus() {
-  // Static mock data with only 14 tables and 3 statuses: Libre (Free/Gray), Ocupada (Occupied/Red), Servida (Served/Green)
-
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4 sm:gap-2">
-        <div className="flex-1">
-          <h2 className="text-2xl font-bold text-gray-900">Estados de Mesa</h2>
-          <p className="text-gray-600 mt-1">
-            Gestiona el estado de todas las mesas del restaurante
-          </p>
-        </div>
-        <Button
-          className="px-8 py-3 w-full sm:min-w-[180px] sm:w-auto text-white font-semibold flex items-center gap-2 justify-center"
-          style={{ background: "#EB3123" }}
-        >
-          <Plus className="h-5 w-5" />
-          Agregar Mesa
-        </Button>
-      </div>{" "}
+      {" "}
+      {/* Header Card */}
+      <Card className="py-2 px-6 border-0">
+        {" "}
+        <CardContent className="p-0">
+          <div className="flex gap-75 items-center justify-center">
+            <div className="flex items-center gap-2">
+              <div
+                className="w-8 h-8 rounded"
+                style={{ backgroundColor: "#d9d9d9" }}
+              ></div>
+              <span className="text-sm font-medium text-gray-700">
+                Mesas Libres
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div
+                className="w-8 h-8 rounded"
+                style={{ backgroundColor: "#ec3224" }}
+              ></div>
+              <span className="text-sm font-medium text-gray-700">
+                Mesas Ocupadas
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div
+                className="w-8 h-8 rounded"
+                style={{ backgroundColor: "#24ec24" }}
+              ></div>
+              <span className="text-sm font-medium text-gray-700">
+                Mesas Atendidas
+              </span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>{" "}
       {/* Big General Card Container */}
       <Card
         className="p-6 border-0"
-        style={{ borderRadius: "30px", height: "calc(100vh - 135px)" }}
+        style={{ borderRadius: "30px", height: "calc(100vh - 120px)" }}
       >
         {" "}
         {/* Scrollable Content Area */}

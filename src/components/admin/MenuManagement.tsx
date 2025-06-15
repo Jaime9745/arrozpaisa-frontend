@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Plus } from "lucide-react";
+import { Search, Plus, Edit, Trash2 } from "lucide-react";
 import { useState } from "react";
 import Image from "next/image";
 import {
@@ -151,8 +151,8 @@ export default function MenuManagement() {
   return (
     <div className="space-y-6">
       {/* Search Input Where Title Was */}
-      <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4 sm:gap-2">
-        <div className="flex-1 w-full sm:max-w-2xl relative">
+      <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4 sm:gap-4">
+        <div className="flex-1 w-full sm:auto relative">
           <Input
             type="text"
             placeholder="Buscar platos o categorías..."
@@ -188,51 +188,57 @@ export default function MenuManagement() {
               filteredMenuItems.map((dish) => (
                 <Card
                   key={dish.id}
-                  className="transition-colors duration-200"
+                  className="transition-colors duration-200 relative"
                   style={{ borderRadius: "30px", backgroundColor: "#F1EFEF" }}
                 >
-                  <CardHeader>
+                  <CardHeader className="pb-2">
                     <CardTitle>{dish.name}</CardTitle>
                     <CardDescription>{dish.category}</CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    {" "}
-                    <div className="flex justify-between items-center">
-                      {" "}
-                      <span
-                        className="text-base font-normal"
-                        style={{ color: "#C83636" }}
-                      >
-                        {dish.price}
-                      </span>{" "}
-                      <div>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 p-0"
-                            >
-                              <Image
-                                src="/images/dropMenuBtn.svg"
-                                alt="Menu"
-                                width={24}
-                                height={24}
-                              />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-36">
-                            <DropdownMenuItem className="cursor-pointer">
-                              Editar
-                            </DropdownMenuItem>
-                            <DropdownMenuItem className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50">
-                              Eliminar
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                    </div>
+                  <CardContent className="pt-0">
+                    <span
+                      className="text-base font-normal"
+                      style={{ color: "#C83636" }}
+                    >
+                      {dish.price}
+                    </span>{" "}
                   </CardContent>
+
+                  {/* Dropdown button positioned absolutely in the middle right */}
+                  <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-16 w-16 p-0"
+                        >
+                          <Image
+                            src="/images/dropMenuBtn.svg"
+                            alt="Menu"
+                            width={48}
+                            height={48}
+                          />
+                        </Button>
+                      </DropdownMenuTrigger>{" "}
+                      <DropdownMenuContent align="end" className="w-36 p-2">
+                        <DropdownMenuItem className="cursor-pointer p-3">
+                          <Edit
+                            className="h-5 w-5 mr-3"
+                            style={{ color: "#DFAA30" }}
+                          />
+                          <span style={{ color: "#DFAA30" }}>Editar</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="cursor-pointer focus:bg-red-50 p-3">
+                          <Trash2
+                            className="h-5 w-5 mr-3"
+                            style={{ color: "#E71D36" }}
+                          />
+                          <span style={{ color: "#E71D36" }}>Eliminar</span>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
                 </Card>
               ))
             ) : (

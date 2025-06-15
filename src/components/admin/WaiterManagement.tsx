@@ -118,8 +118,8 @@ export default function WaiterManagement() {
   return (
     <div className="space-y-6">
       {/* Search Input Where Title Was */}
-      <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4 sm:gap-2">
-        <div className="flex-1 w-full sm:max-w-2xl relative">
+      <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4 sm:gap-4">
+        <div className="flex-1 w-full sm:auto relative">
           <Input
             type="text"
             placeholder="Buscar meseros por nombre, identificación, celular o usuario..."
@@ -142,14 +142,6 @@ export default function WaiterManagement() {
 
       {/* Data Table Card Container */}
       <Card className="border-0" style={{ borderRadius: "30px" }}>
-        <CardHeader>
-          <CardTitle className="text-xl text-gray-800">
-            Lista de Meseros
-          </CardTitle>
-          <CardDescription>
-            Gestiona todos los meseros del restaurante
-          </CardDescription>
-        </CardHeader>{" "}
         <CardContent>
           {" "}
           <DataTable<Waiter, any>

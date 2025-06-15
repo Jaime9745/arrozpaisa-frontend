@@ -11,8 +11,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DataTable } from "@/components/data-table";
 import { ColumnDef } from "@tanstack/react-table";
-import { Plus, Search } from "lucide-react";
+import { Plus, Search, Edit, Trash2 } from "lucide-react";
 import { useState } from "react";
+import Image from "next/image";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface Waiter {
   id: number;
@@ -94,19 +101,35 @@ const columns: ColumnDef<Waiter>[] = [
   },
   {
     id: "actions",
-    header: "Acciones",
+    header: "",
     cell: () => (
-      <div className="flex justify-end space-x-2">
-        <Button variant="outline" size="sm">
-          Editar
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          className="text-red-600 border-red-200 hover:bg-red-50"
-        >
-          Eliminar
-        </Button>
+      <div className="flex justify-center">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="h-12 w-12 p-0">
+              <Image
+                src="/images/dropMenuBtn.svg"
+                alt="Menu"
+                width={36}
+                height={36}
+              />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            align="end"
+            className="w-36 p-2"
+            style={{ borderRadius: "10px" }}
+          >
+            <DropdownMenuItem className="cursor-pointer p-3">
+              <Edit className="h-5 w-5 mr-3" style={{ color: "#DFAA30" }} />
+              <span style={{ color: "#DFAA30" }}>Editar</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem className="cursor-pointer focus:bg-red-50 p-3">
+              <Trash2 className="h-5 w-5 mr-3" style={{ color: "#E71D36" }} />
+              <span style={{ color: "#E71D36" }}>Eliminar</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     ),
   },
@@ -118,7 +141,7 @@ export default function WaiterManagement() {
   return (
     <div className="space-y-6">
       {/* Search Input Where Title Was */}
-      <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4 sm:gap-4">
+      <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2 sm:gap-4">
         <div className="flex-1 w-full sm:auto relative">
           <Input
             type="text"
@@ -132,7 +155,7 @@ export default function WaiterManagement() {
           <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
         </div>
         <Button
-          className="px-8 py-3 w-full sm:min-w-[180px] sm:w-auto text-white font-semibold flex items-center gap-2 justify-center"
+          className="px-8 py-3 w-full sm:min-w-[180px] sm:w-auto text-white flex items-center gap-2 justify-center"
           style={{ background: "#EB3123" }}
         >
           <Plus className="h-5 w-5" />
@@ -143,7 +166,6 @@ export default function WaiterManagement() {
       {/* Data Table Card Container */}
       <Card className="border-0" style={{ borderRadius: "30px" }}>
         <CardContent>
-          {" "}
           <DataTable<Waiter, any>
             columns={columns}
             data={waiters}

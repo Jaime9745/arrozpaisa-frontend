@@ -163,7 +163,7 @@ export default function MenuManagement() {
           <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
         </div>
         <Button
-          className="px-8 py-3 w-full sm:min-w-[180px] sm:w-auto text-white font-semibold flex items-center gap-2 justify-center"
+          className="px-8 py-3 w-full sm:min-w-[180px] sm:w-auto text-white flex items-center gap-2 justify-center"
           style={{ background: "#EB3123" }}
         >
           <Plus className="h-5 w-5" />

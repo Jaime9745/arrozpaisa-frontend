@@ -11,6 +11,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, Plus } from "lucide-react";
 import { useState } from "react";
+import Image from "next/image";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface MenuItem {
   id: number;
@@ -169,21 +176,15 @@ export default function MenuManagement() {
         className="p-6 shadow-xl border-0"
         style={{ borderRadius: "30px", height: "calc(100vh - 200px)" }}
       >
-        <CardHeader className="px-0 pt-0">
-          <CardTitle className="text-xl text-gray-800">
-            Lista de Platos
-          </CardTitle>
-          <CardDescription>Gestiona todos los platos del menú</CardDescription>
-        </CardHeader>{" "}
-        {/* Scrollable Content Area */}
+        {/* Scrollable Content Area */}{" "}
         <CardContent
           className="px-0 pb-0 h-full overflow-y-auto custom-scrollbar"
           style={{
             scrollbarWidth: "thin",
-            scrollbarColor: "#C83636",
+            scrollbarColor: "#C83636 transparent",
           }}
         >
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pr-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 pr-2">
             {filteredMenuItems.length > 0 ? (
               filteredMenuItems.map((dish) => (
                 <Card
@@ -196,6 +197,7 @@ export default function MenuManagement() {
                     <CardDescription>{dish.category}</CardDescription>
                   </CardHeader>
                   <CardContent>
+                    {" "}
                     <div className="flex justify-between items-center">
                       {" "}
                       <span
@@ -203,14 +205,32 @@ export default function MenuManagement() {
                         style={{ color: "#C83636" }}
                       >
                         {dish.price}
-                      </span>
-                      <div className="space-x-2">
-                        <Button variant="outline" size="sm">
-                          Editar
-                        </Button>
-                        <Button variant="destructive" size="sm">
-                          Eliminar
-                        </Button>
+                      </span>{" "}
+                      <div>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 p-0"
+                            >
+                              <Image
+                                src="/images/dropMenuBtn.svg"
+                                alt="Menu"
+                                width={24}
+                                height={24}
+                              />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-36">
+                            <DropdownMenuItem className="cursor-pointer">
+                              Editar
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50">
+                              Eliminar
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
                     </div>
                   </CardContent>

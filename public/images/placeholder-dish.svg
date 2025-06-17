@@ -1,0 +1,8 @@
+<!-- Placeholder for dish image -->
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="128" height="128" fill="#F3F4F6"/>
+  <path d="M64 48C68.4183 48 72 51.5817 72 56C72 60.4183 68.4183 64 64 64C59.5817 64 56 60.4183 56 56C56 51.5817 59.5817 48 64 48Z" fill="#9CA3AF"/>
+  <path d="M48 88L64 72L80 88H48Z" fill="#9CA3AF"/>
+  <rect x="8" y="8" width="112" height="112" stroke="#E5E7EB" stroke-width="2"/>
+  <text x="64" y="100" text-anchor="middle" fill="#6B7280" font-family="Arial" font-size="10">No Image</text>
+</svg>

@@ -18,136 +18,61 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
-interface MenuItem {
-  id: number;
-  name: string;
-  price: string;
-  category: string;
-}
-
-const menuItems: MenuItem[] = [
-  {
-    id: 1,
-    name: "Arroz Paisa",
-    price: "$18.000",
-    category: "Platos Principales",
-  },
-  { id: 2, name: "Chow Mein", price: "$15.000", category: "Platos Chinos" },
-  {
-    id: 3,
-    name: "Bandeja Paisa",
-    price: "$22.000",
-    category: "Platos Principales",
-  },
-  { id: 4, name: "Wonton", price: "$12.000", category: "Entradas" },
-  { id: 5, name: "Sancocho", price: "$16.000", category: "Sopas" },
-  { id: 6, name: "Arroz Chino", price: "$14.000", category: "Platos Chinos" },
-  {
-    id: 7,
-    name: "Pollo Teriyaki",
-    price: "$19.000",
-    category: "Platos Chinos",
-  },
-  { id: 8, name: "Ajiaco", price: "$17.000", category: "Sopas" },
-  { id: 9, name: "Spring Rolls", price: "$13.000", category: "Entradas" },
-  {
-    id: 10,
-    name: "Lomo Saltado",
-    price: "$25.000",
-    category: "Platos Principales",
-  },
-  { id: 11, name: "Sopa Wonton", price: "$14.500", category: "Sopas" },
-  {
-    id: 12,
-    name: "Cerdo Agridulce",
-    price: "$21.000",
-    category: "Platos Chinos",
-  },
-  {
-    id: 13,
-    name: "Arepa de Huevo",
-    price: "$8.000",
-    category: "Entradas",
-  },
-  {
-    id: 14,
-    name: "Dim Sum Variado",
-    price: "$24.000",
-    category: "Platos Chinos",
-  },
-  {
-    id: 15,
-    name: "Cazuela de Mariscos",
-    price: "$32.000",
-    category: "Platos Principales",
-  },
-  {
-    id: 16,
-    name: "Dumplings de Cerdo",
-    price: "$16.500",
-    category: "Entradas",
-  },
-  {
-    id: 17,
-    name: "Mondongo",
-    price: "$19.500",
-    category: "Sopas",
-  },
-  {
-    id: 18,
-    name: "Pato Pekín",
-    price: "$36.000",
-    category: "Platos Chinos",
-  },
-  {
-    id: 19,
-    name: "Chuleta Valluna",
-    price: "$23.000",
-    category: "Platos Principales",
-  },
-  {
-    id: 20,
-    name: "Rollos de Primavera",
-    price: "$12.500",
-    category: "Entradas",
-  },
-  {
-    id: 21,
-    name: "Caldo de Costilla",
-    price: "$15.000",
-    category: "Sopas",
-  },
-  {
-    id: 22,
-    name: "Chop Suey",
-    price: "$20.000",
-    category: "Platos Chinos",
-  },
-  {
-    id: 23,
-    name: "Lechona Tolimense",
-    price: "$28.000",
-    category: "Platos Principales",
-  },
-  {
-    id: 24,
-    name: "Sushi Rolls",
-    price: "$26.000",
-    category: "Platos Chinos",
-  },
-];
+import { Product } from "@/services/productsService";
+import { useProducts } from "@/hooks/useProducts";
 
 export default function MenuManagement() {
   const [searchTerm, setSearchTerm] = useState("");
+  const { products, loading, error, deleteProduct } = useProducts();
 
-  // Filter menu items based on search term
-  const filteredMenuItems = menuItems.filter(
-    (item) =>
-      item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.category.toLowerCase().includes(searchTerm.toLowerCase())
+  // Handle product deletion with confirmation
+  const handleDeleteProduct = async (id: string) => {
+    if (
+      window.confirm("¿Estás seguro de que quieres eliminar este producto?")
+    ) {
+      try {
+        await deleteProduct(id);
+      } catch (error) {
+        // Error is already handled in the hook
+        console.error("Failed to delete product:", error);
+      }
+    }
+  };
+  // Filter products based on search term (only show active products)
+  const filteredProducts = products.filter(
+    (product) =>
+      product.isActive &&
+      (product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.description.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
+  // Get the price range for display
+  const getPriceDisplay = (variants: Product["variants"]) => {
+    if (!variants || variants.length === 0) return "Sin precio";
+
+    if (variants.length === 1) {
+      return formatPrice(variants[0].price);
+    }
+
+    const prices = variants.map((v) => v.price);
+    const minPrice = Math.min(...prices);
+    const maxPrice = Math.max(...prices);
+
+    if (minPrice === maxPrice) {
+      return formatPrice(minPrice);
+    }
+
+    return `${formatPrice(minPrice)} - ${formatPrice(maxPrice)}`;
+  };
+
+  // Format price for display
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat("es-CO", {
+      style: "currency",
+      currency: "COP",
+      minimumFractionDigits: 0,
+    }).format(price);
+  };
   return (
     <div className="space-y-6">
       {/* Search Input Where Title Was */}
@@ -155,7 +80,7 @@ export default function MenuManagement() {
         <div className="flex-1 w-full sm:auto relative">
           <Input
             type="text"
-            placeholder="Buscar platos o categorías..."
+            placeholder="Buscar por nombre o descripción..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full bg-white border-gray-200 pl-4 pr-12 py-3 rounded-xl shadow-sm"
@@ -170,12 +95,20 @@ export default function MenuManagement() {
           Agregar Plato
         </Button>
       </div>
-      {/* Big General Card Container */}{" "}
+
+      {/* Error Message */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+          {error}
+        </div>
+      )}
+
+      {/* Big General Card Container */}
       <Card
         className="p-6 border-0"
         style={{ borderRadius: "30px", height: "calc(100vh - 110px)" }}
       >
-        {/* Scrollable Content Area */}{" "}
+        {/* Scrollable Content Area */}
         <CardContent
           className="px-0 pb-0 h-full overflow-y-auto custom-scrollbar"
           style={{
@@ -183,72 +116,119 @@ export default function MenuManagement() {
             scrollbarColor: "#C83636 transparent",
           }}
         >
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 pr-2">
-            {filteredMenuItems.length > 0 ? (
-              filteredMenuItems.map((dish) => (
-                <Card
-                  key={dish.id}
-                  className="transition-colors duration-200 relative"
-                  style={{ borderRadius: "30px", backgroundColor: "#F1EFEF" }}
-                >
-                  <CardHeader className="pb-2">
-                    <CardTitle>{dish.name}</CardTitle>
-                    <CardDescription>{dish.category}</CardDescription>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <span
-                      className="text-base font-normal"
-                      style={{ color: "#C83636" }}
-                    >
-                      {dish.price}
-                    </span>{" "}
-                  </CardContent>
+          {loading ? (
+            <div className="flex items-center justify-center h-full">
+              <div className="text-lg text-gray-500">Cargando productos...</div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 pr-2">
+              {filteredProducts.length > 0 ? (
+                filteredProducts.map((product: Product) => (
+                  <Card
+                    key={product.id}
+                    className="transition-colors duration-200 relative min-h-[120px]"
+                    style={{ borderRadius: "30px", backgroundColor: "#F1EFEF" }}
+                  >
+                    <div className="flex">
+                      {" "}
+                      {/* Image Section */}
+                      <div className="w-28 h-28 flex-shrink-0 pl-3 pr-1 py-2">
+                        {" "}
+                        <Image
+                          src={product.imageUrl}
+                          alt={product.name}
+                          width={96}
+                          height={96}
+                          className="w-full h-full object-cover rounded-2xl"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = "/images/placeholder-dish.svg"; // Fallback image
+                          }}
+                        />
+                      </div>
+                      {/* Content Section */}
+                      <div className="flex-1 flex flex-col justify-between pr-16 pl-2">
+                        {" "}
+                        <CardHeader className="pb-1">
+                          <CardTitle className="text-lg">
+                            {product.name}
+                          </CardTitle>
+                          <CardDescription className="text-sm text-gray-600 max-h-10 overflow-hidden">
+                            {product.description}
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent className="pt-1">
+                          <div className="flex flex-col gap-1">
+                            <span
+                              className="text-base font-normal"
+                              style={{ color: "#C83636" }}
+                            >
+                              {getPriceDisplay(product.variants)}
+                            </span>
+                            {product.variants &&
+                              product.variants.length > 1 && (
+                                <span className="text-xs text-gray-500">
+                                  {product.variants.length} variantes
+                                  disponibles
+                                </span>
+                              )}
+                          </div>
+                        </CardContent>
+                      </div>
+                    </div>
 
-                  {/* Dropdown button positioned absolutely in the middle right */}
-                  <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-16 w-16 p-0"
-                        >
-                          <Image
-                            src="/images/dropMenuBtn.svg"
-                            alt="Menu"
-                            width={48}
-                            height={48}
-                          />
-                        </Button>
-                      </DropdownMenuTrigger>{" "}
-                      <DropdownMenuContent align="end" className="w-36 p-2">
-                        <DropdownMenuItem className="cursor-pointer p-3">
-                          <Edit
-                            className="h-5 w-5 mr-3"
-                            style={{ color: "#DFAA30" }}
-                          />
-                          <span style={{ color: "#DFAA30" }}>Editar</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="cursor-pointer focus:bg-red-50 p-3">
-                          <Trash2
-                            className="h-5 w-5 mr-3"
-                            style={{ color: "#E71D36" }}
-                          />
-                          <span style={{ color: "#E71D36" }}>Eliminar</span>
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                </Card>
-              ))
-            ) : (
-              <div className="col-span-full text-center py-8">
-                <p className="text-gray-500">
-                  No se encontraron platos que coincidan con tu búsqueda.
-                </p>
-              </div>
-            )}
-          </div>
+                    {/* Dropdown button positioned absolutely in the middle right */}
+                    <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-16 w-16 p-0"
+                          >
+                            <Image
+                              src="/images/dropMenuBtn.svg"
+                              alt="Menu"
+                              width={48}
+                              height={48}
+                            />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-36 p-2">
+                          <DropdownMenuItem className="cursor-pointer p-3">
+                            <Edit
+                              className="h-5 w-5 mr-3"
+                              style={{ color: "#DFAA30" }}
+                            />
+                            <span style={{ color: "#DFAA30" }}>Editar</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="cursor-pointer focus:bg-red-50 p-3"
+                            onClick={() => handleDeleteProduct(product.id)}
+                          >
+                            {" "}
+                            <Trash2
+                              className="h-5 w-5 mr-3"
+                              style={{ color: "#E71D36" }}
+                            />
+                            <span style={{ color: "#E71D36" }}>Eliminar</span>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  </Card>
+                ))
+              ) : (
+                <div className="col-span-full text-center py-8">
+                  <p className="text-gray-500">
+                    {searchTerm
+                      ? "No se encontraron productos que coincidan con tu búsqueda."
+                      : "No hay productos disponibles en este momento."}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DataTable } from "@/components/data-table";
 import { ColumnDef } from "@tanstack/react-table";
-import { Plus, Search, Edit, Trash2 } from "lucide-react";
+import { Plus, Search, Edit, Trash2, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import Image from "next/image";
 import {
@@ -20,124 +20,149 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
-interface Waiter {
-  id: number;
-  nombre: string;
-  identificacion: string;
-  celular: string;
-  usuario: string;
-}
-
-const waiters: Waiter[] = [
-  {
-    id: 1,
-    nombre: "María González",
-    identificacion: "1.234.567.890",
-    celular: "+57 300 123 4567",
-    usuario: "maria.gonzalez",
-  },
-  {
-    id: 2,
-    nombre: "Carlos Ruiz",
-    identificacion: "1.345.678.901",
-    celular: "+57 301 234 5678",
-    usuario: "carlos.ruiz",
-  },
-  {
-    id: 3,
-    nombre: "Ana López",
-    identificacion: "1.456.789.012",
-    celular: "+57 302 345 6789",
-    usuario: "ana.lopez",
-  },
-  {
-    id: 4,
-    nombre: "Pedro Martínez",
-    identificacion: "1.567.890.123",
-    celular: "+57 303 456 7890",
-    usuario: "pedro.martinez",
-  },
-  {
-    id: 5,
-    nombre: "Laura Díaz",
-    identificacion: "1.678.901.234",
-    celular: "+57 304 567 8901",
-    usuario: "laura.diaz",
-  },
-  {
-    id: 6,
-    nombre: "José García",
-    identificacion: "1.789.012.345",
-    celular: "+57 305 678 9012",
-    usuario: "jose.garcia",
-  },
-];
-
-const columns: ColumnDef<Waiter>[] = [
-  {
-    accessorKey: "nombre",
-    header: "Nombre",
-    cell: ({ row }) => (
-      <span className="font-medium">{row.getValue("nombre")}</span>
-    ),
-  },
-  {
-    accessorKey: "identificacion",
-    header: "Identificación",
-  },
-  {
-    accessorKey: "celular",
-    header: "Celular",
-  },
-  {
-    accessorKey: "usuario",
-    header: "Usuario",
-    cell: ({ row }) => (
-      <span className="text-blue-600 font-medium">
-        {row.getValue("usuario")}
-      </span>
-    ),
-  },
-  {
-    id: "actions",
-    header: "",
-    cell: () => (
-      <div className="flex justify-center">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-12 w-12 p-0">
-              <Image
-                src="/images/dropMenuBtn.svg"
-                alt="Menu"
-                width={48}
-                height={48}
-              />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            align="end"
-            className="w-36 p-2"
-            style={{ borderRadius: "10px" }}
-          >
-            <DropdownMenuItem className="cursor-pointer p-3">
-              <Edit className="h-5 w-5 mr-3" style={{ color: "#DFAA30" }} />
-              <span style={{ color: "#DFAA30" }}>Editar</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer focus:bg-red-50 p-3">
-              <Trash2 className="h-5 w-5 mr-3" style={{ color: "#E71D36" }} />
-              <span style={{ color: "#E71D36" }}>Eliminar</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-    ),
-  },
-];
+import { Waiter } from "@/services/waitersService";
+import { useWaiters } from "@/hooks/useWaiters";
 
 export default function WaiterManagement() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [visiblePasswords, setVisiblePasswords] = useState<Set<string>>(
+    new Set()
+  );
+  const { waiters, loading, error, deleteWaiter } = useWaiters();
 
+  // Handle waiter deletion with confirmation
+  const handleDeleteWaiter = async (id: string) => {
+    if (window.confirm("¿Estás seguro de que quieres eliminar este mesero?")) {
+      try {
+        await deleteWaiter(id);
+      } catch (error) {
+        console.error("Failed to delete waiter:", error);
+      }
+    }
+  };
+
+  // Toggle password visibility
+  const togglePasswordVisibility = (waiterId: string) => {
+    const newVisiblePasswords = new Set(visiblePasswords);
+    if (newVisiblePasswords.has(waiterId)) {
+      newVisiblePasswords.delete(waiterId);
+    } else {
+      newVisiblePasswords.add(waiterId);
+    }
+    setVisiblePasswords(newVisiblePasswords);
+  };
+  const columns: ColumnDef<Waiter>[] = [
+    {
+      accessorKey: "firstName",
+      header: "Nombre",
+      cell: ({ row }) => (
+        <span className="font-medium">
+          {`${row.getValue("firstName")} ${row.original.lastName}`}
+        </span>
+      ),
+    },
+    {
+      accessorKey: "identificationNumber",
+      header: "Identificación",
+      cell: ({ row }) => {
+        const id = row.getValue("identificationNumber") as string;
+        // Format identification number with dots for readability
+        if (id && id.length >= 7) {
+          return id.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+        return id;
+      },
+    },
+    {
+      accessorKey: "phoneNumber",
+      header: "Celular",
+      cell: ({ row }) => {
+        const phone = row.getValue("phoneNumber") as string;
+        // Format phone number for display (assuming Colombian format)
+        if (phone && phone.length === 10) {
+          return `+57 ${phone.slice(0, 3)} ${phone.slice(3, 6)} ${phone.slice(
+            6
+          )}`;
+        }
+        return phone;
+      },
+    },
+    {
+      accessorKey: "userName",
+      header: "Usuario",
+      cell: ({ row }) => (
+        <span className="text-blue-600 font-medium">
+          {row.getValue("userName")}
+        </span>
+      ),
+    },
+    {
+      accessorKey: "password",
+      header: "Contraseña",
+      cell: ({ row }) => {
+        const waiterId = row.original.id;
+        const password = row.getValue("password") as string;
+        const isVisible = visiblePasswords.has(waiterId);
+
+        return (
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-sm bg-gray-100 px-2 py-1 rounded">
+              {isVisible ? password : "••••••••"}
+            </span>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => togglePasswordVisibility(waiterId)}
+              className="h-8 w-8 p-0 hover:bg-gray-100"
+            >
+              {isVisible ? (
+                <EyeOff className="h-4 w-4 text-gray-500" />
+              ) : (
+                <Eye className="h-4 w-4 text-gray-500" />
+              )}
+            </Button>
+          </div>
+        );
+      },
+    },
+    {
+      id: "actions",
+      header: "",
+      cell: ({ row }) => (
+        <div className="flex justify-center">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-12 w-12 p-0">
+                <Image
+                  src="/images/dropMenuBtn.svg"
+                  alt="Menu"
+                  width={48}
+                  height={48}
+                />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align="end"
+              className="w-36 p-2"
+              style={{ borderRadius: "10px" }}
+            >
+              <DropdownMenuItem className="cursor-pointer p-3">
+                <Edit className="h-5 w-5 mr-3" style={{ color: "#DFAA30" }} />
+                <span style={{ color: "#DFAA30" }}>Editar</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="cursor-pointer focus:bg-red-50 p-3"
+                onClick={() => handleDeleteWaiter(row.original.id)}
+              >
+                <Trash2 className="h-5 w-5 mr-3" style={{ color: "#E71D36" }} />
+                <span style={{ color: "#E71D36" }}>Eliminar</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      ),
+    },
+  ];
   return (
     <div className="space-y-6">
       {/* Search Input Where Title Was */}
@@ -145,7 +170,7 @@ export default function WaiterManagement() {
         <div className="flex-1 w-full sm:auto relative">
           <Input
             type="text"
-            placeholder="Buscar meseros por nombre, identificación, celular o usuario..."
+            placeholder="Buscar meseros por nombre, identificación, teléfono o usuario..."
             value={searchTerm}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               setSearchTerm(e.target.value)
@@ -163,20 +188,32 @@ export default function WaiterManagement() {
         </Button>
       </div>
 
+      {/* Error Message */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+          {error}
+        </div>
+      )}
+
       {/* Data Table Card Container */}
       <Card
         className="border-0"
         style={{ borderRadius: "30px", backgroundColor: "#fcfeff" }}
       >
         <CardContent>
-          {" "}
-          <DataTable<Waiter, any>
-            columns={columns}
-            data={waiters}
-            globalFilter={searchTerm}
-            onGlobalFilterChange={setSearchTerm}
-            useCardStyle={true}
-          />
+          {loading ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="text-lg text-gray-500">Cargando meseros...</div>
+            </div>
+          ) : (
+            <DataTable<Waiter, any>
+              columns={columns}
+              data={waiters}
+              globalFilter={searchTerm}
+              onGlobalFilterChange={setSearchTerm}
+              useCardStyle={true}
+            />
+          )}
         </CardContent>
       </Card>
     </div>

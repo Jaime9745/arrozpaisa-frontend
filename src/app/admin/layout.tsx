@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { Home, ChefHat, Users, Table } from "lucide-react";
 import AdminSidebar from "@/components/admin/AdminSidebar";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { SidebarProvider, useSidebar } from "@/contexts/SidebarContext";
 
 interface SidebarItem {
   id: string;
@@ -18,8 +19,19 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
+  return (
+    <ProtectedRoute>
+      <SidebarProvider>
+        <AdminLayoutContent>{children}</AdminLayoutContent>
+      </SidebarProvider>
+    </ProtectedRoute>
+  );
+}
+
+function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
+  const { isMobileOpen, setIsMobileOpen } = useSidebar();
 
   // Define sidebar items with paths
   const sidebarItems: SidebarItem[] = [
@@ -42,10 +54,10 @@ export default function AdminLayout({
     if (path.includes("/admin/table")) return "estados-mesa";
     return "inicio";
   };
-
   const [activeSection, setActiveSection] = useState(
     getActiveSectionFromPath(pathname)
   );
+  const [searchTerm, setSearchTerm] = useState("");
 
   // Update active section when path changes
   useEffect(() => {
@@ -59,11 +71,10 @@ export default function AdminLayout({
       router.push(item.path);
     }
   };
-
   return (
     <ProtectedRoute>
       <div
-        className="min-h-screen flex p-6"
+        className="min-h-screen flex flex-col lg:flex-row p-6"
         style={{
           background:
             "linear-gradient(126.22deg, #F3FF18 4.79%, #DFAA30 54.4%)",
@@ -74,9 +85,12 @@ export default function AdminLayout({
           sidebarItems={sidebarItems}
           activeSection={activeSection}
           onSectionChange={handleSectionChange}
-        />{" "}
+          isMobileOpen={isMobileOpen}
+          setIsMobileOpen={setIsMobileOpen}
+        />
+
         {/* Main Content */}
-        <div className="flex-1 ml-6 overflow-auto">{children}</div>
+        <div className="flex-1 lg:ml-6 overflow-auto">{children}</div>
       </div>
     </ProtectedRoute>
   );

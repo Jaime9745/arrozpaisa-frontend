@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DataTable } from "@/components/data-table";
 import { ColumnDef } from "@tanstack/react-table";
-import { Plus, Search, Edit, Trash2, Eye, EyeOff, X } from "lucide-react";
+import { Plus, Search, Edit, Trash2, Eye, EyeOff, X, Menu } from "lucide-react";
 import { useState } from "react";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
@@ -34,6 +34,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Waiter } from "@/services/waitersService";
 import { useWaiters } from "@/hooks/useWaiters";
+import { useSidebar } from "@/contexts/SidebarContext";
 
 export default function WaiterManagement() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -46,10 +47,12 @@ export default function WaiterManagement() {
     lastName: "",
     identificationNumber: "",
     phoneNumber: "",
-  });  const [isSubmitting, setIsSubmitting] = useState(false);
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [waiterToDelete, setWaiterToDelete] = useState<string | null>(null);
   const { waiters, loading, error, deleteWaiter, createWaiter } = useWaiters();
+  const { toggleSidebar } = useSidebar();
   // Handle waiter deletion with confirmation
   const handleDeleteWaiter = async (id: string) => {
     setWaiterToDelete(id);
@@ -221,7 +224,9 @@ export default function WaiterManagement() {
               align="end"
               className="w-36 p-2"
               style={{ borderRadius: "10px" }}
-            >              <DropdownMenuItem className="cursor-pointer p-3">
+            >
+              {" "}
+              <DropdownMenuItem className="cursor-pointer p-3">
                 <Edit className="h-5 w-5 mr-3" style={{ color: "#DFAA30" }} />
                 <span style={{ color: "#DFAA30" }}>Editar</span>
               </DropdownMenuItem>
@@ -240,20 +245,34 @@ export default function WaiterManagement() {
   ];
   return (
     <div className="space-y-6">
+      {" "}
       {/* Search Input and Add Button */}
       <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2 sm:gap-4">
-        <div className="flex-1 w-full sm:auto relative">
-          <Input
-            type="text"
-            placeholder="Buscar meseros por nombre, identificación, teléfono o usuario..."
-            value={searchTerm}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setSearchTerm(e.target.value)
-            }
-            className="w-full bg-white border-gray-200 pl-4 pr-12 py-3 rounded-xl shadow-sm"
-          />
-          <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-        </div>{" "}        <Button
+        <div className="flex items-center gap-4 flex-1">
+          {" "}
+          {/* Mobile Hamburger Button */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleSidebar}
+            className="lg:hidden h-12 w-12 bg-white border-gray-200 hover:bg-gray-50 transition-all duration-200 rounded-xl shadow-sm"
+          >
+            <Menu className="h-6 w-6 text-gray-800" />
+          </Button>
+          <div className="flex-1 relative">
+            <Input
+              type="text"
+              placeholder="Buscar meseros por nombre, identificación, teléfono o usuario..."
+              value={searchTerm}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setSearchTerm(e.target.value)
+              }
+              className="w-full bg-white border-gray-200 pl-4 pr-12 py-3 rounded-xl shadow-sm"
+            />
+            <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+          </div>
+        </div>
+        <Button
           className="px-8 py-3 w-full sm:min-w-[180px] sm:w-auto text-white flex items-center gap-2 justify-center font-normal transition-all duration-200 hover:shadow-lg hover:brightness-110"
           style={{ background: "#EB3123" }}
           onClick={() => setShowCreateForm(true)}
@@ -262,14 +281,12 @@ export default function WaiterManagement() {
           Agregar Mesero
         </Button>
       </div>
-
       {/* Error Message */}
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
           {error}
         </div>
       )}
-
       {/* Main Content Area with Side-by-Side Layout */}
       <div className="flex gap-6">
         {/* Data Table Card Container */}
@@ -422,23 +439,27 @@ export default function WaiterManagement() {
                   </div>
                 </form>
               </CardContent>
-            </Card>          </div>
+            </Card>{" "}
+          </div>
         )}
       </div>
-
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent className="sm:max-w-[425px]" style={{ borderRadius: "20px" }}>
+        <AlertDialogContent
+          className="sm:max-w-[425px]"
+          style={{ borderRadius: "20px" }}
+        >
           <AlertDialogHeader>
             <AlertDialogTitle className="text-xl font-semibold text-gray-800">
               Confirmar Eliminación
             </AlertDialogTitle>
             <AlertDialogDescription className="text-gray-600">
-              ¿Estás seguro de que quieres eliminar este mesero? Esta acción no se puede deshacer.
+              ¿Estás seguro de que quieres eliminar este mesero? Esta acción no
+              se puede deshacer.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="gap-3">
-            <AlertDialogCancel 
+            <AlertDialogCancel
               className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50 transition-all duration-200 hover:scale-105 active:scale-95"
               style={{ borderRadius: "15px" }}
             >

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Home, ChefHat, Users, Table } from "lucide-react";
 import AdminSidebar from "@/components/admin/AdminSidebar";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 
 interface SidebarItem {
   id: string;
@@ -60,21 +61,23 @@ export default function AdminLayout({
   };
 
   return (
-    <div
-      className="min-h-screen flex p-6"
-      style={{
-        background: "linear-gradient(126.22deg, #F3FF18 4.79%, #DFAA30 54.4%)",
-        backdropFilter: "blur(4px)",
-      }}
-    >
-      <AdminSidebar
-        sidebarItems={sidebarItems}
-        activeSection={activeSection}
-        onSectionChange={handleSectionChange}
-      />
-
-      {/* Main Content */}
-      <div className="flex-1 ml-6 overflow-auto">{children}</div>
-    </div>
+    <ProtectedRoute>
+      <div
+        className="min-h-screen flex p-6"
+        style={{
+          background:
+            "linear-gradient(126.22deg, #F3FF18 4.79%, #DFAA30 54.4%)",
+          backdropFilter: "blur(4px)",
+        }}
+      >
+        <AdminSidebar
+          sidebarItems={sidebarItems}
+          activeSection={activeSection}
+          onSectionChange={handleSectionChange}
+        />{" "}
+        {/* Main Content */}
+        <div className="flex-1 ml-6 overflow-auto">{children}</div>
+      </div>
+    </ProtectedRoute>
   );
 }

@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { LogOut } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface SidebarItem {
   id: string;
@@ -22,6 +23,12 @@ export default function AdminSidebar({
   activeSection,
   onSectionChange,
 }: AdminSidebarProps) {
+  const { logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+  };
+
   return (
     <Card
       className="w-80 bg-white border-0 flex flex-col"
@@ -36,7 +43,7 @@ export default function AdminSidebar({
           className="rounded-lg"
         />
         <div className="text-lg font-bold text-gray-900 whitespace-nowrap">
-          ¡Hola Jhon!
+          ¡Hola Admin!
         </div>
       </div>{" "}
       <nav className="flex-1 mt-2 px-4">
@@ -65,16 +72,15 @@ export default function AdminSidebar({
         })}
       </nav>{" "}
       <div className="p-6 pt-0 px-4 flex justify-center">
-        <Link href="/" className="w-[calc(85%-16px)] mx-auto">
-          <Button
-            variant="outline"
-            className="w-full"
-            style={{ borderRadius: "30px" }}
-          >
-            <LogOut className="h-4 w-4 mr-2" />
-            Cerrar Sesión
-          </Button>
-        </Link>
+        <Button
+          onClick={handleLogout}
+          variant="outline"
+          className="w-[calc(85%-16px)] mx-auto"
+          style={{ borderRadius: "30px" }}
+        >
+          <LogOut className="h-4 w-4 mr-2" />
+          Cerrar Sesión
+        </Button>
       </div>
     </Card>
   );

@@ -11,8 +11,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DataTable } from "@/components/data-table";
 import { ColumnDef } from "@tanstack/react-table";
-import { Plus, Search, Edit, Trash2, Eye, EyeOff } from "lucide-react";
+import { Plus, Search, Edit, Trash2, Eye, EyeOff, X } from "lucide-react";
 import { useState } from "react";
+import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import {
   DropdownMenu,
@@ -20,6 +21,17 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Waiter } from "@/services/waitersService";
 import { useWaiters } from "@/hooks/useWaiters";
 
@@ -28,19 +40,35 @@ export default function WaiterManagement() {
   const [visiblePasswords, setVisiblePasswords] = useState<Set<string>>(
     new Set()
   );
-  const { waiters, loading, error, deleteWaiter } = useWaiters();
-
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    identificationNumber: "",
+    phoneNumber: "",
+  });  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [waiterToDelete, setWaiterToDelete] = useState<string | null>(null);
+  const { waiters, loading, error, deleteWaiter, createWaiter } = useWaiters();
   // Handle waiter deletion with confirmation
   const handleDeleteWaiter = async (id: string) => {
-    if (window.confirm("¿Estás seguro de que quieres eliminar este mesero?")) {
+    setWaiterToDelete(id);
+    setDeleteDialogOpen(true);
+  };
+
+  // Confirm deletion
+  const confirmDeleteWaiter = async () => {
+    if (waiterToDelete) {
       try {
-        await deleteWaiter(id);
+        await deleteWaiter(waiterToDelete);
       } catch (error) {
         console.error("Failed to delete waiter:", error);
+      } finally {
+        setDeleteDialogOpen(false);
+        setWaiterToDelete(null);
       }
     }
   };
-
   // Toggle password visibility
   const togglePasswordVisibility = (waiterId: string) => {
     const newVisiblePasswords = new Set(visiblePasswords);
@@ -50,6 +78,54 @@ export default function WaiterManagement() {
       newVisiblePasswords.add(waiterId);
     }
     setVisiblePasswords(newVisiblePasswords);
+  };
+
+  // Handle form input changes
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+  // Handle form submission
+  const handleCreateWaiter = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (isSubmitting) return;
+
+    try {
+      setIsSubmitting(true);
+      // Generate username from firstName and lastName
+      const userName = `${formData.firstName.toLowerCase()}.${formData.lastName.toLowerCase()}`;
+      const waiterData = {
+        ...formData,
+        userName,
+      };
+      await createWaiter(waiterData);
+      // Reset form and close it
+      setFormData({
+        firstName: "",
+        lastName: "",
+        identificationNumber: "",
+        phoneNumber: "",
+      });
+      setShowCreateForm(false);
+    } catch (error) {
+      console.error("Failed to create waiter:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+  // Close form
+  const handleCloseForm = () => {
+    setShowCreateForm(false);
+    setFormData({
+      firstName: "",
+      lastName: "",
+      identificationNumber: "",
+      phoneNumber: "",
+    });
   };
   const columns: ColumnDef<Waiter>[] = [
     {
@@ -145,8 +221,7 @@ export default function WaiterManagement() {
               align="end"
               className="w-36 p-2"
               style={{ borderRadius: "10px" }}
-            >
-              <DropdownMenuItem className="cursor-pointer p-3">
+            >              <DropdownMenuItem className="cursor-pointer p-3">
                 <Edit className="h-5 w-5 mr-3" style={{ color: "#DFAA30" }} />
                 <span style={{ color: "#DFAA30" }}>Editar</span>
               </DropdownMenuItem>
@@ -165,7 +240,7 @@ export default function WaiterManagement() {
   ];
   return (
     <div className="space-y-6">
-      {/* Search Input Where Title Was */}
+      {/* Search Input and Add Button */}
       <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2 sm:gap-4">
         <div className="flex-1 w-full sm:auto relative">
           <Input
@@ -178,10 +253,10 @@ export default function WaiterManagement() {
             className="w-full bg-white border-gray-200 pl-4 pr-12 py-3 rounded-xl shadow-sm"
           />
           <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-        </div>
-        <Button
-          className="px-8 py-3 w-full sm:min-w-[180px] sm:w-auto text-white flex items-center gap-2 justify-center"
+        </div>{" "}        <Button
+          className="px-8 py-3 w-full sm:min-w-[180px] sm:w-auto text-white flex items-center gap-2 justify-center font-normal transition-all duration-200 hover:shadow-lg hover:brightness-110"
           style={{ background: "#EB3123" }}
+          onClick={() => setShowCreateForm(true)}
         >
           <Plus className="h-5 w-5" />
           Agregar Mesero
@@ -195,27 +270,190 @@ export default function WaiterManagement() {
         </div>
       )}
 
-      {/* Data Table Card Container */}
-      <Card
-        className="border-0"
-        style={{ borderRadius: "30px", backgroundColor: "#fcfeff" }}
-      >
-        <CardContent>
-          {loading ? (
-            <div className="flex items-center justify-center py-8">
-              <div className="text-lg text-gray-500">Cargando meseros...</div>
-            </div>
-          ) : (
-            <DataTable<Waiter, any>
-              columns={columns}
-              data={waiters}
-              globalFilter={searchTerm}
-              onGlobalFilterChange={setSearchTerm}
-              useCardStyle={true}
-            />
-          )}
-        </CardContent>
-      </Card>
+      {/* Main Content Area with Side-by-Side Layout */}
+      <div className="flex gap-6">
+        {/* Data Table Card Container */}
+        <div
+          className={`transition-all duration-300 ${
+            showCreateForm ? "w-2/3" : "w-full"
+          }`}
+        >
+          <Card
+            className="border-0"
+            style={{ borderRadius: "30px", backgroundColor: "#fcfeff" }}
+          >
+            <CardContent>
+              {loading ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="text-lg text-gray-500">
+                    Cargando meseros...
+                  </div>
+                </div>
+              ) : (
+                <DataTable<Waiter, any>
+                  columns={columns}
+                  data={waiters}
+                  globalFilter={searchTerm}
+                  onGlobalFilterChange={setSearchTerm}
+                  useCardStyle={true}
+                />
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Create Waiter Form Card */}
+        {showCreateForm && (
+          <div className="w-1/3">
+            <Card
+              className="border-0 sticky top-6"
+              style={{ borderRadius: "30px", backgroundColor: "#fcfeff" }}
+            >
+              <CardHeader className="pb-4">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-xl font-semibold text-gray-800">
+                    Añadir Mesero
+                  </CardTitle>{" "}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={handleCloseForm}
+                    className="h-10 w-10 text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-all duration-200 hover:scale-110 active:scale-95"
+                  >
+                    {" "}
+                    <Image
+                      src="/images/icons/closeCardIcon.svg"
+                      alt="Close"
+                      width={40}
+                      height={40}
+                      className="transition-transform duration-200"
+                    />
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleCreateWaiter} className="space-y-4">
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor="firstName"
+                        className="text-sm font-medium text-gray-700"
+                      >
+                        Nombre *
+                      </Label>
+                      <Input
+                        id="firstName"
+                        name="firstName"
+                        type="text"
+                        value={formData.firstName}
+                        onChange={handleInputChange}
+                        required
+                        className="bg-white border-gray-200 rounded-lg"
+                        placeholder="Ej: Juan"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor="lastName"
+                        className="text-sm font-medium text-gray-700"
+                      >
+                        Apellido *
+                      </Label>
+                      <Input
+                        id="lastName"
+                        name="lastName"
+                        type="text"
+                        value={formData.lastName}
+                        onChange={handleInputChange}
+                        required
+                        className="bg-white border-gray-200 rounded-lg"
+                        placeholder="Ej: Pérez"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor="identificationNumber"
+                        className="text-sm font-medium text-gray-700"
+                      >
+                        Número de Identificación *
+                      </Label>
+                      <Input
+                        id="identificationNumber"
+                        name="identificationNumber"
+                        type="text"
+                        value={formData.identificationNumber}
+                        onChange={handleInputChange}
+                        required
+                        className="bg-white border-gray-200 rounded-lg"
+                        placeholder="Ej: 12345678"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor="phoneNumber"
+                        className="text-sm font-medium text-gray-700"
+                      >
+                        Número de Celular *
+                      </Label>
+                      <Input
+                        id="phoneNumber"
+                        name="phoneNumber"
+                        type="tel"
+                        value={formData.phoneNumber}
+                        onChange={handleInputChange}
+                        required
+                        className="bg-white border-gray-200 rounded-lg"
+                        placeholder="Ej: 3001234567"
+                      />
+                    </div>
+                  </div>{" "}
+                  <div className="flex gap-3 pt-4">
+                    <Button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="flex-1 text-white font-normal transition-all duration-200 hover:scale-105 active:scale-95 hover:shadow-lg disabled:hover:scale-100"
+                      style={{ background: "#EB3123", borderRadius: "30px" }}
+                    >
+                      {isSubmitting ? "Creando..." : "Añadir Mesero"}
+                    </Button>
+                  </div>
+                </form>
+              </CardContent>
+            </Card>          </div>
+        )}
+      </div>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent className="sm:max-w-[425px]" style={{ borderRadius: "20px" }}>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-xl font-semibold text-gray-800">
+              Confirmar Eliminación
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-gray-600">
+              ¿Estás seguro de que quieres eliminar este mesero? Esta acción no se puede deshacer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="gap-3">
+            <AlertDialogCancel 
+              className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50 transition-all duration-200 hover:scale-105 active:scale-95"
+              style={{ borderRadius: "15px" }}
+            >
+              Cancelar
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDeleteWaiter}
+              className="flex-1 text-white transition-all duration-200 hover:scale-105 active:scale-95"
+              style={{ background: "#E71D36", borderRadius: "15px" }}
+            >
+              Eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

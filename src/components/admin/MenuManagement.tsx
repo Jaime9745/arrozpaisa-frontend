@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Plus, Edit, Trash2 } from "lucide-react";
+import { Search, Plus, Edit, Trash2, Menu } from "lucide-react";
 import { useState } from "react";
 import Image from "next/image";
 import {
@@ -20,10 +20,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Product } from "@/services/productsService";
 import { useProducts } from "@/hooks/useProducts";
+import { useSidebar } from "@/contexts/SidebarContext";
 
 export default function MenuManagement() {
   const [searchTerm, setSearchTerm] = useState("");
   const { products, loading, error, deleteProduct } = useProducts();
+  const { toggleSidebar } = useSidebar();
 
   // Handle product deletion with confirmation
   const handleDeleteProduct = async (id: string) => {
@@ -75,17 +77,29 @@ export default function MenuManagement() {
   };
   return (
     <div className="space-y-6">
+      {" "}
       {/* Search Input Where Title Was */}
       <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4 sm:gap-4">
-        <div className="flex-1 w-full sm:auto relative">
-          <Input
-            type="text"
-            placeholder="Buscar por nombre o descripción..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-white border-gray-200 pl-4 pr-12 py-3 rounded-xl shadow-sm"
-          />
-          <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+        <div className="flex items-center gap-4 flex-1">
+          {/* Mobile Hamburger Button */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleSidebar}
+            className="lg:hidden h-auto py-3 w-12 bg-white border-gray-200 hover:bg-gray-50 transition-all duration-200 shadow-sm"
+          >
+            <Menu className="h-6 w-6 text-gray-800" />
+          </Button>
+          <div className="flex-1 relative">
+            <Input
+              type="text"
+              placeholder="Buscar por nombre o descripción..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full bg-white border-gray-200 pl-4 pr-12 py-4 shadow-sm"
+            />
+            <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+          </div>
         </div>
         <Button
           className="px-8 py-3 w-full sm:min-w-[180px] sm:w-auto text-white flex items-center gap-2 justify-center"
@@ -95,27 +109,19 @@ export default function MenuManagement() {
           Agregar Plato
         </Button>
       </div>
-
       {/* Error Message */}
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
           {error}
         </div>
       )}
-
-      {/* Big General Card Container */}
+      {/* Big General Card Container */}{" "}
       <Card
-        className="p-6 border-0"
-        style={{ borderRadius: "30px", height: "calc(100vh - 110px)" }}
+        className="p-6 border-0 h-[calc(100vh-160px)] sm:h-[calc(100vh-140px)] md:h-[calc(100vh-120px)] lg:h-[calc(100vh-100px)]"
+        style={{ borderRadius: "30px" }}
       >
         {/* Scrollable Content Area */}
-        <CardContent
-          className="px-0 pb-0 h-full overflow-y-auto custom-scrollbar"
-          style={{
-            scrollbarWidth: "thin",
-            scrollbarColor: "#C83636 transparent",
-          }}
-        >
+        <CardContent className="px-0 pb-0 h-full overflow-y-auto">
           {loading ? (
             <div className="flex items-center justify-center h-full">
               <div className="text-lg text-gray-500">Cargando productos...</div>

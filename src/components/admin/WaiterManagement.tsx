@@ -255,7 +255,7 @@ export default function WaiterManagement() {
             variant="ghost"
             size="icon"
             onClick={toggleSidebar}
-            className="lg:hidden h-12 w-12 bg-white border-gray-200 hover:bg-gray-50 transition-all duration-200 rounded-xl shadow-sm"
+            className="lg:hidden h-auto py-3 w-12 bg-white border-gray-200 hover:bg-gray-50 transition-all duration-200 shadow-sm"
           >
             <Menu className="h-6 w-6 text-gray-800" />
           </Button>
@@ -267,7 +267,7 @@ export default function WaiterManagement() {
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setSearchTerm(e.target.value)
               }
-              className="w-full bg-white border-gray-200 pl-4 pr-12 py-3 rounded-xl shadow-sm"
+              className="w-full bg-white border-gray-200 pl-4 pr-12 py-4 shadow-sm"
             />
             <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
           </div>
@@ -295,13 +295,14 @@ export default function WaiterManagement() {
             showCreateForm ? "w-2/3" : "w-full"
           }`}
         >
+          {" "}
           <Card
-            className="border-0"
+            className="border-0 h-[calc(100vh-160px)] sm:h-[calc(100vh-140px)] md:h-[calc(100vh-120px)] lg:h-[calc(100vh-100px)]"
             style={{ borderRadius: "30px", backgroundColor: "#fcfeff" }}
           >
-            <CardContent>
+            <CardContent className="h-full overflow-y-auto">
               {loading ? (
-                <div className="flex items-center justify-center py-8">
+                <div className="flex items-center justify-center h-full">
                   <div className="text-lg text-gray-500">
                     Cargando meseros...
                   </div>

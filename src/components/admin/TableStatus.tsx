@@ -6,7 +6,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, Menu } from "lucide-react";
+import { useSidebar } from "@/contexts/SidebarContext";
 import Image from "next/image";
 
 // Define the tableData array that will be used by both TableStatus and DashboardHome
@@ -28,50 +29,65 @@ export const tableData = [
 ];
 
 export default function TableStatus() {
+  const { toggleSidebar } = useSidebar();
   return (
     <div className="space-y-6">
       {" "}
-      {/* Header Card */}
-      <Card className="py-2 px-6 border-0">
-        {" "}
-        <CardContent className="p-0">
-          <div className="flex gap-75 items-center justify-center">
-            <div className="flex items-center gap-2">
-              <div
-                className="w-8 h-8 rounded"
-                style={{ backgroundColor: "#d9d9d9" }}
-              ></div>
-              <span className="text-sm font-medium text-gray-700">
-                Mesas Libres
-              </span>
+      {/* Mobile Hamburger Button and Header Card */}
+      <div className="flex items-center gap-4">
+        {/* Mobile Hamburger Button */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={toggleSidebar}
+          className="lg:hidden h-12 w-12 bg-white border-gray-200 hover:bg-gray-50 transition-all duration-200 shadow-sm"
+        >
+          <Menu className="h-6 w-6 text-gray-800" />
+        </Button>
+
+        {/* Header Card */}
+        <Card className="py-2 px-6 border-0 flex-1">
+          {" "}
+          <CardContent className="p-0">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-6 items-center justify-center">
+              <div className="flex flex-col sm:flex-row gap-6 sm:gap-8 lg:gap-12 items-center justify-center w-full sm:w-auto">
+                <div className="flex items-center gap-2">
+                  <div
+                    className="w-8 h-8 rounded"
+                    style={{ backgroundColor: "#d9d9d9" }}
+                  ></div>
+                  <span className="text-sm font-medium text-gray-700">
+                    Mesas Libres
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div
+                    className="w-8 h-8 rounded"
+                    style={{ backgroundColor: "#ec3224" }}
+                  ></div>
+                  <span className="text-sm font-medium text-gray-700">
+                    Mesas Ocupadas
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div
+                    className="w-8 h-8 rounded"
+                    style={{ backgroundColor: "#24ec24" }}
+                  ></div>
+                  <span className="text-sm font-medium text-gray-700">
+                    Mesas Atendidas
+                  </span>
+                </div>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <div
-                className="w-8 h-8 rounded"
-                style={{ backgroundColor: "#ec3224" }}
-              ></div>
-              <span className="text-sm font-medium text-gray-700">
-                Mesas Ocupadas
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div
-                className="w-8 h-8 rounded"
-                style={{ backgroundColor: "#24ec24" }}
-              ></div>
-              <span className="text-sm font-medium text-gray-700">
-                Mesas Atendidas
-              </span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>{" "}
+          </CardContent>
+        </Card>
+      </div>
       {/* Big General Card Container */}
       <Card
-        className="p-6 border-0"
-        style={{ borderRadius: "30px", height: "calc(100vh - 120px)" }}
+        className="p-6 border-0 h-[calc(100vh-180px)] sm:h-[calc(100vh-160px)] md:h-[calc(100vh-140px)] lg:h-[calc(100vh-120px)]"
+        style={{ borderRadius: "30px" }}
       >
-        {" "}
         {/* Scrollable Content Area */}
         <CardContent className="px-0 pb-0 h-full overflow-y-auto">
           <div className="flex justify-between w-full px-6">

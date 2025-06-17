@@ -5,11 +5,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Clock, DollarSign, Table, Users } from "lucide-react";
+import { Clock, DollarSign, Table, Users, Menu } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useSidebar } from "@/contexts/SidebarContext";
 import StatsCard from "./StatsCard";
 import { tableData } from "./TableStatus"; // Import tableData from TableStatus component
 
 export default function DashboardHome() {
+  const { toggleSidebar } = useSidebar();
+
   const dashboardStats = [
     {
       title: "Ventas del Día",
@@ -57,25 +61,33 @@ export default function DashboardHome() {
       price: staticPrices[index] || "35.00",
       status: table.status === "Servida" ? "Entregado" : "En preparación",
     }));
-
   return (
     <div className="space-y-6">
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="flex items-center gap-4 md:hidden col-span-full">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleSidebar}
+            className="lg:hidden h-auto py-3 w-12 bg-white border-gray-200 hover:bg-gray-50 transition-all duration-200 shadow-sm"
+          >
+            <Menu className="h-6 w-6 text-gray-800" />
+          </Button>
+          <h1 className="text-xl font-semibold">Dashboard</h1>
+        </div>
         {dashboardStats.map((stat, index) => (
           <StatsCard key={index} {...stat} />
         ))}
-      </div>
-
+      </div>{" "}
       {/* Recent Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card style={{ borderRadius: "30px" }}>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[calc(100vh-250px)] md:h-[calc(100vh-200px)] lg:h-[calc(100vh-180px)]">
+        <Card style={{ borderRadius: "30px" }} className="h-full">
           <CardHeader>
             <CardTitle>Órdenes Recientes</CardTitle>
             <CardDescription>Últimas órdenes del restaurante</CardDescription>
           </CardHeader>
-          <CardContent>
-            {" "}
+          <CardContent className="h-[calc(100%-80px)] overflow-auto">
             <div className="space-y-4">
               {recentOrders.map((order) => (
                 <div
@@ -89,7 +101,6 @@ export default function DashboardHome() {
                     </p>
                   </div>
                   <div className="text-right">
-                    {" "}
                     <p className="font-medium">${order.price}</p>
                     <span
                       className={`text-xs px-2 py-1 rounded-full ${
@@ -104,16 +115,15 @@ export default function DashboardHome() {
                 </div>
               ))}
             </div>
-          </CardContent>
+          </CardContent>{" "}
         </Card>
 
-        <Card style={{ borderRadius: "30px" }}>
+        <Card style={{ borderRadius: "30px" }} className="h-full">
           <CardHeader>
             <CardTitle>Estado de Mesas</CardTitle>
             <CardDescription>Vista rápida del estado actual</CardDescription>
           </CardHeader>
-          <CardContent>
-            {" "}
+          <CardContent className="h-[calc(100%-80px)] overflow-auto">
             <div className="grid grid-cols-7 gap-2">
               {tableData.map((table) => (
                 <div

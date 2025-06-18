@@ -23,10 +23,8 @@ interface ProductsResponse {
 
 class ProductsService {
   private baseUrl: string;
-
   constructor() {
-    this.baseUrl =
-      process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
+    this.baseUrl = process.env.NEXT_PUBLIC_API_URL!;
   }
 
   async getAllProducts(): Promise<Product[]> {

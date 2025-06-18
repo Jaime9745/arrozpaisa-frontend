@@ -121,9 +121,9 @@ export default function WaiterForm({
               />
             </Button>
           </div>
-        </CardHeader>
-        <CardContent className="h-[calc(100%-80px)] overflow-y-auto">
-          <form onSubmit={handleSubmit} className="space-y-4">
+        </CardHeader>{" "}
+        <CardContent className="h-[calc(100%-140px)] overflow-y-auto">
+          <form id="waiter-form" onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label
@@ -233,6 +233,7 @@ export default function WaiterForm({
         <CardFooter>
           <Button
             type="submit"
+            form="waiter-form"
             disabled={isSubmitting}
             className="flex-1 text-white font-normal transition-all duration-200 hover:scale-105 active:scale-95 hover:shadow-lg disabled:hover:scale-100"
             style={{

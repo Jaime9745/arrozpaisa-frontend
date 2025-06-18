@@ -6,7 +6,8 @@ import { AuthProvider } from "@/contexts/AuthContext";
 const poppins = Poppins({
   variable: "--font-poppins",
   subsets: ["latin"],
-  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+  weight: ["400", "500", "600", "700"], // Reduced font weights for better performance
+  display: "swap", // Improve font loading performance
 });
 
 export const metadata: Metadata = {
@@ -22,6 +23,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        {/* Preload critical resources */}
+        <link
+          rel="preload"
+          href="/images/loginLogo.svg"
+          as="image"
+          type="image/svg+xml"
+        />
+      </head>
       <body className={`${poppins.variable} antialiased font-sans`}>
         <AuthProvider>{children}</AuthProvider>
       </body>

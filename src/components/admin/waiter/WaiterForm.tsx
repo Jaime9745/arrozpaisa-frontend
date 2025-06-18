@@ -94,11 +94,10 @@ export default function WaiterForm({
   const title = mode === "add" ? "Añadir Mesero" : "Editar Mesero";
   const buttonText = mode === "add" ? "Añadir Mesero" : "Guardar Cambios";
   const submittingText = mode === "add" ? "Creando..." : "Guardando...";
-
   return (
-    <div className="w-1/3">
+    <div className="w-full">
       <Card
-        className="border-0 sticky top-6 h-[calc(100vh-160px)] sm:h-[calc(100vh-140px)] md:h-[calc(100vh-120px)] lg:h-[calc(100vh-100px)]"
+        className="border-0 lg:sticky lg:top-6 h-auto lg:h-[calc(100vh-160px)] sm:lg:h-[calc(100vh-140px)] md:lg:h-[calc(100vh-120px)] lg:h-[calc(100vh-100px)] transform transition-all duration-300 ease-in-out animate-in slide-in-from-top-4 lg:slide-in-from-right-4 fade-in"
         style={{ borderRadius: "30px", backgroundColor: "#fcfeff" }}
       >
         <CardHeader className="pb-4">
@@ -122,7 +121,7 @@ export default function WaiterForm({
             </Button>
           </div>
         </CardHeader>{" "}
-        <CardContent className="h-[calc(100%-140px)] overflow-y-auto">
+        <CardContent className="h-auto lg:h-[calc(100%-140px)] lg:overflow-y-auto p-6">
           <form id="waiter-form" onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-4">
               <div className="space-y-2">

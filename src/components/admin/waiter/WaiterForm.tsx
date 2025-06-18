@@ -1,11 +1,17 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface FormData {
   firstName: string;
@@ -14,23 +20,41 @@ interface FormData {
   phoneNumber: string;
 }
 
-interface AddWaiterFormProps {
+interface WaiterFormProps {
+  mode: "add" | "edit";
+  initialData?: FormData;
   onSubmit: (formData: FormData) => Promise<void>;
   onClose: () => void;
   isSubmitting: boolean;
 }
 
-export default function AddWaiterForm({
+export default function WaiterForm({
+  mode,
+  initialData,
   onSubmit,
   onClose,
   isSubmitting,
-}: AddWaiterFormProps) {
+}: WaiterFormProps) {
   const [formData, setFormData] = useState<FormData>({
     firstName: "",
     lastName: "",
     identificationNumber: "",
     phoneNumber: "",
   });
+
+  // Initialize form data when component mounts or initialData changes
+  useEffect(() => {
+    if (mode === "edit" && initialData) {
+      setFormData(initialData);
+    } else {
+      setFormData({
+        firstName: "",
+        lastName: "",
+        identificationNumber: "",
+        phoneNumber: "",
+      });
+    }
+  }, [mode, initialData]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -43,13 +67,16 @@ export default function AddWaiterForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await onSubmit(formData);
-    // Reset form after successful submission
-    setFormData({
-      firstName: "",
-      lastName: "",
-      identificationNumber: "",
-      phoneNumber: "",
-    });
+
+    // Reset form after successful submission only in add mode
+    if (mode === "add") {
+      setFormData({
+        firstName: "",
+        lastName: "",
+        identificationNumber: "",
+        phoneNumber: "",
+      });
+    }
   };
 
   const handleClose = () => {
@@ -62,6 +89,12 @@ export default function AddWaiterForm({
     });
     onClose();
   };
+
+  // Dynamic text based on mode
+  const title = mode === "add" ? "Añadir Mesero" : "Editar Mesero";
+  const buttonText = mode === "add" ? "Añadir Mesero" : "Guardar Cambios";
+  const submittingText = mode === "add" ? "Creando..." : "Guardando...";
+
   return (
     <div className="w-1/3">
       <Card
@@ -71,7 +104,7 @@ export default function AddWaiterForm({
         <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
             <CardTitle className="text-xl font-semibold text-gray-800">
-              Añadir Mesero
+              {title}
             </CardTitle>
             <Button
               variant="ghost"
@@ -95,7 +128,7 @@ export default function AddWaiterForm({
               <div className="space-y-2">
                 <Label
                   htmlFor="firstName"
-                  className="text-sm font-medium text-gray-700"
+                  className="text-sm font-normal text-gray-700"
                 >
                   Nombre *
                 </Label>
@@ -108,12 +141,19 @@ export default function AddWaiterForm({
                   required
                   className="bg-white border-gray-200 rounded-lg"
                   placeholder="Ej: Juan"
+                  style={{
+                    background: "#f7f7f8",
+                    borderRadius: "20px",
+                    width: "100%",
+                    height: "50px",
+                    color: "#000",
+                  }}
                 />
               </div>
               <div className="space-y-2">
                 <Label
                   htmlFor="lastName"
-                  className="text-sm font-medium text-gray-700"
+                  className="text-sm font-normal text-gray-700"
                 >
                   Apellido *
                 </Label>
@@ -126,6 +166,13 @@ export default function AddWaiterForm({
                   required
                   className="bg-white border-gray-200 rounded-lg"
                   placeholder="Ej: Pérez"
+                  style={{
+                    background: "#f7f7f8",
+                    borderRadius: "20px",
+                    width: "100%",
+                    height: "50px",
+                    color: "#000",
+                  }}
                 />
               </div>
             </div>
@@ -133,7 +180,7 @@ export default function AddWaiterForm({
               <div className="space-y-2">
                 <Label
                   htmlFor="identificationNumber"
-                  className="text-sm font-medium text-gray-700"
+                  className="text-sm font-normal text-gray-700"
                 >
                   Número de Identificación *
                 </Label>
@@ -144,15 +191,21 @@ export default function AddWaiterForm({
                   value={formData.identificationNumber}
                   onChange={handleInputChange}
                   required
-                  className="bg-white border-gray-200 rounded-lg"
                   placeholder="Ej: 12345678"
+                  style={{
+                    background: "#f7f7f8",
+                    borderRadius: "20px",
+                    width: "100%",
+                    height: "50px",
+                    color: "#000",
+                  }}
                 />
               </div>
 
               <div className="space-y-2">
                 <Label
                   htmlFor="phoneNumber"
-                  className="text-sm font-medium text-gray-700"
+                  className="text-sm font-normal text-gray-700"
                 >
                   Número de Celular *
                 </Label>
@@ -165,21 +218,32 @@ export default function AddWaiterForm({
                   required
                   className="bg-white border-gray-200 rounded-lg"
                   placeholder="Ej: 3001234567"
+                  style={{
+                    background: "#f7f7f8",
+                    borderRadius: "20px",
+                    width: "100%",
+                    height: "50px",
+                    color: "#000",
+                  }}
                 />
               </div>
             </div>
-            <div className="flex gap-3 pt-4">
-              <Button
-                type="submit"
-                disabled={isSubmitting}
-                className="flex-1 text-white font-normal transition-all duration-200 hover:scale-105 active:scale-95 hover:shadow-lg disabled:hover:scale-100"
-                style={{ background: "#EB3123", borderRadius: "30px" }}
-              >
-                {isSubmitting ? "Creando..." : "Añadir Mesero"}
-              </Button>
-            </div>
           </form>
         </CardContent>
+        <CardFooter>
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+            className="flex-1 text-white font-normal transition-all duration-200 hover:scale-105 active:scale-95 hover:shadow-lg disabled:hover:scale-100"
+            style={{
+              background: "#EB3123",
+              borderRadius: "30px",
+              height: "50px",
+            }}
+          >
+            {isSubmitting ? submittingText : buttonText}
+          </Button>
+        </CardFooter>
       </Card>
     </div>
   );

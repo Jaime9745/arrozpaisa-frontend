@@ -10,6 +10,15 @@ const nextConfig: NextConfig = {
         pathname: "/**",
       },
     ],
+  }, // Optimize for modern browsers
+  experimental: {
+    optimizePackageImports: ["lucide-react", "@radix-ui/react-icons"],
+  },
+  // Enable compression
+  compress: true,
+  // Optimize JavaScript for modern browsers
+  compiler: {
+    removeConsole: process.env.NODE_ENV === "production",
   },
 };
 

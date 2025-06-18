@@ -12,7 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import Image from "next/image";
 
 export function LoginForm({
@@ -24,20 +24,22 @@ export function LoginForm({
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+      setError("");
+      setIsLoading(true);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setIsLoading(true);
-
-    try {
-      await login(userName, password);
-    } catch (error) {
-      setError((error as Error).message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+      try {
+        await login(userName, password);
+      } catch (error) {
+        setError((error as Error).message);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [login, userName, password]
+  );
   return (
     <div className={cn("flex flex-col gap-4 sm:gap-6", className)} {...props}>
       {" "}
@@ -55,6 +57,8 @@ export function LoginForm({
               width={100}
               height={100}
               className="w-20 h-20 sm:w-24 sm:h-24"
+              priority
+              loading="eager"
             />
           </div>
           <CardDescription

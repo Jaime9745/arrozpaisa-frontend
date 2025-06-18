@@ -6,8 +6,8 @@ import { LoginForm } from "@/components/login-form";
 export default function LoginPage() {
   return (
     <div className="min-h-svh grid grid-cols-1 lg:grid-cols-2 gap-2">
-      {/* Left Side - Logo */}
-      <div className="flex items-center justify-end p-2 lg:pr-1">
+      {/* Left Side - Logo (hidden on mobile/tablet, visible on desktop) */}
+      <div className="hidden lg:flex items-center justify-end p-2 lg:pr-1">
         <div className="text-center">
           <Image
             src="/images/loginLogo.svg"
@@ -21,7 +21,7 @@ export default function LoginPage() {
       </div>
 
       {/* Right Side - Login Form */}
-      <div className="flex items-center justify-start p-2 lg:pl-1">
+      <div className="flex items-center justify-center lg:justify-start p-2 lg:pl-1">
         <div className="w-full max-w-xs md:max-w-sm lg:max-w-[500px]">
           <LoginForm />
         </div>

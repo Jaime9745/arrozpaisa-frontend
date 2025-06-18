@@ -126,42 +126,43 @@ export function useWaiterTableColumns({
         const isVisible = visiblePasswords.has(waiterId);
         const copyKey = `password-${password}`;
         const isCopied = copiedValues.has(copyKey);
-
         return (
-          <div className="flex items-center gap-2 group">
+          <div className="flex items-center gap-2 group flex-wrap sm:flex-nowrap">
             <span
-              className="font-mono text-sm bg-gray-100 px-2 py-1 rounded cursor-pointer"
+              className="font-mono text-sm bg-gray-100 px-2 py-1 rounded cursor-pointer flex-shrink-0"
               onClick={() => onCopyToClipboard(password, "password")}
               title="Hacer clic para copiar contraseña"
             >
               {isVisible ? password : "••••••••"}
             </span>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onTogglePasswordVisibility(waiterId)}
-              className="h-8 w-8 p-0 hover:bg-gray-100"
-              title={isVisible ? "Ocultar contraseña" : "Mostrar contraseña"}
-            >
-              {isVisible ? (
-                <EyeOff className="h-4 w-4 text-gray-500" />
-              ) : (
-                <Eye className="h-4 w-4 text-gray-500" />
-              )}
-            </Button>{" "}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onCopyToClipboard(password, "password")}
-              className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-gray-100"
-              title="Copiar contraseña"
-            >
-              {isCopied ? (
-                <Check className="h-3 w-3 text-green-500" />
-              ) : (
-                <Copy className="h-3 w-3 text-gray-500" />
-              )}
-            </Button>
+            <div className="flex items-center gap-1">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onTogglePasswordVisibility(waiterId)}
+                className="h-8 w-8 p-0 hover:bg-gray-100"
+                title={isVisible ? "Ocultar contraseña" : "Mostrar contraseña"}
+              >
+                {isVisible ? (
+                  <EyeOff className="h-4 w-4 text-gray-500" />
+                ) : (
+                  <Eye className="h-4 w-4 text-gray-500" />
+                )}
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onCopyToClipboard(password, "password")}
+                className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-gray-100"
+                title="Copiar contraseña"
+              >
+                {isCopied ? (
+                  <Check className="h-3 w-3 text-green-500" />
+                ) : (
+                  <Copy className="h-3 w-3 text-gray-500" />
+                )}
+              </Button>
+            </div>
           </div>
         );
       },

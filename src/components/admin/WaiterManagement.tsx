@@ -23,6 +23,7 @@ export default function WaiterManagement() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [waiterToDelete, setWaiterToDelete] = useState<string | null>(null);
+  const [isClosing, setIsClosing] = useState(false);
   const { waiters, loading, error, deleteWaiter, createWaiter, updateWaiter } =
     useWaiters();
   const { toggleSidebar } = useSidebar();
@@ -33,13 +34,15 @@ export default function WaiterManagement() {
     setWaiterToDelete(id);
     setDeleteDialogOpen(true);
   };
-
   // Handle waiter editing
   const handleEditWaiter = (waiter: Waiter) => {
     setEditingWaiter(waiter);
     setShowEditForm(true);
+    setIsClosing(false);
     // Close add form if open
-    setShowCreateForm(false);
+    if (showCreateForm) {
+      handleCloseAddForm();
+    }
   };
 
   // Confirm deletion
@@ -74,7 +77,8 @@ export default function WaiterManagement() {
         userName,
       };
       await createWaiter(waiterData);
-      setShowCreateForm(false);
+      // Close form with animation
+      handleCloseAddForm();
     } catch (error) {
       console.error("Failed to create waiter:", error);
     } finally {
@@ -100,24 +104,31 @@ export default function WaiterManagement() {
         userName,
       };
       await updateWaiter(editingWaiter.id, waiterData);
-      setShowEditForm(false);
-      setEditingWaiter(null);
+      // Close form with animation
+      handleCloseEditForm();
     } catch (error) {
       console.error("Failed to update waiter:", error);
     } finally {
       setIsSubmitting(false);
     }
   };
-
-  // Close add form
+  // Close add form with animation
   const handleCloseAddForm = () => {
-    setShowCreateForm(false);
+    setIsClosing(true);
+    setTimeout(() => {
+      setShowCreateForm(false);
+      setIsClosing(false);
+    }, 300); // Match animation duration
   };
 
-  // Close edit form
+  // Close edit form with animation
   const handleCloseEditForm = () => {
-    setShowEditForm(false);
-    setEditingWaiter(null);
+    setIsClosing(true);
+    setTimeout(() => {
+      setShowEditForm(false);
+      setEditingWaiter(null);
+      setIsClosing(false);
+    }, 300); // Match animation duration
   }; // Toggle password visibility
   const togglePasswordVisibility = (waiterId: string) => {
     const newVisiblePasswords = new Set(visiblePasswords);
@@ -144,30 +155,94 @@ export default function WaiterManagement() {
       <WaiterManagementHeader
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
-        onAddWaiter={() => setShowCreateForm(true)}
+        onAddWaiter={() => {
+          setShowCreateForm(true);
+          setIsClosing(false);
+          // Close edit form if open
+          if (showEditForm) {
+            handleCloseEditForm();
+          }
+        }}
         onToggleSidebar={toggleSidebar}
       />
-
       {/* Error Message */}
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
           {error}
         </div>
-      )}
+      )}{" "}
+      {/* Main Content Area with Responsive Layout */}
+      <div className="space-y-6 lg:space-y-0 lg:flex lg:gap-6">
+        {" "}
+        {/* Forms Container - Shows on top for mobile/tablet, side for desktop */}
+        {(showCreateForm || showEditForm || isClosing) && (
+          <div
+            className={`lg:order-2 lg:w-1/3 w-full transition-all duration-300 ${
+              (showCreateForm || showEditForm) && !isClosing
+                ? "max-h-[1000px] opacity-100"
+                : "max-h-0 opacity-0 overflow-hidden"
+            }`}
+          >
+            {/* Create Waiter Form */}
+            {showCreateForm && (
+              <div
+                className={`transform transition-all duration-300 ease-in-out ${
+                  isClosing
+                    ? "scale-95 opacity-0 -translate-y-4 lg:translate-y-0 lg:translate-x-4"
+                    : "scale-100 opacity-100 translate-y-0 lg:translate-x-0"
+                }`}
+              >
+                <WaiterForm
+                  mode="add"
+                  onSubmit={handleCreateWaiter}
+                  onClose={handleCloseAddForm}
+                  isSubmitting={isSubmitting}
+                />
+              </div>
+            )}
 
-      {/* Main Content Area with Side-by-Side Layout */}
-      <div className="flex gap-6">
+            {/* Edit Waiter Form */}
+            {showEditForm && editingWaiter && (
+              <div
+                className={`transform transition-all duration-300 ease-in-out ${
+                  isClosing
+                    ? "scale-95 opacity-0 -translate-y-4 lg:translate-y-0 lg:translate-x-4"
+                    : "scale-100 opacity-100 translate-y-0 lg:translate-x-0"
+                }`}
+              >
+                <WaiterForm
+                  mode="edit"
+                  initialData={{
+                    firstName: editingWaiter.firstName,
+                    lastName: editingWaiter.lastName,
+                    identificationNumber: editingWaiter.identificationNumber,
+                    phoneNumber: editingWaiter.phoneNumber,
+                  }}
+                  onSubmit={handleUpdateWaiter}
+                  onClose={handleCloseEditForm}
+                  isSubmitting={isSubmitting}
+                />
+              </div>
+            )}
+          </div>
+        )}
         {/* Data Table Card Container */}
         <div
-          className={`transition-all duration-300 ${
-            showCreateForm || showEditForm ? "w-2/3" : "w-full"
+          className={`lg:order-1 transition-all duration-300 ${
+            (showCreateForm || showEditForm) && !isClosing
+              ? "lg:w-2/3 w-full"
+              : "w-full"
           }`}
         >
           <Card
-            className="border-0 h-[calc(100vh-160px)] sm:h-[calc(100vh-140px)] md:h-[calc(100vh-120px)] lg:h-[calc(100vh-100px)]"
+            className={`border-0 transition-all duration-300 ${
+              (showCreateForm || showEditForm) && !isClosing
+                ? "h-[calc(100vh-500px)] sm:h-[calc(100vh-480px)] md:h-[calc(100vh-460px)] lg:h-[calc(100vh-100px)]"
+                : "h-[calc(100vh-160px)] sm:h-[calc(100vh-140px)] md:h-[calc(100vh-120px)] lg:h-[calc(100vh-100px)]"
+            }`}
             style={{ borderRadius: "30px", backgroundColor: "#fcfeff" }}
           >
-            <CardContent className="h-full overflow-y-auto">
+            <CardContent className="h-full overflow-hidden p-4 sm:p-6">
               {loading ? (
                 <div className="flex items-center justify-center h-full">
                   <div className="text-lg text-gray-500">
@@ -175,45 +250,20 @@ export default function WaiterManagement() {
                   </div>
                 </div>
               ) : (
-                <DataTable<Waiter, any>
-                  columns={columns}
-                  data={waiters}
-                  globalFilter={searchTerm}
-                  onGlobalFilterChange={setSearchTerm}
-                  useCardStyle={true}
-                />
+                <div className="h-full overflow-x-auto">
+                  <DataTable<Waiter, any>
+                    columns={columns}
+                    data={waiters}
+                    globalFilter={searchTerm}
+                    onGlobalFilterChange={setSearchTerm}
+                    useCardStyle={true}
+                  />
+                </div>
               )}
             </CardContent>
           </Card>
         </div>
-
-        {/* Create Waiter Form */}
-        {showCreateForm && (
-          <WaiterForm
-            mode="add"
-            onSubmit={handleCreateWaiter}
-            onClose={handleCloseAddForm}
-            isSubmitting={isSubmitting}
-          />
-        )}
-
-        {/* Edit Waiter Form */}
-        {showEditForm && editingWaiter && (
-          <WaiterForm
-            mode="edit"
-            initialData={{
-              firstName: editingWaiter.firstName,
-              lastName: editingWaiter.lastName,
-              identificationNumber: editingWaiter.identificationNumber,
-              phoneNumber: editingWaiter.phoneNumber,
-            }}
-            onSubmit={handleUpdateWaiter}
-            onClose={handleCloseEditForm}
-            isSubmitting={isSubmitting}
-          />
-        )}
       </div>
-
       {/* Delete Confirmation Dialog */}
       <DeleteConfirmationDialog
         isOpen={deleteDialogOpen}

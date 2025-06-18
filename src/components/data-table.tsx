@@ -71,8 +71,9 @@ export function DataTable<TData, TValue>({
     <div className="space-y-4">
       {useCardStyle ? (
         <div className="space-y-4">
-          {/* Header row for sorting */}
-          <div className="hidden sm:flex px-6 py-3 border-b">
+          {" "}
+          {/* Header row for sorting - only visible on larger screens */}
+          <div className="hidden lg:flex px-6 py-3 border-b">
             {table.getHeaderGroups().map((headerGroup) => (
               <div key={headerGroup.id} className="flex w-full">
                 {headerGroup.headers.map((header) => (
@@ -87,7 +88,6 @@ export function DataTable<TData, TValue>({
                     }`}
                     onClick={header.column.getToggleSortingHandler()}
                   >
-                    {" "}
                     <span
                       style={{
                         color: "#030229",
@@ -106,21 +106,23 @@ export function DataTable<TData, TValue>({
               </div>
             ))}
           </div>
-
           {/* Card rows */}
           <div className="space-y-4">
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <div
                   key={row.id}
-                  className="rounded-xl shadow-sm p-6 flex items-center"
+                  className="rounded-xl shadow-sm p-4 sm:p-6 space-y-3 sm:space-y-0 sm:flex sm:items-center"
                   style={{ backgroundColor: "#ffffff" }}
                 >
-                  {row.getVisibleCells().map((cell) => {
+                  {row.getVisibleCells().map((cell, index) => {
                     // Special styling for the actions column
                     if (cell.column.id === "actions") {
                       return (
-                        <div key={cell.id} className="w-20 flex justify-center">
+                        <div
+                          key={cell.id}
+                          className="flex justify-end sm:justify-center sm:w-20 mt-3 sm:mt-0"
+                        >
                           {flexRender(
                             cell.column.columnDef.cell,
                             cell.getContext()
@@ -128,13 +130,30 @@ export function DataTable<TData, TValue>({
                         </div>
                       );
                     }
-                    // Regular columns
+
+                    // Get header name for mobile labels
+                    const headerGroup = table.getHeaderGroups()[0];
+                    const header = headerGroup?.headers[index];
+                    const headerText = header
+                      ? typeof header.column.columnDef.header === "string"
+                        ? header.column.columnDef.header
+                        : header.id
+                      : "";
+
+                    // Regular columns with responsive design
                     return (
-                      <div key={cell.id} className="flex-1">
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
+                      <div key={cell.id} className="flex-1 min-w-0">
+                        {/* Mobile: Show header label above content */}
+                        <div className="sm:hidden text-xs font-medium text-gray-500 mb-1 uppercase tracking-wide">
+                          {headerText}
+                        </div>
+                        {/* Content */}
+                        <div className="break-words">
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </div>
                       </div>
                     );
                   })}

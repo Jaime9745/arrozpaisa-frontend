@@ -44,7 +44,7 @@ export default function AdminSidebar({
       {/* Mobile Overlay */}
       {isMobileOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          className="fixed inset-0 backdrop-blur-sm bg-black/20 z-40 lg:hidden"
           onClick={() => setIsMobileOpen(false)}
         />
       )}{" "}
@@ -52,14 +52,15 @@ export default function AdminSidebar({
       <Card
         className={`
           fixed lg:relative transition-transform duration-300 ease-in-out z-50
-          w-80 bg-white border-0 flex flex-col h-full lg:h-auto
+          w-80 bg-white border-0 flex flex-col
+          h-[calc(100vh-60px)] md:h-[calc(100vh-50px)] lg:h-[calc(100vh-48px)]
           ${
             isMobileOpen
               ? "translate-x-0"
               : "-translate-x-[120%] lg:translate-x-0"
           }
         `}
-        style={{ borderRadius: "30px" }}
+        style={{ borderRadius: "30px", backgroundColor: "#ffffff" }}
       >
         {" "}
         {/* Header with close button for mobile */}
@@ -92,7 +93,7 @@ export default function AdminSidebar({
             </div>
           </div>
         </div>{" "}
-        <nav className="flex-1 mt-2 px-4">
+        <nav className="flex-1 mt-2 px-4 overflow-y-auto">
           {sidebarItems.map((item) => {
             const IconComponent = item.icon;
             return (
@@ -116,7 +117,7 @@ export default function AdminSidebar({
             );
           })}
         </nav>
-        <div className="p-6 pt-0 px-4 flex justify-center">
+        <div className="p-6 pt-0 px-4 flex justify-center mt-auto">
           <Button
             onClick={handleLogout}
             variant="outline"

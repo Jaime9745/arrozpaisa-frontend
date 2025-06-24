@@ -71,13 +71,23 @@ class ProductsService {
   ): Promise<Product> {
     try {
       const token = localStorage.getItem("token");
+
+      // Transform the product data to match backend expectations
+      const productData = {
+        name: product.name,
+        description: product.description,
+        categoryId: product.categoryId,
+        price: product.price,
+        imageBase64: product.imageUrl, // Backend expects imageBase64, not imageUrl
+      };
+
       const response = await fetch(`${this.baseUrl}/productes`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           ...(token && { Authorization: `Bearer ${token}` }),
         },
-        body: JSON.stringify(product),
+        body: JSON.stringify(productData),
       });
 
       if (!response.ok) {
@@ -95,13 +105,28 @@ class ProductsService {
   async updateProduct(id: string, product: Partial<Product>): Promise<Product> {
     try {
       const token = localStorage.getItem("token");
+
+      // Transform the product data to match backend expectations
+      const productData: any = {};
+
+      if (product.name !== undefined) productData.name = product.name;
+      if (product.description !== undefined)
+        productData.description = product.description;
+      if (product.categoryId !== undefined)
+        productData.categoryId = product.categoryId;
+      if (product.price !== undefined) productData.price = product.price;
+      if (product.imageUrl !== undefined) {
+        // Backend expects imageBase64, not imageUrl
+        productData.imageBase64 = product.imageUrl;
+      }
+
       const response = await fetch(`${this.baseUrl}/productes/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
           ...(token && { Authorization: `Bearer ${token}` }),
         },
-        body: JSON.stringify(product),
+        body: JSON.stringify(productData),
       });
 
       if (!response.ok) {

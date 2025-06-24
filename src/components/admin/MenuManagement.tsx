@@ -48,25 +48,6 @@ export default function MenuManagement() {
         product.description.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
-  // Get the price range for display
-  const getPriceDisplay = (variants: Product["variants"]) => {
-    if (!variants || variants.length === 0) return "Sin precio";
-
-    if (variants.length === 1) {
-      return formatPrice(variants[0].price);
-    }
-
-    const prices = variants.map((v) => v.price);
-    const minPrice = Math.min(...prices);
-    const maxPrice = Math.max(...prices);
-
-    if (minPrice === maxPrice) {
-      return formatPrice(minPrice);
-    }
-
-    return `${formatPrice(minPrice)} - ${formatPrice(maxPrice)}`;
-  };
-
   // Format price for display
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("es-CO", {
@@ -169,15 +150,8 @@ export default function MenuManagement() {
                               className="text-base font-normal"
                               style={{ color: "#C83636" }}
                             >
-                              {getPriceDisplay(product.variants)}
+                              {formatPrice(product.price)}
                             </span>
-                            {product.variants &&
-                              product.variants.length > 1 && (
-                                <span className="text-xs text-gray-500">
-                                  {product.variants.length} variantes
-                                  disponibles
-                                </span>
-                              )}
                           </div>
                         </CardContent>
                       </div>

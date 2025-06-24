@@ -1,18 +1,13 @@
-interface ProductVariant {
-  name: string;
-  price: number;
-}
-
-interface Product {
+export interface Product {
   id: string;
   name: string;
   description: string;
   imageUrl: string;
   categoryId: string;
+  price: number;
   isActive: boolean;
-  variants: ProductVariant[];
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 interface ProductsResponse {
@@ -144,4 +139,3 @@ class ProductsService {
 }
 
 export const productsService = new ProductsService();
-export type { Product, ProductVariant };

@@ -7,10 +7,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Search, Plus, Edit, Trash2, Menu } from "lucide-react";
+import { Edit, Trash2 } from "lucide-react";
 import { useState } from "react";
 import Image from "next/image";
 import {
@@ -19,11 +17,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 import { Product } from "@/services/productsService";
 import { useProducts } from "@/hooks/useProducts";
 import { useCategories } from "@/hooks/useCategories";
 import { useSidebar } from "@/contexts/SidebarContext";
 import ProductForm from "./product/ProductForm";
+import MenuManagementHeader from "./menu/MenuManagementHeader";
 
 export default function MenuManagement() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -157,52 +157,28 @@ export default function MenuManagement() {
   };
   return (
     <div className="space-y-6">
-      {" "}
-      {/* Search Input Where Title Was */}
-      <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4 sm:gap-4">
-        <div className="flex items-center gap-4 flex-1">
-          {/* Mobile Hamburger Button */}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggleSidebar}
-            className="lg:hidden h-auto py-3 w-12 bg-white border-gray-200 hover:bg-gray-50 transition-all duration-200 shadow-sm"
-          >
-            <Menu className="h-6 w-6 text-gray-800" />
-          </Button>
-          <div className="flex-1 relative">
-            <Input
-              type="text"
-              placeholder="Buscar por nombre o descripción..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-white border-gray-200 pl-4 pr-12 py-4 shadow-sm"
-            />
-            <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-          </div>
-        </div>
-        <Button
-          className="px-8 py-3 w-full sm:min-w-[180px] sm:w-auto text-white flex items-center gap-2 justify-center"
-          style={{ background: "#EB3123" }}
-          onClick={() => {
-            setShowCreateForm(true);
-            setIsClosing(false);
-            // Close edit form if open
-            if (showEditForm) {
-              handleCloseEditForm();
-            }
-          }}
-        >
-          <Plus className="h-5 w-5" />
-          Agregar Plato
-        </Button>
-      </div>
+      {/* Search Input and Add Button */}
+      <MenuManagementHeader
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        onAddProduct={() => {
+          setShowCreateForm(true);
+          setIsClosing(false);
+          // Close edit form if open
+          if (showEditForm) {
+            handleCloseEditForm();
+          }
+        }}
+        onToggleSidebar={toggleSidebar}
+      />
+
       {/* Error Message */}
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
           {error}
         </div>
       )}
+
       {/* Main Content Area with Responsive Layout */}
       <div className="space-y-6 lg:space-y-0 lg:flex lg:gap-6">
         {/* Forms Container - Shows on top for mobile/tablet, side for desktop */}
@@ -297,10 +273,8 @@ export default function MenuManagement() {
                         }}
                       >
                         <div className="flex">
-                          {" "}
                           {/* Image Section */}
                           <div className="w-28 h-28 flex-shrink-0 pl-3 pr-1 py-2">
-                            {" "}
                             <Image
                               src={product.imageUrl}
                               alt={product.name}
@@ -315,7 +289,6 @@ export default function MenuManagement() {
                           </div>
                           {/* Content Section */}
                           <div className="flex-1 flex flex-col justify-between pr-16 pl-2">
-                            {" "}
                             <CardHeader className="pb-1">
                               <CardTitle className="text-lg">
                                 {product.name}
@@ -377,7 +350,6 @@ export default function MenuManagement() {
                                 className="cursor-pointer focus:bg-red-50 p-3"
                                 onClick={() => handleDeleteProduct(product.id)}
                               >
-                                {" "}
                                 <Trash2
                                   className="h-5 w-5 mr-3"
                                   style={{ color: "#E71D36" }}

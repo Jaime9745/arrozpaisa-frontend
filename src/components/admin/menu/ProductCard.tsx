@@ -37,7 +37,7 @@ export default function ProductCard({
   return (
     <Card
       key={product.id}
-      className="transition-colors duration-200 relative min-h-[120px]"
+      className="transition-colors duration-200 relative min-h-[120px] py-2"
       style={{
         borderRadius: "30px",
         backgroundColor: "#F1EFEF",
@@ -45,12 +45,12 @@ export default function ProductCard({
     >
       <div className="flex">
         {/* Image Section */}
-        <div className="w-28 h-28 flex-shrink-0 pl-3 pr-1 py-2">
+        <div className="w-32 h-32 flex-shrink-0 pl-3 pr-1 py-2">
           <Image
             src={product.imageUrl}
             alt={product.name}
-            width={96}
-            height={96}
+            width={128}
+            height={128}
             className="w-full h-full object-cover rounded-2xl"
             onError={(e) => {
               const target = e.target as HTMLImageElement;

@@ -216,22 +216,103 @@ export default function ProductForm({
               {title}
             </CardTitle>
             <Button
-              type="button"
               variant="ghost"
               size="icon"
               onClick={handleClose}
-              className="hover:bg-gray-100 rounded-full h-8 w-8"
+              className="h-10 w-10 text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-all duration-200 hover:scale-110 active:scale-95"
             >
-              <X className="h-4 w-4" />
+              <Image
+                src="/images/icons/closeCardIcon.svg"
+                alt="Close"
+                width={40}
+                height={40}
+                className="transition-transform duration-200"
+              />
             </Button>
           </div>
-        </CardHeader>
-
+        </CardHeader>{" "}
         <CardContent className="h-auto lg:h-[calc(100%-140px)] lg:overflow-y-auto p-6">
           <form id="product-form" onSubmit={handleSubmit} className="space-y-4">
+            {/* Image Upload */}
+            <div className="space-y-2">
+              <Label className="text-sm font-normal text-gray-700">
+                Imagen del plato *
+              </Label>
+
+              {/* Image Preview or Upload Area */}
+              <div className="relative w-48 h-48 mx-auto">
+                <div
+                  className="w-full h-full cursor-pointer flex items-center justify-center rounded-full overflow-hidden"
+                  onClick={() => fileInputRef.current?.click()}
+                  style={{
+                    background: "#f7f7f8",
+                  }}
+                >
+                  {imagePreview ? (
+                    <Image
+                      src={imagePreview}
+                      alt="Vista previa"
+                      fill
+                      className="object-cover"
+                    />
+                  ) : (
+                    <Image
+                      src="/images/icons/ImageInputIcon.svg"
+                      alt="Seleccionar imagen"
+                      width={64}
+                      height={64}
+                      className="opacity-50"
+                    />
+                  )}
+                </div>
+
+                {/* Remove Image Button - Only show when image is selected */}
+                {imagePreview && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={handleRemoveImage}
+                    className="absolute top-2 right-2 h-10 w-10 text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-all duration-200 hover:scale-110 active:scale-95"
+                  >
+                    <Image
+                      src="/images/icons/closeCardIcon.svg"
+                      alt="Close"
+                      width={40}
+                      height={40}
+                      className="transition-transform duration-200"
+                    />
+                  </Button>
+                )}
+              </div>
+
+              {/* Hidden File Input */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleImageSelect}
+                className="hidden"
+              />
+
+              {/* Image Error */}
+              {imageError && (
+                <p className="text-sm text-red-600 mt-1">{imageError}</p>
+              )}
+
+              {/* Image Guidelines */}
+              <p className="text-xs text-gray-500 mt-1">
+                Haz clic en el área para seleccionar una imagen. Formatos: JPG,
+                PNG, WebP. Tamaño máximo: 5MB.
+              </p>
+            </div>
+
             {/* Product Name */}
             <div className="space-y-2">
-              <Label htmlFor="name" className="text-sm font-medium">
+              <Label
+                htmlFor="name"
+                className="text-sm font-normal text-gray-700"
+              >
                 Nombre del plato *
               </Label>
               <Input
@@ -242,48 +323,22 @@ export default function ProductForm({
                 onChange={handleInputChange}
                 placeholder="Ej: Arroz con pollo"
                 required
-                className="w-full"
-              />
-            </div>
-
-            {/* Product Description */}
-            <div className="space-y-2">
-              <Label htmlFor="description" className="text-sm font-medium">
-                Descripción *
-              </Label>
-              <Textarea
-                id="description"
-                name="description"
-                value={formData.description}
-                onChange={handleInputChange}
-                placeholder="Describe los ingredientes y características del plato..."
-                required
-                className="w-full min-h-[80px] resize-none"
-              />
-            </div>
-
-            {/* Price */}
-            <div className="space-y-2">
-              <Label htmlFor="price" className="text-sm font-medium">
-                Precio *
-              </Label>
-              <Input
-                id="price"
-                name="price"
-                type="number"
-                value={priceInput}
-                onChange={handleInputChange}
-                placeholder="0"
-                required
-                min="0"
-                step="100"
-                className="w-full"
+                style={{
+                  background: "#f7f7f8",
+                  borderRadius: "20px",
+                  width: "100%",
+                  height: "50px",
+                  color: "#000",
+                }}
               />
             </div>
 
             {/* Category */}
             <div className="space-y-2">
-              <Label htmlFor="category" className="text-sm font-medium">
+              <Label
+                htmlFor="category"
+                className="text-sm font-normal text-gray-700"
+              >
                 Categoría *
               </Label>
               <Select
@@ -291,12 +346,20 @@ export default function ProductForm({
                 onValueChange={handleSelectChange}
                 required
               >
-                <SelectTrigger className="w-full">
+                <SelectTrigger
+                  style={{
+                    background: "#f7f7f8",
+                    borderRadius: "20px",
+                    width: "100%",
+                    height: "50px",
+                    color: "#000",
+                  }}
+                >
                   <SelectValue placeholder="Selecciona una categoría" />
                 </SelectTrigger>
                 <SelectContent>
                   {categoriesLoading ? (
-                    <SelectItem value="" disabled>
+                    <SelectItem value="loading" disabled>
                       Cargando categorías...
                     </SelectItem>
                   ) : (
@@ -310,77 +373,70 @@ export default function ProductForm({
               </Select>
             </div>
 
-            {/* Image Upload */}
+            {/* Price */}
             <div className="space-y-2">
-              <Label className="text-sm font-medium">Imagen del plato *</Label>
+              <Label
+                htmlFor="price"
+                className="text-sm font-normal text-gray-700"
+              >
+                Precio *
+              </Label>
+              <Input
+                id="price"
+                name="price"
+                type="number"
+                value={priceInput}
+                onChange={handleInputChange}
+                placeholder="0"
+                required
+                min="0"
+                step="100"
+                style={{
+                  background: "#f7f7f8",
+                  borderRadius: "20px",
+                  width: "100%",
+                  height: "50px",
+                  color: "#000",
+                }}
+              />
+            </div>
 
-              {/* Image Preview */}
-              {imagePreview && (
-                <div className="relative w-full h-48 rounded-lg overflow-hidden mb-3">
-                  <Image
-                    src={imagePreview}
-                    alt="Vista previa"
-                    fill
-                    className="object-cover"
-                  />
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    size="icon"
-                    onClick={handleRemoveImage}
-                    className="absolute top-2 right-2 h-8 w-8 rounded-full"
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-              )}
-
-              {/* Upload Button */}
-              <div className="flex items-center gap-3">
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageSelect}
-                  className="hidden"
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={isImageLoading}
-                  className="flex items-center gap-2"
-                >
-                  <Upload className="h-4 w-4" />
-                  {isImageLoading
-                    ? "Procesando..."
-                    : imagePreview
-                    ? "Cambiar imagen"
-                    : "Subir imagen"}
-                </Button>
-              </div>
-
-              {/* Image Error */}
-              {imageError && (
-                <p className="text-sm text-red-600 mt-1">{imageError}</p>
-              )}
-
-              {/* Image Guidelines */}
-              <p className="text-xs text-gray-500 mt-1">
-                Formatos: JPG, PNG, WebP. Tamaño máximo: 5MB. Se redimensionará
-                automáticamente.
-              </p>
+            {/* Product Description */}
+            <div className="space-y-2">
+              <Label
+                htmlFor="description"
+                className="text-sm font-normal text-gray-700"
+              >
+                Descripción *
+              </Label>
+              <Textarea
+                id="description"
+                name="description"
+                value={formData.description}
+                onChange={handleInputChange}
+                placeholder="Describe los ingredientes y características del plato..."
+                required
+                className="w-full min-h-[80px] resize-none"
+                style={{
+                  background: "#f7f7f8",
+                  borderRadius: "20px",
+                  color: "#000",
+                }}
+              />
             </div>
           </form>
         </CardContent>
-
         <CardFooter>
           <Button
             type="submit"
             form="product-form"
             disabled={isSubmitting}
-            className="w-full text-white font-medium"
-            style={{ background: "#EB3123" }}
+            className="flex-1 text-white font-normal transition-all duration-200 hover:scale-105 active:scale-95 hover:shadow-lg disabled:hover:scale-100"
+            style={{
+              background: "#EB3123",
+              borderRadius: "30px",
+              height: "50px",
+            }}
           >
             {isSubmitting ? submittingText : buttonText}
           </Button>

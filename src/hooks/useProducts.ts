@@ -41,10 +41,18 @@ export const useProducts = () => {
     try {
       setError(null);
       const updatedProduct = await productsService.updateProduct(id, product);
-      setProducts((prev) =>
-        prev.map((p) => (p.id === id ? updatedProduct : p))
-      );
-      return updatedProduct;
+
+      // If the image was updated but backend returned old URL, use the new image
+      const finalProduct = {
+        ...updatedProduct,
+        imageUrl:
+          product.imageUrl && product.imageUrl.startsWith("data:image/")
+            ? product.imageUrl
+            : updatedProduct.imageUrl,
+      };
+
+      setProducts((prev) => prev.map((p) => (p.id === id ? finalProduct : p)));
+      return finalProduct;
     } catch (error) {
       console.error("Error updating product:", error);
       setError("Error al actualizar el producto");

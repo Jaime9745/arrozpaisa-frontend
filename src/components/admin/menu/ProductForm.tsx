@@ -86,6 +86,27 @@ export default function ProductForm({
     }
   }, [mode, initialData]);
 
+  // Ensure category selection is maintained when categories load
+  useEffect(() => {
+    if (
+      mode === "edit" &&
+      initialData &&
+      categories.length > 0 &&
+      !categoriesLoading
+    ) {
+      // Verify the categoryId exists in the loaded categories
+      const categoryExists = categories.some(
+        (cat) => cat.id === initialData.categoryId
+      );
+      if (categoryExists && formData.categoryId !== initialData.categoryId) {
+        setFormData((prev) => ({
+          ...prev,
+          categoryId: initialData.categoryId,
+        }));
+      }
+    }
+  }, [categories, categoriesLoading, mode, initialData]);
+
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -342,7 +363,8 @@ export default function ProductForm({
                 Categoría *
               </Label>
               <Select
-                value={formData.categoryId}
+                key={`category-select-${formData.categoryId}-${categories.length}`}
+                value={formData.categoryId || ""}
                 onValueChange={handleSelectChange}
                 required
               >

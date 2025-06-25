@@ -216,89 +216,23 @@ export default function ProductForm({
               {title}
             </CardTitle>
             <Button
+              type="button"
               variant="ghost"
               size="icon"
               onClick={handleClose}
-              className="h-10 w-10 text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-all duration-200 hover:scale-110 active:scale-95"
+              className="hover:bg-gray-100 rounded-full h-8 w-8"
             >
-              <Image
-                src="/images/icons/closeCardIcon.svg"
-                alt="Close"
-                width={40}
-                height={40}
-                className="transition-transform duration-200"
-              />
+              <X className="h-4 w-4" />
             </Button>
           </div>
         </CardHeader>
 
         <CardContent className="h-auto lg:h-[calc(100%-140px)] lg:overflow-y-auto p-6">
           <form id="product-form" onSubmit={handleSubmit} className="space-y-4">
-            {/* Image Upload Section */}
+            {/* Product Name */}
             <div className="space-y-2">
-              <Label className="text-sm font-normal text-gray-700">
-                Imagen del Plato *
-              </Label>
-
-              {imagePreview ? (
-                <div className="relative">
-                  <div className="w-full h-48 rounded-lg overflow-hidden border-2 border-gray-200">
-                    <Image
-                      src={imagePreview}
-                      alt="Preview"
-                      width={400}
-                      height={200}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={handleRemoveImage}
-                    className="absolute top-2 right-2 h-8 w-8 bg-red-500 hover:bg-red-600 text-white"
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-              ) : (
-                <div
-                  className="w-full h-48 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-gray-400 transition-colors"
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  <Upload className="h-12 w-12 text-gray-400 mb-2" />
-                  <p className="text-sm text-gray-500 text-center">
-                    {isImageLoading
-                      ? "Procesando imagen..."
-                      : "Haz clic para seleccionar una imagen"}
-                  </p>
-                  <p className="text-xs text-gray-400 mt-1">
-                    JPG, PNG o WebP (máx. 5MB)
-                  </p>
-                </div>
-              )}
-
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/jpeg,image/jpg,image/png,image/webp"
-                onChange={handleImageSelect}
-                className="hidden"
-                disabled={isImageLoading}
-              />
-
-              {imageError && (
-                <p className="text-sm text-red-500">{imageError}</p>
-              )}
-            </div>
-
-            {/* Name Field */}
-            <div className="space-y-2">
-              <Label
-                htmlFor="name"
-                className="text-sm font-normal text-gray-700"
-              >
-                Nombre del Plato *
+              <Label htmlFor="name" className="text-sm font-medium">
+                Nombre del plato *
               </Label>
               <Input
                 id="name"
@@ -306,103 +240,15 @@ export default function ProductForm({
                 type="text"
                 value={formData.name}
                 onChange={handleInputChange}
+                placeholder="Ej: Arroz con pollo"
                 required
-                placeholder="Ej: Arroz con Pollo"
-                style={{
-                  background: "#f7f7f8",
-                  borderRadius: "20px",
-                  width: "100%",
-                  height: "50px",
-                  color: "#000",
-                }}
+                className="w-full"
               />
             </div>
 
-            {/* Category Field */}
+            {/* Product Description */}
             <div className="space-y-2">
-              <Label className="text-sm font-normal text-gray-700">
-                Categoría *
-              </Label>
-              <Select
-                value={formData.categoryId}
-                onValueChange={handleSelectChange}
-                disabled={categoriesLoading}
-              >
-                <SelectTrigger
-                  style={{
-                    background: "#f7f7f8",
-                    borderRadius: "20px",
-                    width: "100%",
-                    height: "50px",
-                    color: "#000",
-                  }}
-                >
-                  <SelectValue placeholder="Selecciona una categoría" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((category) => (
-                    <SelectItem key={category.id} value={category.id}>
-                      {category.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {categoriesLoading && (
-                <p className="text-sm text-gray-500">Cargando categorías...</p>
-              )}
-            </div>
-
-            {/* Price Field */}
-            <div className="space-y-2">
-              <Label
-                htmlFor="price"
-                className="text-sm font-normal text-gray-700"
-              >
-                Precio (COP) *
-              </Label>
-              <Input
-                id="price"
-                name="price"
-                type="text"
-                value={priceInput}
-                onChange={handleInputChange}
-                onKeyPress={(e) => {
-                  // Only allow numbers
-                  if (
-                    !/[0-9]/.test(e.key) &&
-                    ![
-                      "Backspace",
-                      "Delete",
-                      "Tab",
-                      "Escape",
-                      "Enter",
-                      "ArrowLeft",
-                      "ArrowRight",
-                      "ArrowUp",
-                      "ArrowDown",
-                    ].includes(e.key)
-                  ) {
-                    e.preventDefault();
-                  }
-                }}
-                required
-                placeholder="Ej: 15000"
-                style={{
-                  background: "#f7f7f8",
-                  borderRadius: "20px",
-                  width: "100%",
-                  height: "50px",
-                  color: "#000",
-                }}
-              />
-            </div>
-
-            {/* Description Field */}
-            <div className="space-y-2">
-              <Label
-                htmlFor="description"
-                className="text-sm font-normal text-gray-700"
-              >
+              <Label htmlFor="description" className="text-sm font-medium">
                 Descripción *
               </Label>
               <Textarea
@@ -410,15 +256,120 @@ export default function ProductForm({
                 name="description"
                 value={formData.description}
                 onChange={handleInputChange}
+                placeholder="Describe los ingredientes y características del plato..."
                 required
-                placeholder="Describe el plato..."
-                className="min-h-[100px] resize-none"
-                style={{
-                  background: "#f7f7f8",
-                  borderRadius: "20px",
-                  color: "#000",
-                }}
+                className="w-full min-h-[80px] resize-none"
               />
+            </div>
+
+            {/* Price */}
+            <div className="space-y-2">
+              <Label htmlFor="price" className="text-sm font-medium">
+                Precio *
+              </Label>
+              <Input
+                id="price"
+                name="price"
+                type="number"
+                value={priceInput}
+                onChange={handleInputChange}
+                placeholder="0"
+                required
+                min="0"
+                step="100"
+                className="w-full"
+              />
+            </div>
+
+            {/* Category */}
+            <div className="space-y-2">
+              <Label htmlFor="category" className="text-sm font-medium">
+                Categoría *
+              </Label>
+              <Select
+                value={formData.categoryId}
+                onValueChange={handleSelectChange}
+                required
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Selecciona una categoría" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categoriesLoading ? (
+                    <SelectItem value="" disabled>
+                      Cargando categorías...
+                    </SelectItem>
+                  ) : (
+                    categories.map((category) => (
+                      <SelectItem key={category.id} value={category.id}>
+                        {category.name}
+                      </SelectItem>
+                    ))
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Image Upload */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Imagen del plato *</Label>
+
+              {/* Image Preview */}
+              {imagePreview && (
+                <div className="relative w-full h-48 rounded-lg overflow-hidden mb-3">
+                  <Image
+                    src={imagePreview}
+                    alt="Vista previa"
+                    fill
+                    className="object-cover"
+                  />
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="icon"
+                    onClick={handleRemoveImage}
+                    className="absolute top-2 right-2 h-8 w-8 rounded-full"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
+
+              {/* Upload Button */}
+              <div className="flex items-center gap-3">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageSelect}
+                  className="hidden"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isImageLoading}
+                  className="flex items-center gap-2"
+                >
+                  <Upload className="h-4 w-4" />
+                  {isImageLoading
+                    ? "Procesando..."
+                    : imagePreview
+                    ? "Cambiar imagen"
+                    : "Subir imagen"}
+                </Button>
+              </div>
+
+              {/* Image Error */}
+              {imageError && (
+                <p className="text-sm text-red-600 mt-1">{imageError}</p>
+              )}
+
+              {/* Image Guidelines */}
+              <p className="text-xs text-gray-500 mt-1">
+                Formatos: JPG, PNG, WebP. Tamaño máximo: 5MB. Se redimensionará
+                automáticamente.
+              </p>
             </div>
           </form>
         </CardContent>
@@ -427,13 +378,9 @@ export default function ProductForm({
           <Button
             type="submit"
             form="product-form"
-            disabled={isSubmitting || isImageLoading}
-            className="flex-1 text-white font-normal transition-all duration-200 hover:scale-105 active:scale-95 hover:shadow-lg disabled:hover:scale-100"
-            style={{
-              background: "#EB3123",
-              borderRadius: "30px",
-              height: "50px",
-            }}
+            disabled={isSubmitting}
+            className="w-full text-white font-medium"
+            style={{ background: "#EB3123" }}
           >
             {isSubmitting ? submittingText : buttonText}
           </Button>

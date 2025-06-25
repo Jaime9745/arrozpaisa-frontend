@@ -5,6 +5,9 @@ interface LoginRequest {
 
 interface LoginResponse {
   token: string;
+  user: {
+    role: string;
+  };
 }
 
 class LoginService {

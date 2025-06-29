@@ -20,9 +20,15 @@ import { useSidebar } from "@/contexts/SidebarContext";
 import StatsCard from "./StatsCard";
 import { ChartAreaDefault } from "../chart-area-default";
 import { ChartPieDonut } from "../chart-pie-donut";
+import { useTableMetrics } from "@/hooks/useTableMetrics";
 
 export default function DashboardHome() {
   const { toggleSidebar } = useSidebar();
+  const {
+    tableMetrics,
+    loading: tableLoading,
+    error: tableError,
+  } = useTableMetrics();
 
   const dashboardStats = [
     {
@@ -87,6 +93,64 @@ export default function DashboardHome() {
           <ChartPieDonut />
         </div>
       </div>
+
+      <Card style={{ borderRadius: "30px" }} className="h-full">
+        <CardHeader>
+          <CardTitle>Estado de Mesas</CardTitle>
+          <CardDescription>Vista rápida del estado actual</CardDescription>
+        </CardHeader>
+        <CardContent className="h-[calc(100%-80px)] overflow-auto">
+          {tableLoading ? (
+            <div className="flex items-center justify-center h-[200px]">
+              <div className="text-muted-foreground">
+                Cargando estado de mesas...
+              </div>
+            </div>
+          ) : tableError ? (
+            <div className="flex flex-col items-center justify-center h-[200px] space-y-2">
+              <div className="text-red-600">
+                Error al cargar mesas: {tableError}
+              </div>
+              <div className="text-sm text-muted-foreground">
+                Mostrando datos de ejemplo
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-7 gap-2">
+                {tableMetrics?.tables?.map((table) => (
+                  <div
+                    key={table.id}
+                    className={`p-2 rounded-lg text-center text-sm font-medium ${
+                      table.status === "free"
+                        ? "bg-gray-100 text-gray-800"
+                        : "bg-red-100 text-red-800" // For "attended"
+                    }`}
+                  >
+                    {table.number}
+                  </div>
+                ))}
+              </div>
+              <div className="flex justify-between mt-4 text-sm">
+                <span className="flex items-center gap-2">
+                  <div className="w-3 h-3 bg-red-100 border border-red-300 rounded"></div>
+                  Atendida ({tableMetrics?.occupiedTables || 0})
+                </span>
+                <span className="flex items-center gap-2">
+                  <div className="w-3 h-3 bg-gray-100 border border-gray-300 rounded"></div>
+                  Libre ({tableMetrics?.freeTables || 0})
+                </span>
+              </div>
+              <div className="mt-2 text-xs text-muted-foreground text-center">
+                Total: {tableMetrics?.totalTables || 0} mesas
+                {tableMetrics?.fromCache && (
+                  <span className="ml-2 text-blue-600">(datos en caché)</span>
+                )}
+              </div>
+            </>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

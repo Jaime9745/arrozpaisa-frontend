@@ -24,8 +24,6 @@ class WaitersService {
   async getAllWaiters(): Promise<Waiter[]> {
     try {
       const token = localStorage.getItem("token");
-      console.log("Fetching waiters from:", `${this.baseUrl}/waiters`);
-      console.log("Token:", token ? "Present" : "Not present");
 
       const response = await fetch(`${this.baseUrl}/waiters`, {
         method: "GET",
@@ -35,19 +33,12 @@ class WaitersService {
         },
       });
 
-      console.log("Response status:", response.status);
-      console.log("Response ok:", response.ok);
-
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Error al obtener los meseros");
       }
 
       const data: WaitersResponse = await response.json();
-      console.log("Raw response data:", data);
-
-      // Log the number of waiters received
-      console.log("Number of waiters received:", data.data?.length || 0);
 
       return data.data || [];
     } catch (error) {

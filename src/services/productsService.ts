@@ -25,8 +25,6 @@ class ProductsService {
   async getAllProducts(): Promise<Product[]> {
     try {
       const token = localStorage.getItem("token");
-      console.log("Fetching products from:", `${this.baseUrl}/productes`);
-      console.log("Token:", token ? "Present" : "Not present");
 
       const response = await fetch(`${this.baseUrl}/productes`, {
         method: "GET",
@@ -36,29 +34,21 @@ class ProductsService {
         },
       });
 
-      console.log("Response status:", response.status);
-      console.log("Response ok:", response.ok);
-
       if (!response.ok) {
         throw new Error("Error al obtener los productos");
       }
 
       const data = await response.json();
-      console.log("Raw response data:", data);
 
       // Handle different response formats
       if (Array.isArray(data)) {
-        console.log("Data is array, returning directly");
         return data;
       } else if (data.products) {
-        console.log("Data has products property");
         return data.products;
       } else if (data.data) {
-        console.log("Data has data property");
         return data.data;
       }
 
-      console.log("No recognizable data format, returning empty array");
       return [];
     } catch (error) {
       console.error("Error in getAllProducts:", error);

@@ -21,8 +21,6 @@ class CategoriesService {
   async getAllCategories(): Promise<Category[]> {
     try {
       const token = localStorage.getItem("token");
-      console.log("Fetching categories from:", `${this.baseUrl}/categories`);
-      console.log("Token:", token ? "Present" : "Not present");
 
       const response = await fetch(`${this.baseUrl}/categories`, {
         method: "GET",
@@ -32,29 +30,21 @@ class CategoriesService {
         },
       });
 
-      console.log("Response status:", response.status);
-      console.log("Response ok:", response.ok);
-
       if (!response.ok) {
         throw new Error("Error al obtener las categorías");
       }
 
       const data = await response.json();
-      console.log("Raw response data:", data);
 
       // Handle different response formats
       if (Array.isArray(data)) {
-        console.log("Data is array, returning directly");
         return data;
       } else if (data.categories) {
-        console.log("Data has categories property");
         return data.categories;
       } else if (data.data) {
-        console.log("Data has data property");
         return data.data;
       }
 
-      console.log("No recognizable data format, returning empty array");
       return [];
     } catch (error) {
       console.error("Error in getAllCategories:", error);

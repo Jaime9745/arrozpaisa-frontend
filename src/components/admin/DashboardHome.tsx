@@ -5,7 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Clock, DollarSign, Table, Users, Menu } from "lucide-react";
+import { Clock, DollarSign, Table, Users, Menu, TrendingUp, Gift, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useSidebar } from "@/contexts/SidebarContext";
 import StatsCard from "./StatsCard";
@@ -23,30 +23,24 @@ export default function DashboardHome() {
       trend: "up" as const,
     },
     {
-      title: "Órdenes Activas",
-      value: "23",
-      description: "8 en preparación",
-      icon: Clock,
-      trend: "neutral" as const,
-    },
-    {
-      title: "Mesas Ocupadas",
-      value: `${tableData.filter((t) => t.status === "Ocupada").length}/${
-        tableData.length
-      }`,
-      description: `${Math.round(
-        (tableData.filter((t) => t.status === "Ocupada").length /
-          tableData.length) *
-          100
-      )}% ocupación`,
-      icon: Table,
+      title: "Producto Más Vendido",
+      value: "Arroz con Pollo",
+      description: "28 órdenes hoy",
+      icon: TrendingUp,
       trend: "up" as const,
     },
     {
-      title: "Meseros Activos",
-      value: "8",
-      description: "Turno actual",
-      icon: Users,
+      title: "Propinas Recaudadas",
+      value: "$8,750",
+      description: "+5% desde ayer",
+      icon: Gift,
+      trend: "up" as const,
+    },
+    {
+      title: "Número de Pedidos",
+      value: "89",
+      description: "23 activos",
+      icon: ShoppingBag,
       trend: "neutral" as const,
     },
   ]; // Static mock data for recent orders based on tables with "Servida" or "Ocupada" status

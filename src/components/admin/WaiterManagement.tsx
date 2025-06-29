@@ -10,6 +10,7 @@ import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
 import WaiterForm from "@/components/admin/waiter/WaiterForm";
 import WaiterManagementHeader from "./waiter/WaiterManagementHeader";
 import DeleteConfirmationDialog from "./waiter/DeleteConfirmationDialog";
+import EditConfirmationDialog from "./waiter/EditConfirmationDialog";
 import { useWaiterTableColumns } from "./waiter/WaiterTableColumns";
 
 export default function WaiterManagement() {
@@ -23,6 +24,7 @@ export default function WaiterManagement() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [waiterToDelete, setWaiterToDelete] = useState<string | null>(null);
+  const [showEditSuccess, setShowEditSuccess] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   const { waiters, loading, error, deleteWaiter, createWaiter, updateWaiter } =
     useWaiters();
@@ -104,8 +106,9 @@ export default function WaiterManagement() {
         userName,
       };
       await updateWaiter(editingWaiter.id, waiterData);
-      // Close form with animation
-      handleCloseEditForm();
+      // Show success dialog
+      setShowEditSuccess(true);
+      // Don't close form here - it will close when dialog is dismissed
     } catch (error) {
       console.error("Failed to update waiter:", error);
     } finally {
@@ -269,6 +272,17 @@ export default function WaiterManagement() {
         isOpen={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
         onConfirm={confirmDeleteWaiter}
+      />
+      {/* Edit Success Dialog */}
+      <EditConfirmationDialog
+        isOpen={showEditSuccess}
+        onClose={() => {
+          setShowEditSuccess(false);
+          // Close the edit form when dialog is closed
+          if (showEditForm) {
+            handleCloseEditForm();
+          }
+        }}
       />
     </div>
   );

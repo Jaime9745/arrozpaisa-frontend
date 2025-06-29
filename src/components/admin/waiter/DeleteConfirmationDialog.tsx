@@ -31,10 +31,10 @@ export default function DeleteConfirmationDialog({
         style={{ borderRadius: "20px" }}
       >
         <AlertDialogHeader>
-          <AlertDialogTitle className="text-xl font-semibold text-gray-800">
+          <AlertDialogTitle className="text-xl font-semibold text-gray-800 text-center">
             Confirmar Eliminación
           </AlertDialogTitle>
-          <AlertDialogDescription className="text-gray-600">
+          <AlertDialogDescription className="text-gray-600 text-center py-7">
             ¿Estás seguro de que quieres eliminar este mesero? Esta acción no se
             puede deshacer.
           </AlertDialogDescription>

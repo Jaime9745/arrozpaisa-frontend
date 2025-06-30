@@ -90,7 +90,7 @@ export function ChartPieDonut({
 
   if (loading) {
     return (
-      <Card className="w-[400px] h-[320px]" style={{ borderRadius: "30px" }}>
+      <Card className="w-full h-[320px]" style={{ borderRadius: "30px" }}>
         <CardHeader className="items-center pb-2">
           <CardTitle className="text-sm">Productividad del Mesero</CardTitle>
           <CardDescription className="text-xs">
@@ -110,7 +110,7 @@ export function ChartPieDonut({
 
   if (error) {
     return (
-      <Card className="w-[400px] h-[320px]" style={{ borderRadius: "30px" }}>
+      <Card className="w-full h-[320px]" style={{ borderRadius: "30px" }}>
         <CardHeader className="items-center pb-2">
           <CardTitle className="text-sm">Productividad del Mesero</CardTitle>
           <CardDescription className="text-xs">
@@ -129,7 +129,7 @@ export function ChartPieDonut({
     );
   }
   return (
-    <Card className="w-[400px] h-[320px]" style={{ borderRadius: "30px" }}>
+    <Card className="w-full h-[320px]" style={{ borderRadius: "30px" }}>
       <CardHeader className="items-center pb-2">
         <CardTitle className="text-sm">Productividad del Mesero</CardTitle>
         <CardDescription className="text-xs">
@@ -141,7 +141,7 @@ export function ChartPieDonut({
         </CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-4 px-6">
-        <div className="flex items-center justify-between h-full">
+        <div className="flex items-center gap-4 h-full">
           {/* Legend */}
           <div className="flex flex-col gap-2 justify-center">
             {chartData.slice(0, 5).map((item, index) => (
@@ -166,7 +166,7 @@ export function ChartPieDonut({
           </div>
 
           {/* Chart - Centered */}
-          <div className="flex items-center justify-center">
+          <div className="flex items-center justify-center flex-1">
             <div className="w-[180px] h-[180px]">
               <ChartContainer config={chartConfig} className="w-full h-full">
                 <PieChart>

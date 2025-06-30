@@ -57,14 +57,6 @@ export function ChartPieDonut({
   error = null,
   dateRange,
 }: ChartPieDonutProps) {
-  // Debug logging
-  console.log("🥧 ChartPieDonut received:", {
-    waiterPerformanceLength: waiterPerformance.length,
-    waiterPerformance: waiterPerformance,
-    loading,
-    error,
-  });
-
   // Prepare chart data from waiter performance
   const chartData =
     waiterPerformance.length > 0
@@ -77,8 +69,6 @@ export function ChartPieDonut({
             fill: chartColors[index % chartColors.length],
           }))
       : defaultChartData;
-
-  console.log("📊 ChartPieDonut processed chartData:", chartData);
 
   // Calculate total orders
   const totalOrders = chartData.reduce((sum, item) => sum + item.orders, 0);
@@ -100,14 +90,18 @@ export function ChartPieDonut({
 
   if (loading) {
     return (
-      <Card className="flex flex-col" style={{ borderRadius: "30px" }}>
-        <CardHeader className="items-center pb-0">
-          <CardTitle>Productividad del Mesero</CardTitle>
-          <CardDescription>Órdenes atendidas por mesero</CardDescription>
+      <Card className="w-[400px] h-[320px]" style={{ borderRadius: "30px" }}>
+        <CardHeader className="items-center pb-2">
+          <CardTitle className="text-sm">Productividad del Mesero</CardTitle>
+          <CardDescription className="text-xs">
+            Órdenes atendidas por mesero
+          </CardDescription>
         </CardHeader>
         <CardContent className="flex-1 pb-0">
-          <div className="flex items-center justify-center h-[250px]">
-            <div className="text-muted-foreground">Cargando datos...</div>
+          <div className="flex items-center justify-center h-[220px]">
+            <div className="text-muted-foreground text-sm">
+              Cargando datos...
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -116,13 +110,15 @@ export function ChartPieDonut({
 
   if (error) {
     return (
-      <Card className="flex flex-col" style={{ borderRadius: "30px" }}>
-        <CardHeader className="items-center pb-0">
-          <CardTitle>Productividad del Mesero</CardTitle>
-          <CardDescription>Órdenes atendidas por mesero</CardDescription>
+      <Card className="w-[400px] h-[320px]" style={{ borderRadius: "30px" }}>
+        <CardHeader className="items-center pb-2">
+          <CardTitle className="text-sm">Productividad del Mesero</CardTitle>
+          <CardDescription className="text-xs">
+            Órdenes atendidas por mesero
+          </CardDescription>
         </CardHeader>
         <CardContent className="flex-1 pb-0">
-          <div className="flex flex-col items-center justify-center h-[250px] space-y-2">
+          <div className="flex flex-col items-center justify-center h-[220px] space-y-2">
             <div className="text-red-600 text-sm">Error: {error}</div>
             <div className="text-xs text-muted-foreground">
               Mostrando datos de ejemplo
@@ -133,10 +129,10 @@ export function ChartPieDonut({
     );
   }
   return (
-    <Card className="flex flex-col" style={{ borderRadius: "30px" }}>
-      <CardHeader className="items-center pb-0">
-        <CardTitle>Productividad del Mesero</CardTitle>
-        <CardDescription>
+    <Card className="w-[400px] h-[320px]" style={{ borderRadius: "30px" }}>
+      <CardHeader className="items-center pb-2">
+        <CardTitle className="text-sm">Productividad del Mesero</CardTitle>
+        <CardDescription className="text-xs">
           {dateRange && dateRange.from && dateRange.to
             ? `Órdenes del ${format(dateRange.from, "dd/MM", {
                 locale: es,
@@ -144,47 +140,53 @@ export function ChartPieDonut({
             : "Órdenes atendidas por mesero"}
         </CardDescription>
       </CardHeader>
-      <CardContent className="flex-1 pb-0">
-        <ChartContainer
-          config={chartConfig}
-          className="mx-auto aspect-square max-h-[250px]"
-        >
-          <PieChart>
-            <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent hideLabel />}
-            />
-            <Pie
-              data={chartData}
-              dataKey="orders"
-              nameKey="waiterName"
-              innerRadius={60}
-            />
-          </PieChart>
-        </ChartContainer>
+      <CardContent className="flex-1 pb-4 px-6">
+        <div className="flex items-center justify-between h-full">
+          {/* Legend */}
+          <div className="flex flex-col gap-2 justify-center">
+            {chartData.slice(0, 5).map((item, index) => (
+              <div
+                key={item.waiterName}
+                className="flex items-center gap-2 text-xs"
+              >
+                <div
+                  className="w-2 h-2 rounded-full flex-shrink-0"
+                  style={{
+                    backgroundColor: chartColors[index % chartColors.length],
+                  }}
+                />
+                <span className="truncate max-w-[90px]" title={item.waiterName}>
+                  {item.waiterName}
+                </span>
+                <span className="text-muted-foreground ml-auto text-xs">
+                  {item.orders}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          {/* Chart - Centered */}
+          <div className="flex items-center justify-center">
+            <div className="w-[180px] h-[180px]">
+              <ChartContainer config={chartConfig} className="w-full h-full">
+                <PieChart>
+                  <ChartTooltip
+                    cursor={false}
+                    content={<ChartTooltipContent hideLabel />}
+                  />
+                  <Pie
+                    data={chartData}
+                    dataKey="orders"
+                    nameKey="waiterName"
+                    innerRadius={45}
+                    outerRadius={85}
+                  />
+                </PieChart>
+              </ChartContainer>
+            </div>
+          </div>
+        </div>
       </CardContent>
-      <CardFooter className="flex-col gap-2 text-sm">
-        <div className="flex items-center gap-2 leading-none font-medium">
-          {waiterPerformance.length > 0 ? (
-            <>
-              Total de {totalOrders} órdenes <TrendingUp className="h-4 w-4" />
-            </>
-          ) : (
-            <>
-              Rendimiento mejorado 8.5% esta semana{" "}
-              <TrendingUp className="h-4 w-4" />
-            </>
-          )}
-        </div>
-        <div className="text-muted-foreground leading-none">
-          {waiterPerformance.length > 0
-            ? `Distribución de órdenes entre ${chartData.length} meseros activos`
-            : "Órdenes totales atendidas por el equipo"}
-        </div>
-        {waiterPerformance.some((p) => p.fromCache) && (
-          <div className="text-xs text-blue-600">Algunos datos en caché</div>
-        )}
-      </CardFooter>
     </Card>
   );
 }

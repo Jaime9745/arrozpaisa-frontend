@@ -100,9 +100,6 @@ export default function DashboardHome() {
         </div>
 
         <div className="flex items-center space-x-4">
-          <div className="text-sm text-muted-foreground">
-            Período de análisis:
-          </div>
           <DateRangePicker
             dateRange={dateRange}
             onDateRangeChange={setDateRange}
@@ -120,9 +117,9 @@ export default function DashboardHome() {
       </div>
 
       {/* Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         {/* Area Chart - Flujo de Atención por Franja Horaria */}
-        <div>
+        <div className="w-full">
           <ChartAreaDefault />
         </div>
 

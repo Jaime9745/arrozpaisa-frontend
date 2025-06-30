@@ -21,6 +21,10 @@ import StatsCard from "./StatsCard";
 import { ChartAreaDefault } from "../chart-area-default";
 import { ChartPieDonut } from "../chart-pie-donut";
 import { useTableMetrics } from "@/hooks/useTableMetrics";
+import { useWaiterPerformance } from "@/hooks/useWaiterPerformance";
+import { DateRangePicker } from "@/components/ui/date-range-picker";
+import { useState } from "react";
+import { type DateRange } from "react-day-picker";
 
 export default function DashboardHome() {
   const { toggleSidebar } = useSidebar();
@@ -29,6 +33,24 @@ export default function DashboardHome() {
     loading: tableLoading,
     error: tableError,
   } = useTableMetrics();
+
+  // Date range state for waiter performance
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({
+    from: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 7 days ago
+    to: new Date(), // today
+  });
+
+  // Get all waiters performance
+  const {
+    waiterPerformance,
+    loading: waiterLoading,
+    error: waiterError,
+  } = useWaiterPerformance({
+    startDate:
+      dateRange?.from || new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+    endDate: dateRange?.to || new Date(),
+    enabled: true,
+  });
 
   const dashboardStats = [
     {
@@ -63,9 +85,9 @@ export default function DashboardHome() {
 
   return (
     <div className="space-y-6">
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="flex items-center gap-4 md:hidden col-span-full">
+      {/* Dashboard Header with Date Range Picker */}
+      <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
+        <div className="flex items-center gap-4">
           <Button
             variant="ghost"
             size="icon"
@@ -74,8 +96,24 @@ export default function DashboardHome() {
           >
             <Menu className="h-6 w-6 text-gray-800" />
           </Button>
-          <h1 className="text-xl font-semibold">Dashboard</h1>
+          <h1 className="text-2xl font-semibold">Dashboard</h1>
         </div>
+
+        <div className="flex items-center space-x-4">
+          <div className="text-sm text-muted-foreground">
+            Período de análisis:
+          </div>
+          <DateRangePicker
+            dateRange={dateRange}
+            onDateRangeChange={setDateRange}
+            placeholder="Seleccionar período"
+            className="w-auto"
+          />
+        </div>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {dashboardStats.map((stat, index) => (
           <StatsCard key={index} {...stat} />
         ))}
@@ -88,9 +126,14 @@ export default function DashboardHome() {
           <ChartAreaDefault />
         </div>
 
-        {/* Pie Chart - Productividad del Mesero */}
+        {/* Pie Chart - Productividad del Mesero (Número de Órdenes) */}
         <div>
-          <ChartPieDonut />
+          <ChartPieDonut
+            waiterPerformance={waiterPerformance}
+            loading={waiterLoading}
+            error={waiterError}
+            dateRange={dateRange}
+          />
         </div>
       </div>
 

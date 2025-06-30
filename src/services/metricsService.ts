@@ -106,16 +106,6 @@ export interface SalesMetrics {
   calculatedAt: string;
 }
 
-// Waiter interface for getting all waiters
-export interface Waiter {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  role: string;
-  isActive: boolean;
-}
-
 // API Service Class
 export class MetricsService {
   private async makeRequest<T>(
@@ -170,61 +160,135 @@ export class MetricsService {
     });
   }
 
-  // Get waiter performance
+  // Get waiter performance for a specific waiter
   async getWaiterPerformance(
     waiterId: string,
     startDate: Date,
     endDate: Date
   ): Promise<WaiterPerformance> {
-    return this.makeRequest<WaiterPerformance>("/metrics/waiters", {
+    const formattedStartDate = startDate.toISOString().split("T")[0];
+    const formattedEndDate = endDate.toISOString().split("T")[0];
+
+    console.log(`🔍 getWaiterPerformance called for waiterId: ${waiterId}`, {
       waiterId,
-      startDate: startDate.toISOString(),
-      endDate: endDate.toISOString(),
+      startDate: formattedStartDate,
+      endDate: formattedEndDate,
     });
+
+    try {
+      const result = await this.makeRequest<WaiterPerformance>(
+        "/metrics/waiters",
+        {
+          waiterId,
+          startDate: formattedStartDate,
+          endDate: formattedEndDate,
+        }
+      );
+
+      console.log(`✅ API response for waiter ${waiterId}:`, result);
+      return result;
+    } catch (error) {
+      console.error(`❌ API error for waiter ${waiterId}:`, error);
+      throw error;
+    }
   }
 
-  // Get all waiters - assuming you have this endpoint
-  async getAllWaiters(): Promise<Waiter[]> {
-    return this.makeRequest<Waiter[]>("/waiters");
-  }
-
-  // Get all waiters performance for today
+  // Get performance for all waiters
   async getAllWaitersPerformance(
     startDate: Date,
     endDate: Date
   ): Promise<WaiterPerformance[]> {
-    try {
-      // First get all waiters
-      const waiters = await this.getAllWaiters();
+    console.log("🚀 getAllWaitersPerformance called with:", {
+      startDate: startDate.toISOString().split("T")[0],
+      endDate: endDate.toISOString().split("T")[0],
+    });
 
-      // Then get performance for each waiter
-      const performancePromises = waiters.map((waiter) =>
-        this.getWaiterPerformance(waiter.id, startDate, endDate).catch(
-          (error) => {
-            console.warn(
-              `Error getting performance for waiter ${waiter.id}:`,
-              error
-            );
-            // Return a default performance object if individual waiter fails
-            return {
-              waiterId: waiter.id,
-              waiterName: `${waiter.firstName} ${waiter.lastName}`,
-              totalOrders: 0,
-              totalSales: 0,
-              averageOrderValue: 0,
-              ordersByDay: [],
-              fromCache: false,
-              cacheKey: "",
-              cacheTTL: 0,
-              calculatedAt: new Date().toISOString(),
-            };
-          }
-        )
+    try {
+      // Import waitersService dynamically to avoid circular imports
+      const { waitersService } = await import("./waitersService");
+
+      // Get all waiters from the existing waitersService
+      const waiters = await waitersService.getAllWaiters();
+      console.log("📋 Fetched waiters:", waiters);
+
+      // Ensure waiters is an array
+      if (!Array.isArray(waiters)) {
+        console.error("❌ Waiters data is not an array:", waiters);
+        return [];
+      }
+
+      console.log(`👥 Found ${waiters.length} total waiters`);
+
+      // Filter active waiters
+      const activeWaiters = waiters.filter(
+        (waiter) => waiter.isActive !== false
+      );
+      console.log(
+        `✅ Active waiters (${activeWaiters.length}):`,
+        activeWaiters.map((w) => ({
+          id: w.id,
+          name: `${w.firstName} ${w.lastName}`,
+          isActive: w.isActive,
+        }))
       );
 
-      return Promise.all(performancePromises);
+      // Then get performance for each active waiter
+      const performancePromises = activeWaiters.map(async (waiter, index) => {
+        console.log(
+          `📊 Fetching performance for waiter ${index + 1}/${
+            activeWaiters.length
+          }: ${waiter.firstName} ${waiter.lastName} (ID: ${waiter.id})`
+        );
+
+        try {
+          const performance = await this.getWaiterPerformance(
+            waiter.id,
+            startDate,
+            endDate
+          );
+          console.log(
+            `✅ Performance data for ${waiter.firstName} ${waiter.lastName}:`,
+            performance
+          );
+          return performance;
+        } catch (error) {
+          console.warn(
+            `⚠️ Error getting performance for waiter ${waiter.id} (${waiter.firstName} ${waiter.lastName}):`,
+            error
+          );
+          // Return a default performance object if individual waiter fails
+          const defaultPerformance = {
+            waiterId: waiter.id,
+            waiterName: `${waiter.firstName} ${waiter.lastName}`,
+            totalOrders: 0,
+            totalSales: 0,
+            averageOrderValue: 0,
+            ordersByDay: [],
+            fromCache: false,
+            cacheKey: "",
+            cacheTTL: 0,
+            calculatedAt: new Date().toISOString(),
+          };
+          console.log(
+            `🔄 Using default performance for ${waiter.firstName} ${waiter.lastName}:`,
+            defaultPerformance
+          );
+          return defaultPerformance;
+        }
+      });
+
+      const allPerformance = await Promise.all(performancePromises);
+      console.log("🎯 Final performance results:", allPerformance);
+      console.log("📈 Performance summary:", {
+        totalWaiters: allPerformance.length,
+        totalOrders: allPerformance.reduce((sum, p) => sum + p.totalOrders, 0),
+        totalSales: allPerformance.reduce((sum, p) => sum + p.totalSales, 0),
+        waitersWithData: allPerformance.filter((p) => p.totalOrders > 0).length,
+      });
+
+      return allPerformance;
     } catch (error) {
-      console.error("Error getting all waiters performance:", error);
+      console.error("❌ Error in getAllWaitersPerformance:", error);
       throw error;
     }
   }

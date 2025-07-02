@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, ChevronDown } from "lucide-react";
 import { type DateRange } from "react-day-picker";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -57,6 +57,38 @@ export function DateRangePicker({
     },
   ];
 
+  // Function to get display text for the button
+  const getDisplayText = () => {
+    if (!dateRange?.from) return placeholder;
+
+    const isToday =
+      dateRange.from.toDateString() === today.toDateString() &&
+      (!dateRange.to || dateRange.to.toDateString() === today.toDateString());
+
+    const isYesterday =
+      dateRange.from.toDateString() === yesterday.toDateString() &&
+      (!dateRange.to ||
+        dateRange.to.toDateString() === yesterday.toDateString());
+
+    if (isToday) return "Hoy";
+    if (isYesterday) return "Ayer";
+
+    // For ranges, show trimmed format
+    if (
+      dateRange.to &&
+      dateRange.from.toDateString() !== dateRange.to.toDateString()
+    ) {
+      return `${format(dateRange.from, "dd/MM", { locale: es })} - ${format(
+        dateRange.to,
+        "dd/MM",
+        { locale: es }
+      )}`;
+    }
+
+    // Single date (not today/yesterday)
+    return format(dateRange.from, "dd/MM/yyyy", { locale: es });
+  };
+
   return (
     <div className={cn("grid gap-2", className)}>
       <Popover>
@@ -65,23 +97,13 @@ export function DateRangePicker({
             id="date"
             variant={"outline"}
             className={cn(
-              "w-[300px] justify-start text-left font-normal",
+              "w-[200px] justify-center text-center font-normal rounded-[30px] h-10 px-4 flex items-center",
               !dateRange && "text-muted-foreground"
             )}
           >
-            <CalendarIcon className="mr-2 h-4 w-4" />
-            {dateRange?.from ? (
-              dateRange.to ? (
-                <>
-                  {format(dateRange.from, "dd/MM/yyyy", { locale: es })} -{" "}
-                  {format(dateRange.to, "dd/MM/yyyy", { locale: es })}
-                </>
-              ) : (
-                format(dateRange.from, "dd/MM/yyyy", { locale: es })
-              )
-            ) : (
-              <span>{placeholder}</span>
-            )}
+            <CalendarIcon className="mr-2 h-4 w-4 flex-shrink-0" />
+            <span className="flex-1 text-center">{getDisplayText()}</span>
+            <ChevronDown className="ml-2 h-4 w-4 flex-shrink-0" />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">

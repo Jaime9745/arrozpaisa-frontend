@@ -141,9 +141,9 @@ export function ChartPieDonut({
         </CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-4 px-6">
-        <div className="flex items-center gap-4 h-full">
-          {/* Legend */}
-          <div className="flex flex-col gap-2 justify-center">
+        <div className="flex flex-col xl:flex-row items-center gap-4 h-full">
+          {/* Legend - Shows on top for small/medium, on left for xl */}
+          <div className="flex flex-col gap-2 justify-center w-full xl:w-auto order-1 xl:order-1">
             {chartData.slice(0, 5).map((item, index) => (
               <div
                 key={item.waiterName}
@@ -165,9 +165,9 @@ export function ChartPieDonut({
             ))}
           </div>
 
-          {/* Chart - Centered */}
-          <div className="flex items-center justify-center flex-1">
-            <div className="w-[180px] h-[180px]">
+          {/* Chart - Shows on bottom for small/medium, on right for xl */}
+          <div className="flex items-center justify-center w-full xl:flex-1 order-2 xl:order-2">
+            <div className="w-[120px] h-[120px] sm:w-[150px] sm:h-[150px] lg:w-[180px] lg:h-[180px] xl:w-[200px] xl:h-[200px]">
               <ChartContainer config={chartConfig} className="w-full h-full">
                 <PieChart>
                   <ChartTooltip
@@ -178,8 +178,8 @@ export function ChartPieDonut({
                     data={chartData}
                     dataKey="orders"
                     nameKey="waiterName"
-                    innerRadius={45}
-                    outerRadius={85}
+                    innerRadius="35%"
+                    outerRadius="70%"
                   />
                 </PieChart>
               </ChartContainer>

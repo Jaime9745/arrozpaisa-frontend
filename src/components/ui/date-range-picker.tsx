@@ -29,8 +29,12 @@ export function DateRangePicker({
   className,
 }: DateRangePickerProps) {
   const today = new Date();
+
   const yesterday = new Date(today);
   yesterday.setDate(yesterday.getDate() - 1);
+
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
 
   const last7Days = new Date(today);
   last7Days.setDate(last7Days.getDate() - 7);
@@ -41,11 +45,11 @@ export function DateRangePicker({
   const presets = [
     {
       label: "Hoy",
-      range: { from: today, to: today },
+      range: { from: today, to: tomorrow },
     },
     {
       label: "Ayer",
-      range: { from: yesterday, to: yesterday },
+      range: { from: yesterday, to: today },
     },
     {
       label: "Últimos 7 días",
@@ -124,7 +128,7 @@ export function DateRangePicker({
               ))}
             </div>
             <Calendar
-              initialFocus
+              autoFocus
               mode="range"
               defaultMonth={dateRange?.from}
               selected={dateRange}

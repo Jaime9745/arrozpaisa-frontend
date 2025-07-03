@@ -15,117 +15,77 @@ class CategoriesService {
   private baseUrl: string;
 
   constructor() {
-    this.baseUrl = process.env.NEXT_PUBLIC_API_URL!;
+    if (!process.env.NEXT_PUBLIC_API_URL) {
+      throw new Error("NEXT_PUBLIC_API_URL environment variable is required");
+    }
+    this.baseUrl = process.env.NEXT_PUBLIC_API_URL;
+  }
+
+  private async makeRequest<T>(
+    endpoint: string,
+    options: RequestInit = {}
+  ): Promise<T> {
+    const token = localStorage.getItem("token");
+
+    const response = await fetch(`${this.baseUrl}${endpoint}`, {
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        ...(token && { Authorization: `Bearer ${token}` }),
+        ...options.headers,
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(
+        errorData.message || `Error ${response.status}: ${response.statusText}`
+      );
+    }
+
+    return response.json();
   }
 
   async getAllCategories(): Promise<Category[]> {
-    try {
-      const token = localStorage.getItem("token");
+    const data = await this.makeRequest<CategoriesResponse | Category[]>(
+      "/categories"
+    );
 
-      const response = await fetch(`${this.baseUrl}/categories`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Error al obtener las categorías");
-      }
-
-      const data = await response.json();
-
-      // Handle different response formats
-      if (Array.isArray(data)) {
-        return data;
-      } else if (data.categories) {
-        return data.categories;
-      } else if (data.data) {
-        return data.data;
-      }
-
-      return [];
-    } catch (error) {
-      console.error("Error in getAllCategories:", error);
-      throw error;
+    // Handle different response formats
+    if (Array.isArray(data)) {
+      return data;
+    } else if ("categories" in data && data.categories) {
+      return data.categories;
+    } else if ("data" in data && data.data) {
+      return data.data;
     }
+
+    return [];
   }
 
   async createCategory(
     category: Omit<Category, "id" | "createdAt" | "updatedAt">
   ): Promise<Category> {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(`${this.baseUrl}/categories`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
-        body: JSON.stringify(category),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Error al crear la categoría");
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error("Error in createCategory:", error);
-      throw error;
-    }
+    return this.makeRequest<Category>("/categories", {
+      method: "POST",
+      body: JSON.stringify(category),
+    });
   }
 
   async updateCategory(
     id: string,
     category: Partial<Category>
   ): Promise<Category> {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(`${this.baseUrl}/categories/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
-        body: JSON.stringify(category),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(
-          errorData.message || "Error al actualizar la categoría"
-        );
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error("Error in updateCategory:", error);
-      throw error;
-    }
+    return this.makeRequest<Category>(`/categories/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(category),
+    });
   }
 
   async deleteCategory(id: string): Promise<void> {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(`${this.baseUrl}/categories/${id}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Error al eliminar la categoría");
-      }
-    } catch (error) {
-      console.error("Error in deleteCategory:", error);
-      throw error;
-    }
+    await this.makeRequest<void>(`/categories/${id}`, {
+      method: "DELETE",
+    });
   }
 }
 

@@ -1,6 +1,3 @@
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
-
 // Types based on your backend DTOs
 export interface TableMetrics {
   totalTables: number;
@@ -159,11 +156,20 @@ export interface AllWaitersPerformanceDTO {
 
 // API Service Class
 export class MetricsService {
+  private baseUrl: string;
+  
+  constructor() {
+    if (!process.env.NEXT_PUBLIC_API_URL) {
+      throw new Error('NEXT_PUBLIC_API_URL environment variable is required');
+    }
+    this.baseUrl = process.env.NEXT_PUBLIC_API_URL;
+  }
+
   private async makeRequest<T>(
     endpoint: string,
     params?: Record<string, string>
   ): Promise<T> {
-    const url = new URL(`${API_BASE_URL}${endpoint}`);
+    const url = new URL(`${this.baseUrl}${endpoint}`);
 
     if (params) {
       Object.entries(params).forEach(([key, value]) => {

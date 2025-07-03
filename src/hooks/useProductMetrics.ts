@@ -28,19 +28,11 @@ export const useProductMetrics = ({
     try {
       setData((prev) => ({ ...prev, loading: true, error: null }));
 
-      console.log(
-        `🔍 Fetching product metrics - Period: ${period}, Start: ${
-          startDate.toISOString().split("T")[0]
-        }, End: ${endDate.toISOString().split("T")[0]}`
-      );
-
       const productMetrics = await metricsService.getProductMetrics(
         period,
         startDate,
         endDate
       );
-
-      console.log(`✅ Product metrics fetched successfully:`, productMetrics);
 
       setData({
         productMetrics,
@@ -48,7 +40,6 @@ export const useProductMetrics = ({
         error: null,
       });
     } catch (error) {
-      console.error("❌ Error fetching product metrics:", error);
       setData((prev) => ({
         ...prev,
         loading: false,

@@ -12,31 +12,38 @@ interface LoginResponse {
 
 class LoginService {
   private baseUrl: string;
+
   constructor() {
-    this.baseUrl = process.env.NEXT_PUBLIC_API_URL!;
+    if (!process.env.NEXT_PUBLIC_API_URL) {
+      throw new Error("NEXT_PUBLIC_API_URL environment variable is required");
+    }
+    this.baseUrl = process.env.NEXT_PUBLIC_API_URL;
+  }
+
+  private async makeRequest<T>(
+    endpoint: string,
+    options: RequestInit = {}
+  ): Promise<T> {
+    const response = await fetch(`${this.baseUrl}${endpoint}`, options);
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(
+        errorData.message || `HTTP error! status: ${response.status}`
+      );
+    }
+
+    return response.json();
   }
 
   async login(credentials: LoginRequest): Promise<LoginResponse> {
-    try {
-      const response = await fetch(`${this.baseUrl}/auth/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(credentials),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Error en el inicio de sesión");
-      }
-
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error("Error en loginService:", error);
-      throw error;
-    }
+    return this.makeRequest<LoginResponse>("/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(credentials),
+    });
   }
 
   logout(): void {

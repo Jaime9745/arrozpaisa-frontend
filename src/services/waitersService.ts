@@ -17,107 +17,66 @@ interface WaitersResponse {
 
 class WaitersService {
   private baseUrl: string;
+
   constructor() {
-    this.baseUrl = process.env.NEXT_PUBLIC_API_URL!;
+    if (!process.env.NEXT_PUBLIC_API_URL) {
+      throw new Error("NEXT_PUBLIC_API_URL environment variable is required");
+    }
+    this.baseUrl = process.env.NEXT_PUBLIC_API_URL;
+  }
+
+  private async makeRequest<T>(
+    endpoint: string,
+    options: RequestInit = {}
+  ): Promise<T> {
+    const token = localStorage.getItem("token");
+
+    const response = await fetch(`${this.baseUrl}${endpoint}`, {
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        ...(token && { Authorization: `Bearer ${token}` }),
+        ...options.headers,
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(
+        errorData.message || `HTTP error! status: ${response.status}`
+      );
+    }
+
+    return response.json();
   }
 
   async getAllWaiters(): Promise<Waiter[]> {
-    try {
-      const token = localStorage.getItem("token");
-
-      const response = await fetch(`${this.baseUrl}/waiters`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Error al obtener los meseros");
-      }
-
-      const data: WaitersResponse = await response.json();
-
-      return data.data || [];
-    } catch (error) {
-      console.error("Error in getAllWaiters:", error);
-      throw error;
-    }
+    const data = await this.makeRequest<WaitersResponse>("/waiters");
+    return data.data || [];
   }
 
   async createWaiter(
     waiter: Omit<Waiter, "id" | "createdAt" | "updatedAt" | "password">
   ): Promise<Waiter> {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(`${this.baseUrl}/waiters`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
-        body: JSON.stringify(waiter),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Error al crear el mesero");
-      }
-
-      const result = await response.json();
-      return result.data || result;
-    } catch (error) {
-      console.error("Error in createWaiter:", error);
-      throw error;
-    }
+    const result = await this.makeRequest<{ data: Waiter }>("/waiters", {
+      method: "POST",
+      body: JSON.stringify(waiter),
+    });
+    return result.data || result;
   }
 
   async updateWaiter(id: string, waiter: Partial<Waiter>): Promise<Waiter> {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(`${this.baseUrl}/waiters/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
-        body: JSON.stringify(waiter),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Error al actualizar el mesero");
-      }
-
-      const result = await response.json();
-      return result.data || result;
-    } catch (error) {
-      console.error("Error in updateWaiter:", error);
-      throw error;
-    }
+    const result = await this.makeRequest<{ data: Waiter }>(`/waiters/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(waiter),
+    });
+    return result.data || result;
   }
 
   async deleteWaiter(id: string): Promise<void> {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(`${this.baseUrl}/waiters/${id}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Error al eliminar el mesero");
-      }
-    } catch (error) {
-      console.error("Error in deleteWaiter:", error);
-      throw error;
-    }
+    await this.makeRequest<void>(`/waiters/${id}`, {
+      method: "DELETE",
+    });
   }
 }
 

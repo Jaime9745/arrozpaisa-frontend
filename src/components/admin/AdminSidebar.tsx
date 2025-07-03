@@ -87,6 +87,8 @@ export default function AdminSidebar({
               width={120}
               height={120}
               className="rounded-lg"
+              style={{ width: "auto", height: "auto" }}
+              priority
             />
             <div className="text-lg font-bold text-gray-900 whitespace-nowrap">
               ¡Hola Admin!

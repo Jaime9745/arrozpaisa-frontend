@@ -1,13 +1,7 @@
 "use client";
 
 import { TrendingUp } from "lucide-react";
-import {
-  Area,
-  AreaChart,
-  CartesianGrid,
-  XAxis,
-  ResponsiveContainer,
-} from "recharts";
+import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 
 import {
   Card,
@@ -50,36 +44,36 @@ export function ChartAreaDefault() {
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig} className="h-[300px] w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart
-              accessibilityLayer
-              data={chartData}
-              margin={{
-                left: 12,
-                right: 12,
-              }}
-            >
-              <CartesianGrid vertical={false} />
-              <XAxis
-                dataKey="month"
-                tickLine={false}
-                axisLine={false}
-                tickMargin={8}
-                tickFormatter={(value) => value.slice(0, 3)}
-              />
-              <ChartTooltip
-                cursor={false}
-                content={<ChartTooltipContent indicator="line" />}
-              />
-              <Area
-                dataKey="desktop"
-                type="natural"
-                fill="var(--color-desktop)"
-                fillOpacity={0.4}
-                stroke="var(--color-desktop)"
-              />
-            </AreaChart>
-          </ResponsiveContainer>
+          <AreaChart
+            accessibilityLayer
+            data={chartData}
+            width={458}
+            height={300}
+            margin={{
+              left: 12,
+              right: 12,
+            }}
+          >
+            <CartesianGrid vertical={false} />
+            <XAxis
+              dataKey="month"
+              tickLine={false}
+              axisLine={false}
+              tickMargin={8}
+              tickFormatter={(value) => value.slice(0, 3)}
+            />
+            <ChartTooltip
+              cursor={false}
+              content={<ChartTooltipContent indicator="line" />}
+            />
+            <Area
+              dataKey="desktop"
+              type="natural"
+              fill="var(--color-desktop)"
+              fillOpacity={0.4}
+              stroke="var(--color-desktop)"
+            />
+          </AreaChart>
         </ChartContainer>
       </CardContent>
     </Card>

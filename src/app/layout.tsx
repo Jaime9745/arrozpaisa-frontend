@@ -24,13 +24,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* Preload critical resources */}
-        <link
-          rel="preload"
-          href="/images/loginLogo.svg"
-          as="image"
-          type="image/svg+xml"
-        />
+        {/* Critical resources will be preloaded by Next.js automatically */}
       </head>
       <body className={`${poppins.variable} antialiased font-sans`}>
         <AuthProvider>{children}</AuthProvider>

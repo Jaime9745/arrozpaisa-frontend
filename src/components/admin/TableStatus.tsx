@@ -11,24 +11,6 @@ import { useSidebar } from "@/contexts/SidebarContext";
 import { useTables } from "@/hooks/useTables";
 import Image from "next/image";
 
-// Export tableData for backward compatibility with other components
-export const tableData = [
-  { number: 14, status: "Ocupada" },
-  { number: 13, status: "Servida" },
-  { number: 12, status: "Libre" },
-  { number: 11, status: "Ocupada" },
-  { number: 10, status: "Servida" },
-  { number: 9, status: "Libre" },
-  { number: 8, status: "Ocupada" },
-  { number: 7, status: "Servida" },
-  { number: 6, status: "Libre" },
-  { number: 5, status: "Ocupada" },
-  { number: 4, status: "Servida" },
-  { number: 3, status: "Libre" },
-  { number: 2, status: "Ocupada" },
-  { number: 1, status: "Servida" },
-];
-
 export default function TableStatus() {
   const { toggleSidebar } = useSidebar();
   const { tables, loading, error, refreshTables } = useTables();

@@ -106,6 +106,30 @@ export interface SalesMetrics {
   calculatedAt: string;
 }
 
+export interface ProductMetrics {
+  period: "week" | "month";
+  startDate: string;
+  endDate: string;
+  topProducts: Array<{
+    productId: string;
+    productName: string;
+    category: string;
+    quantity: number;
+    totalSales: number;
+    percentageOfTotal: number;
+  }>;
+  categoryBreakdown: Array<{
+    category: string;
+    totalSales: number;
+    totalQuantity: number;
+    percentageOfTotal: number;
+  }>;
+  fromCache: boolean;
+  cacheKey: string;
+  cacheTTL: number;
+  calculatedAt: string;
+}
+
 // All Waiters Performance DTO for optimized endpoint
 export interface AllWaitersPerformanceDTO {
   startDate: string;
@@ -184,6 +208,19 @@ export class MetricsService {
       period,
       startDate: startDate.toISOString(),
       endDate: endDate.toISOString(),
+    });
+  }
+
+  // Get product metrics
+  async getProductMetrics(
+    period: "week" | "month",
+    startDate: Date,
+    endDate: Date
+  ): Promise<ProductMetrics> {
+    return this.makeRequest<ProductMetrics>("/metrics/products", {
+      period,
+      startDate: startDate.toISOString().split("T")[0],
+      endDate: endDate.toISOString().split("T")[0],
     });
   }
 

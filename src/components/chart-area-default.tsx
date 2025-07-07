@@ -43,12 +43,12 @@ export function ChartAreaDefault() {
         <CardTitle>Flujo de Atención por Franja Horaria</CardTitle>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig} className="h-[300px] w-full">
+        <ChartContainer config={chartConfig} className="h-[450px] w-full">
           <AreaChart
             accessibilityLayer
             data={chartData}
             width={458}
-            height={300}
+            height={450}
             margin={{
               left: 12,
               right: 12,

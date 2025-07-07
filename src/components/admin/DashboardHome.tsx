@@ -25,6 +25,7 @@ import { useWaiterPerformance } from "@/hooks/useWaiterPerformance";
 import { useSalesMetrics } from "@/hooks/useSalesMetrics";
 import { useProductMetrics } from "@/hooks/useProductMetrics";
 import { DateRangePicker } from "@/components/ui/date-range-picker";
+import Calendar04 from "../calendar-04";
 import { useState } from "react";
 import { type DateRange } from "react-day-picker";
 
@@ -226,27 +227,16 @@ export default function DashboardHome() {
 
   return (
     <div className="p-4 space-y-6">
-      {/* Dashboard Header with Date Range Picker */}
-      <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
-        <div className="flex items-center gap-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggleSidebar}
-            className="lg:hidden h-auto py-3 w-12 bg-white border-gray-200 hover:bg-gray-50 transition-all duration-200 shadow-sm"
-          >
-            <Menu className="h-6 w-6 text-gray-800" />
-          </Button>
-        </div>
-
-        <div className="flex items-center space-x-4">
-          <DateRangePicker
-            dateRange={dateRange}
-            onDateRangeChange={setDateRange}
-            placeholder="Seleccionar período"
-            className="w-auto"
-          />
-        </div>
+      {/* Mobile Menu Button - Only visible on small screens */}
+      <div className="lg:hidden">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={toggleSidebar}
+          className="h-auto py-3 w-12 bg-white border-gray-200 hover:bg-gray-50 transition-all duration-200 shadow-sm"
+        >
+          <Menu className="h-6 w-6 text-gray-800" />
+        </Button>
       </div>
 
       {/* Stats Cards */}
@@ -262,12 +252,17 @@ export default function DashboardHome() {
 
       {/* Bento Grid Layout */}
       <div className="grid grid-cols-6 gap-6 auto-rows-[minmax(180px,auto)]">
-        {/* Area Chart - Spans 4 columns */}
+        {/* Calendar - Spans 2 columns, 1 row */}
+        <div className="col-span-6 lg:col-span-2 row-span-1">
+          <Calendar04 dateRange={dateRange} onDateRangeChange={setDateRange} />
+        </div>
+
+        {/* Area Chart - Spans 4 columns, 2 rows */}
         <div className="col-span-6 lg:col-span-4 row-span-2">
           <ChartAreaDefault />
         </div>
 
-        {/* Pie Chart - Spans 2 columns */}
+        {/* Pie Chart - Spans 2 columns, 1 row (below calendar) */}
         <div className="col-span-6 lg:col-span-2 row-span-1">
           <ChartPieDonut
             waiterPerformance={waiterPerformance}
@@ -275,61 +270,6 @@ export default function DashboardHome() {
             error={waiterError}
             dateRange={dateRange}
           />
-        </div>
-
-        {/* Table Status Card */}
-        <div className="col-span-6 lg:col-span-2 row-span-1">
-          <Card style={{ borderRadius: "30px" }} className="h-full">
-            <CardHeader>
-              <CardTitle>Estado de Mesas</CardTitle>
-              <CardDescription>Vista rápida del estado actual</CardDescription>
-            </CardHeader>
-            <CardContent className="h-[calc(100%-80px)] overflow-auto">
-              {tableLoading ? (
-                <div className="flex items-center justify-center h-full">
-                  <div className="text-muted-foreground">
-                    Cargando estado de mesas...
-                  </div>
-                </div>
-              ) : tableError ? (
-                <div className="flex flex-col items-center justify-center h-full space-y-2">
-                  <div className="text-red-600 text-sm">
-                    Error al cargar mesas: {tableError}
-                  </div>
-                  <div className="text-xs text-muted-foreground">
-                    Mostrando datos de ejemplo
-                  </div>
-                </div>
-              ) : (
-                <>
-                  <div className="grid grid-cols-7 gap-2">
-                    {tableMetrics?.tables?.map((table) => (
-                      <div
-                        key={table.id}
-                        className={`p-2 rounded-lg text-center text-sm font-medium ${
-                          table.status === "free"
-                            ? "bg-gray-100 text-gray-800"
-                            : "bg-red-100 text-red-800"
-                        }`}
-                      >
-                        {table.number}
-                      </div>
-                    ))}
-                  </div>
-                  <div className="flex justify-between mt-4 text-sm">
-                    <span className="flex items-center gap-2">
-                      <div className="w-3 h-3 bg-red-100 border border-red-300 rounded"></div>
-                      Atendida ({tableMetrics?.occupiedTables || 0})
-                    </span>
-                    <span className="flex items-center gap-2">
-                      <div className="w-3 h-3 bg-gray-100 border border-gray-300 rounded"></div>
-                      Libre ({tableMetrics?.freeTables || 0})
-                    </span>
-                  </div>
-                </>
-              )}
-            </CardContent>
-          </Card>
         </div>
       </div>
     </div>

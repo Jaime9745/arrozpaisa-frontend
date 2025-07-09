@@ -44,7 +44,6 @@ export default function ProductCard({
       }}
     >
       <div className="flex">
-        {/* Image Section */}
         <div className="w-32 h-32 flex-shrink-0 pl-3 pr-1 py-2">
           <Image
             src={product.imageUrl}
@@ -58,7 +57,7 @@ export default function ProductCard({
             }}
           />
         </div>
-        {/* Content Section */}
+
         <div className="flex-1 flex flex-col justify-between pr-16 pl-2">
           <CardHeader className="pb-1">
             <CardTitle className="text-lg">{product.name}</CardTitle>
@@ -84,7 +83,6 @@ export default function ProductCard({
         </div>
       </div>
 
-      {/* Dropdown button positioned absolutely in the middle right */}
       <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

@@ -165,7 +165,6 @@ export function ChartPieDonut({
             ))}
           </div>
 
-          {/* Chart - Shows on bottom for small/medium, on right for xl */}
           <div className="flex items-center justify-center w-full xl:flex-1 order-2 xl:order-2">
             <div className="w-[120px] h-[120px] sm:w-[150px] sm:h-[150px] lg:w-[180px] lg:h-[180px] xl:w-[200px] xl:h-[200px]">
               <ChartContainer config={chartConfig} className="w-full h-full">

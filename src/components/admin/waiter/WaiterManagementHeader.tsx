@@ -20,7 +20,6 @@ export default function WaiterManagementHeader({
   return (
     <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2 sm:gap-4">
       <div className="flex items-center gap-4 flex-1">
-        {/* Mobile Hamburger Button */}
         <Button
           variant="ghost"
           size="icon"

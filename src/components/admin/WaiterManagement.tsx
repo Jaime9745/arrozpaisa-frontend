@@ -154,7 +154,6 @@ export default function WaiterManagement() {
   });
   return (
     <div className="space-y-6">
-      {/* Search Input and Add Button */}
       <WaiterManagementHeader
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
@@ -168,16 +167,13 @@ export default function WaiterManagement() {
         }}
         onToggleSidebar={toggleSidebar}
       />
-      {/* Error Message */}
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
           {error}
         </div>
       )}{" "}
-      {/* Main Content Area with Responsive Layout */}
       <div className="space-y-6 lg:space-y-0 lg:flex lg:gap-6">
         {" "}
-        {/* Forms Container - Shows on top for mobile/tablet, side for desktop */}
         {(showCreateForm || showEditForm || isClosing) && (
           <div
             className={`lg:order-2 lg:w-1/3 w-full transition-all duration-300 ${
@@ -186,7 +182,6 @@ export default function WaiterManagement() {
                 : "max-h-0 opacity-0 overflow-hidden"
             }`}
           >
-            {/* Create Waiter Form */}
             {showCreateForm && (
               <div
                 className={`transform transition-all duration-300 ease-in-out ${
@@ -204,7 +199,6 @@ export default function WaiterManagement() {
               </div>
             )}
 
-            {/* Edit Waiter Form */}
             {showEditForm && editingWaiter && (
               <div
                 className={`transform transition-all duration-300 ease-in-out ${
@@ -229,7 +223,6 @@ export default function WaiterManagement() {
             )}
           </div>
         )}
-        {/* Data Table Card Container */}
         <div
           className={`lg:order-1 transition-all duration-300 ${
             (showCreateForm || showEditForm) && !isClosing
@@ -267,13 +260,11 @@ export default function WaiterManagement() {
           </Card>
         </div>
       </div>
-      {/* Delete Confirmation Dialog */}
       <DeleteConfirmationDialog
         isOpen={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
         onConfirm={confirmDeleteWaiter}
       />
-      {/* Edit Success Dialog */}
       <EditConfirmationDialog
         isOpen={showEditSuccess}
         onClose={() => {

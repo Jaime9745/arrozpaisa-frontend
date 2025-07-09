@@ -56,9 +56,7 @@ export default function TableStatus() {
   return (
     <div className="space-y-6">
       {" "}
-      {/* Mobile Hamburger Button and Header Card */}
       <div className="flex items-center gap-4">
-        {/* Mobile Hamburger Button */}
         <Button
           variant="ghost"
           size="icon"
@@ -68,7 +66,6 @@ export default function TableStatus() {
           <Menu className="h-6 w-6 text-gray-800" />
         </Button>
 
-        {/* Header Card */}
         <Card className="py-2 px-6 border-0 flex-1">
           <CardContent className="p-0">
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-6 items-center justify-center">
@@ -104,7 +101,6 @@ export default function TableStatus() {
                 </div>
               </div>
 
-              {/* Refresh Button */}
               <Button
                 variant="ghost"
                 size="icon"
@@ -120,19 +116,16 @@ export default function TableStatus() {
           </CardContent>
         </Card>
       </div>
-      {/* Big General Card Container */}
       <Card
         className="p-6 border-0 h-[calc(100vh-180px)] sm:h-[calc(100vh-160px)] md:h-[calc(100vh-140px)] lg:h-[calc(100vh-120px)]"
         style={{ borderRadius: "30px" }}
       >
-        {/* Error Message */}
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
             {error}
           </div>
         )}
 
-        {/* Warning if not all tables are loaded */}
         {!loading && tables.length < 14 && (
           <div className="bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded-lg mb-4">
             ⚠️ Solo se encontraron {tables.length} mesas en la base de datos (se
@@ -141,10 +134,8 @@ export default function TableStatus() {
           </div>
         )}
 
-        {/* Scrollable Content Area */}
         <CardContent className="px-0 pb-0 h-full overflow-y-auto">
           <div className="flex justify-between w-full px-6">
-            {/* First Column - first 4 tables */}
             <div className="flex flex-col gap-4 flex-1 items-center">
               {sortedTables.slice(0, 4).map((table, index) => {
                 const displayStatus = getDisplayStatus(table.status);
@@ -181,7 +172,7 @@ export default function TableStatus() {
                 );
               })}
             </div>
-            {/* Second Column - next 6 tables */}
+
             <div className="flex flex-col gap-1 flex-1 items-center">
               {sortedTables.slice(4, 10).map((table, index) => {
                 const displayStatus = getDisplayStatus(table.status);
@@ -241,7 +232,7 @@ export default function TableStatus() {
                 );
               })}
             </div>
-            {/* Third Column - last 4 tables */}
+
             <div className="flex flex-col gap-4 flex-1 items-center">
               {sortedTables.slice(10, 14).map((table) => {
                 const displayStatus = getDisplayStatus(table.status);

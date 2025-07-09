@@ -41,14 +41,12 @@ export default function AdminSidebar({
 
   return (
     <>
-      {/* Mobile Overlay */}
       {isMobileOpen && (
         <div
           className="fixed inset-0 backdrop-blur-sm bg-black/20 z-40 lg:hidden"
           onClick={() => setIsMobileOpen(false)}
         />
       )}{" "}
-      {/* Sidebar */}
       <Card
         className={`
           fixed lg:relative transition-transform duration-300 ease-in-out z-50
@@ -63,9 +61,7 @@ export default function AdminSidebar({
         style={{ borderRadius: "30px", backgroundColor: "#ffffff" }}
       >
         {" "}
-        {/* Header with close button for mobile */}
         <div className="relative p-6 pb-4">
-          {/* Close button positioned at top-right */}{" "}
           <Button
             variant="ghost"
             size="icon"
@@ -79,7 +75,7 @@ export default function AdminSidebar({
               height={40}
             />
           </Button>
-          {/* Logo and greeting */}
+
           <div className="flex items-center gap-2 pr-12">
             <Image
               src="/images/logo.webp"

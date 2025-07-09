@@ -227,7 +227,6 @@ export default function DashboardHome() {
 
   return (
     <div className="p-4 space-y-6">
-      {/* Mobile Menu Button - Only visible on small screens */}
       <div className="lg:hidden">
         <Button
           variant="ghost"
@@ -239,7 +238,6 @@ export default function DashboardHome() {
         </Button>
       </div>
 
-      {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {dashboardStats.map((stat, index) => (
           <StatsCard
@@ -250,19 +248,15 @@ export default function DashboardHome() {
         ))}
       </div>
 
-      {/* Bento Grid Layout */}
       <div className="grid grid-cols-6 gap-6 auto-rows-[minmax(180px,auto)]">
-        {/* Calendar - Spans 2 columns, 1 row */}
         <div className="col-span-6 lg:col-span-2 row-span-1">
           <Calendar04 dateRange={dateRange} onDateRangeChange={setDateRange} />
         </div>
 
-        {/* Area Chart - Spans 4 columns, 2 rows */}
         <div className="col-span-6 lg:col-span-4 row-span-2">
           <ChartAreaDefault />
         </div>
 
-        {/* Pie Chart - Spans 2 columns, 1 row (below calendar) */}
         <div className="col-span-6 lg:col-span-2 row-span-1">
           <ChartPieDonut
             waiterPerformance={waiterPerformance}

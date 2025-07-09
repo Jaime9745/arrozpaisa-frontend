@@ -254,13 +254,11 @@ export default function ProductForm({
         </CardHeader>{" "}
         <CardContent className="h-auto lg:h-[calc(100%-140px)] lg:overflow-y-auto p-6">
           <form id="product-form" onSubmit={handleSubmit} className="space-y-4">
-            {/* Image Upload */}
             <div className="space-y-2">
               <Label className="text-sm font-normal text-gray-700">
                 Imagen del plato *
               </Label>
 
-              {/* Image Preview or Upload Area */}
               <div className="relative w-48 h-48 mx-auto">
                 <div
                   className="w-full h-full cursor-pointer flex items-center justify-center rounded-full overflow-hidden"
@@ -287,7 +285,6 @@ export default function ProductForm({
                   )}
                 </div>
 
-                {/* Remove Image Button - Only show when image is selected */}
                 {imagePreview && (
                   <Button
                     type="button"
@@ -307,7 +304,6 @@ export default function ProductForm({
                 )}
               </div>
 
-              {/* Hidden File Input */}
               <input
                 ref={fileInputRef}
                 type="file"
@@ -316,19 +312,16 @@ export default function ProductForm({
                 className="hidden"
               />
 
-              {/* Image Error */}
               {imageError && (
                 <p className="text-sm text-red-600 mt-1">{imageError}</p>
               )}
 
-              {/* Image Guidelines */}
               <p className="text-xs text-gray-500 mt-1">
                 Haz clic en el área para seleccionar una imagen. Formatos: JPG,
                 PNG, WebP. Tamaño máximo: 5MB.
               </p>
             </div>
 
-            {/* Product Name */}
             <div className="space-y-2">
               <Label
                 htmlFor="name"
@@ -354,7 +347,6 @@ export default function ProductForm({
               />
             </div>
 
-            {/* Category */}
             <div className="space-y-2">
               <Label
                 htmlFor="category"
@@ -395,7 +387,6 @@ export default function ProductForm({
               </Select>
             </div>
 
-            {/* Price */}
             <div className="space-y-2">
               <Label
                 htmlFor="price"
@@ -423,7 +414,6 @@ export default function ProductForm({
               />
             </div>
 
-            {/* Product Description */}
             <div className="space-y-2">
               <Label
                 htmlFor="description"

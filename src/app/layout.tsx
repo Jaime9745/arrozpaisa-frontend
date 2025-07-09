@@ -23,9 +23,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
-        {/* Critical resources will be preloaded by Next.js automatically */}
-      </head>
+      <head></head>
       <body className={`${poppins.variable} antialiased font-sans`}>
         <AuthProvider>{children}</AuthProvider>
       </body>

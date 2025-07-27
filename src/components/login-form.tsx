@@ -49,7 +49,6 @@ export function LoginForm({
       >
         <CardHeader className="text-center px-4 sm:px-6 py-6 sm:py-8">
           {" "}
-          {/* Logo visible only on mobile and tablets, hidden on desktop */}
           <div className="flex justify-center mb-4 lg:hidden">
             <Image
               src="/images/loginLogo.svg"

@@ -1,3 +1,5 @@
+import { apiClient } from "../api";
+
 interface LoginRequest {
   userName: string;
   password: string;
@@ -5,34 +7,23 @@ interface LoginRequest {
 
 interface LoginResponse {
   token: string;
+  user: {
+    role: string;
+  };
 }
 
 class LoginService {
-  private baseUrl: string;
-  constructor() {
-    this.baseUrl = process.env.NEXT_PUBLIC_API_URL!;
-  }
+  private api = apiClient.getInstance();
 
   async login(credentials: LoginRequest): Promise<LoginResponse> {
     try {
-      const response = await fetch(`${this.baseUrl}/auth/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(credentials),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Error en el inicio de sesión");
-      }
-
-      const data = await response.json();
-      return data;
+      const response = await this.api.post<LoginResponse>(
+        "/auth/login",
+        credentials
+      );
+      return response.data;
     } catch (error) {
-      console.error("Error en loginService:", error);
-      throw error;
+      return apiClient.handleError(error);
     }
   }
 

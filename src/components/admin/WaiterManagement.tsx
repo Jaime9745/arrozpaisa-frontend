@@ -10,6 +10,7 @@ import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
 import WaiterForm from "@/components/admin/waiter/WaiterForm";
 import WaiterManagementHeader from "./waiter/WaiterManagementHeader";
 import DeleteConfirmationDialog from "./waiter/DeleteConfirmationDialog";
+import EditConfirmationDialog from "./waiter/EditConfirmationDialog";
 import { useWaiterTableColumns } from "./waiter/WaiterTableColumns";
 
 export default function WaiterManagement() {
@@ -23,6 +24,7 @@ export default function WaiterManagement() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [waiterToDelete, setWaiterToDelete] = useState<string | null>(null);
+  const [showEditSuccess, setShowEditSuccess] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   const { waiters, loading, error, deleteWaiter, createWaiter, updateWaiter } =
     useWaiters();
@@ -104,8 +106,9 @@ export default function WaiterManagement() {
         userName,
       };
       await updateWaiter(editingWaiter.id, waiterData);
-      // Close form with animation
-      handleCloseEditForm();
+      // Show success dialog
+      setShowEditSuccess(true);
+      // Don't close form here - it will close when dialog is dismissed
     } catch (error) {
       console.error("Failed to update waiter:", error);
     } finally {
@@ -151,7 +154,6 @@ export default function WaiterManagement() {
   });
   return (
     <div className="space-y-6">
-      {/* Search Input and Add Button */}
       <WaiterManagementHeader
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
@@ -165,16 +167,13 @@ export default function WaiterManagement() {
         }}
         onToggleSidebar={toggleSidebar}
       />
-      {/* Error Message */}
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
           {error}
         </div>
       )}{" "}
-      {/* Main Content Area with Responsive Layout */}
       <div className="space-y-6 lg:space-y-0 lg:flex lg:gap-6">
         {" "}
-        {/* Forms Container - Shows on top for mobile/tablet, side for desktop */}
         {(showCreateForm || showEditForm || isClosing) && (
           <div
             className={`lg:order-2 lg:w-1/3 w-full transition-all duration-300 ${
@@ -183,7 +182,6 @@ export default function WaiterManagement() {
                 : "max-h-0 opacity-0 overflow-hidden"
             }`}
           >
-            {/* Create Waiter Form */}
             {showCreateForm && (
               <div
                 className={`transform transition-all duration-300 ease-in-out ${
@@ -201,7 +199,6 @@ export default function WaiterManagement() {
               </div>
             )}
 
-            {/* Edit Waiter Form */}
             {showEditForm && editingWaiter && (
               <div
                 className={`transform transition-all duration-300 ease-in-out ${
@@ -226,7 +223,6 @@ export default function WaiterManagement() {
             )}
           </div>
         )}
-        {/* Data Table Card Container */}
         <div
           className={`lg:order-1 transition-all duration-300 ${
             (showCreateForm || showEditForm) && !isClosing
@@ -264,11 +260,20 @@ export default function WaiterManagement() {
           </Card>
         </div>
       </div>
-      {/* Delete Confirmation Dialog */}
       <DeleteConfirmationDialog
         isOpen={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
         onConfirm={confirmDeleteWaiter}
+      />
+      <EditConfirmationDialog
+        isOpen={showEditSuccess}
+        onClose={() => {
+          setShowEditSuccess(false);
+          // Close the edit form when dialog is closed
+          if (showEditForm) {
+            handleCloseEditForm();
+          }
+        }}
       />
     </div>
   );

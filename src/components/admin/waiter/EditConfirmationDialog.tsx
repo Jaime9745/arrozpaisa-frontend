@@ -3,27 +3,23 @@
 import {
   AlertDialog,
   AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import Image from "next/image";
 
-interface DeleteConfirmationDialogProps {
+interface EditConfirmationDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: () => void;
-  isDeleting?: boolean;
 }
 
-export default function DeleteConfirmationDialog({
+export default function EditConfirmationDialog({
   isOpen,
   onClose,
-  onConfirm,
-  isDeleting = false,
-}: DeleteConfirmationDialogProps) {
+}: EditConfirmationDialogProps) {
   return (
     <AlertDialog open={isOpen} onOpenChange={onClose}>
       <AlertDialogContent
@@ -32,28 +28,25 @@ export default function DeleteConfirmationDialog({
       >
         <AlertDialogHeader>
           <AlertDialogTitle className="text-xl font-semibold text-gray-800 text-center">
-            Confirmar Eliminación
+            Edición Completada
           </AlertDialogTitle>
-          <AlertDialogDescription className="text-gray-600 text-center py-7">
-            ¿Estás seguro de que quieres eliminar este mesero? Esta acción no se
-            puede deshacer.
+          <AlertDialogDescription className="text-gray-600 text-center py-7 flex justify-center">
+            <Image
+              src="/images/icons/checkComplete.svg"
+              alt="Edición completada"
+              width={64}
+              height={64}
+              className="w-16 h-16"
+            />
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="gap-3">
-          <AlertDialogCancel
-            className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50 transition-all duration-200 hover:scale-105 active:scale-95"
-            style={{ borderRadius: "15px" }}
-            disabled={isDeleting}
-          >
-            Cancelar
-          </AlertDialogCancel>
           <AlertDialogAction
-            onClick={onConfirm}
-            disabled={isDeleting}
+            onClick={onClose}
             className="flex-1 text-white transition-all duration-200 hover:scale-105 active:scale-95"
-            style={{ background: "#E71D36", borderRadius: "15px" }}
+            style={{ background: "#DFAA30", borderRadius: "15px" }}
           >
-            {isDeleting ? "Eliminando..." : "Eliminar"}
+            Aceptar
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

@@ -33,14 +33,40 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     // Check if user is already authenticated on app load
     const token = loginService.getToken();
-    setIsAuthenticated(!!token);
+    const savedRole = localStorage.getItem("role");
+
+    if (token && savedRole) {
+      // Only set as authenticated if user is admin
+      if (savedRole === "admin") {
+        setIsAuthenticated(true);
+      } else {
+        // Clear invalid data
+        loginService.logout();
+        localStorage.removeItem("role");
+      }
+    }
+
     setLoading(false);
   }, []);
 
   const login = async (userName: string, password: string) => {
     try {
       const response = await loginService.login({ userName, password });
+
+      // Check if backend returned user info
+      if (!response.user) {
+        throw new Error("No se pudo obtener la información del usuario.");
+      }
+
+      // Check if user is admin
+      if (response.user.role !== "admin") {
+        throw new Error(
+          "Acceso denegado. Solo los administradores pueden acceder."
+        );
+      }
+
       localStorage.setItem("token", response.token);
+      localStorage.setItem("role", response.user.role);
       setIsAuthenticated(true);
       router.push("/admin");
     } catch (error) {
@@ -51,6 +77,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = () => {
     loginService.logout();
+    localStorage.removeItem("role");
     setIsAuthenticated(false);
     router.push("/login");
   };

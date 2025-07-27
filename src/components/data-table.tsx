@@ -72,7 +72,6 @@ export function DataTable<TData, TValue>({
       {useCardStyle ? (
         <div className="space-y-4">
           {" "}
-          {/* Header row for sorting - only visible on larger screens */}
           <div className="hidden lg:flex px-6 py-3 border-b">
             {table.getHeaderGroups().map((headerGroup) => (
               <div key={headerGroup.id} className="flex w-full">
@@ -106,7 +105,6 @@ export function DataTable<TData, TValue>({
               </div>
             ))}
           </div>
-          {/* Card rows */}
           <div className="space-y-4">
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
@@ -143,11 +141,10 @@ export function DataTable<TData, TValue>({
                     // Regular columns with responsive design
                     return (
                       <div key={cell.id} className="flex-1 min-w-0">
-                        {/* Mobile: Show header label above content */}
                         <div className="sm:hidden text-xs font-medium text-gray-500 mb-1 uppercase tracking-wide">
                           {headerText}
                         </div>
-                        {/* Content */}
+
                         <div className="break-words">
                           {flexRender(
                             cell.column.columnDef.cell,

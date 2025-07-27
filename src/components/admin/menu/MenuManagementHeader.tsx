@@ -4,19 +4,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, Search, Menu } from "lucide-react";
 
-interface WaiterManagementHeaderProps {
+interface MenuManagementHeaderProps {
   searchTerm: string;
   onSearchChange: (value: string) => void;
-  onAddWaiter: () => void;
+  onAddProduct: () => void;
   onToggleSidebar: () => void;
 }
 
-export default function WaiterManagementHeader({
+export default function MenuManagementHeader({
   searchTerm,
   onSearchChange,
-  onAddWaiter,
+  onAddProduct,
   onToggleSidebar,
-}: WaiterManagementHeaderProps) {
+}: MenuManagementHeaderProps) {
   return (
     <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2 sm:gap-4">
       <div className="flex items-center gap-4 flex-1">
@@ -31,7 +31,7 @@ export default function WaiterManagementHeader({
         <div className="flex-1 relative">
           <Input
             type="text"
-            placeholder="Buscar meseros por nombre, identificación, teléfono o usuario..."
+            placeholder="Buscar por nombre o descripción..."
             value={searchTerm}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               onSearchChange(e.target.value)
@@ -44,10 +44,10 @@ export default function WaiterManagementHeader({
       <Button
         className="px-8 py-3 w-full sm:min-w-[180px] sm:w-auto text-white flex items-center gap-2 justify-center font-normal transition-all duration-200 hover:shadow-lg hover:brightness-110"
         style={{ background: "#EB3123" }}
-        onClick={onAddWaiter}
+        onClick={onAddProduct}
       >
         <Plus className="h-5 w-5" />
-        Agregar Mesero
+        Agregar Plato
       </Button>
     </div>
   );

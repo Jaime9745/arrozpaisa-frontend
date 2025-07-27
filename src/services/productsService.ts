@@ -1,18 +1,15 @@
-interface ProductVariant {
-  name: string;
-  price: number;
-}
+import { apiClient } from "../api";
 
-interface Product {
+export interface Product {
   id: string;
   name: string;
   description: string;
   imageUrl: string;
   categoryId: string;
+  price: number;
   isActive: boolean;
-  variants: ProductVariant[];
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 interface ProductsResponse {
@@ -22,52 +19,26 @@ interface ProductsResponse {
 }
 
 class ProductsService {
-  private baseUrl: string;
-  constructor() {
-    this.baseUrl = process.env.NEXT_PUBLIC_API_URL!;
-  }
+  private api = apiClient.getInstance();
 
   async getAllProducts(): Promise<Product[]> {
     try {
-      const token = localStorage.getItem("token");
-      console.log("Fetching products from:", `${this.baseUrl}/productes`);
-      console.log("Token:", token ? "Present" : "Not present");
-
-      const response = await fetch(`${this.baseUrl}/productes`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
-      });
-
-      console.log("Response status:", response.status);
-      console.log("Response ok:", response.ok);
-
-      if (!response.ok) {
-        throw new Error("Error al obtener los productos");
-      }
-
-      const data = await response.json();
-      console.log("Raw response data:", data);
+      const response = await this.api.get<ProductsResponse | Product[]>(
+        "/productes"
+      );
 
       // Handle different response formats
-      if (Array.isArray(data)) {
-        console.log("Data is array, returning directly");
-        return data;
-      } else if (data.products) {
-        console.log("Data has products property");
-        return data.products;
-      } else if (data.data) {
-        console.log("Data has data property");
-        return data.data;
+      if (Array.isArray(response.data)) {
+        return response.data;
+      } else if ("products" in response.data && response.data.products) {
+        return response.data.products;
+      } else if ("data" in response.data && response.data.data) {
+        return response.data.data;
       }
 
-      console.log("No recognizable data format, returning empty array");
       return [];
     } catch (error) {
-      console.error("Error in getAllProducts:", error);
-      throw error;
+      return apiClient.handleError(error);
     }
   }
 
@@ -75,73 +46,55 @@ class ProductsService {
     product: Omit<Product, "id" | "createdAt" | "updatedAt">
   ): Promise<Product> {
     try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(`${this.baseUrl}/productes`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
-        body: JSON.stringify(product),
-      });
+      // Transform the product data to match backend expectations
+      const productData = {
+        name: product.name,
+        description: product.description,
+        categoryId: product.categoryId,
+        price: product.price,
+        imageBase64: product.imageUrl, // Backend expects imageBase64, not imageUrl
+      };
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Error al crear el producto");
-      }
-
-      return await response.json();
+      const response = await this.api.post<Product>("/productes", productData);
+      return response.data;
     } catch (error) {
-      console.error("Error in createProduct:", error);
-      throw error;
+      return apiClient.handleError(error);
     }
   }
 
   async updateProduct(id: string, product: Partial<Product>): Promise<Product> {
     try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(`${this.baseUrl}/productes/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
-        body: JSON.stringify(product),
-      });
+      // Transform the product data to match backend expectations
+      const productData: any = {};
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Error al actualizar el producto");
+      if (product.name !== undefined) productData.name = product.name;
+      if (product.description !== undefined)
+        productData.description = product.description;
+      if (product.categoryId !== undefined)
+        productData.categoryId = product.categoryId;
+      if (product.price !== undefined) productData.price = product.price;
+      if (product.imageUrl !== undefined) {
+        // Backend expects imageBase64, not imageUrl
+        productData.imageBase64 = product.imageUrl;
       }
 
-      return await response.json();
+      const response = await this.api.put<Product>(
+        `/productes/${id}`,
+        productData
+      );
+      return response.data;
     } catch (error) {
-      console.error("Error in updateProduct:", error);
-      throw error;
+      return apiClient.handleError(error);
     }
   }
 
   async deleteProduct(id: string): Promise<void> {
     try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(`${this.baseUrl}/productes/${id}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Error al eliminar el producto");
-      }
+      await this.api.delete(`/productes/${id}`);
     } catch (error) {
-      console.error("Error in deleteProduct:", error);
-      throw error;
+      return apiClient.handleError(error);
     }
   }
 }
 
 export const productsService = new ProductsService();
-export type { Product, ProductVariant };

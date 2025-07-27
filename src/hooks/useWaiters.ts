@@ -15,7 +15,6 @@ export const useWaiters = () => {
       const fetchedWaiters = await waitersService.getAllWaiters();
       setWaiters(fetchedWaiters);
     } catch (error) {
-      console.error("Error fetching waiters:", error);
       setError("Error al cargar los meseros");
     } finally {
       setLoading(false);
@@ -31,7 +30,6 @@ export const useWaiters = () => {
       setWaiters((prev) => [...prev, newWaiter]);
       return newWaiter;
     } catch (error) {
-      console.error("Error creating waiter:", error);
       setError("Error al crear el mesero");
       throw error;
     }
@@ -44,7 +42,6 @@ export const useWaiters = () => {
       setWaiters((prev) => prev.map((w) => (w.id === id ? updatedWaiter : w)));
       return updatedWaiter;
     } catch (error) {
-      console.error("Error updating waiter:", error);
       setError("Error al actualizar el mesero");
       throw error;
     }
@@ -56,7 +53,6 @@ export const useWaiters = () => {
       await waitersService.deleteWaiter(id);
       setWaiters((prev) => prev.filter((w) => w.id !== id));
     } catch (error) {
-      console.error("Error deleting waiter:", error);
       setError("Error al eliminar el mesero");
       throw error;
     }

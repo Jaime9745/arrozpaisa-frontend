@@ -13,8 +13,16 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const router = useRouter();
 
   useEffect(() => {
-    if (!loading && !isAuthenticated) {
-      router.push("/login");
+    if (!loading) {
+      if (!isAuthenticated) {
+        router.push("/login");
+      } else {
+        // Double-check role from localStorage
+        const role = localStorage.getItem("role");
+        if (role !== "admin") {
+          router.push("/login");
+        }
+      }
     }
   }, [isAuthenticated, loading, router]);
 
@@ -27,6 +35,12 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   }
 
   if (!isAuthenticated) {
+    return null;
+  }
+
+  // Double-check role
+  const role = localStorage.getItem("role");
+  if (role !== "admin") {
     return null;
   }
 

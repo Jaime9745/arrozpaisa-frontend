@@ -7,6 +7,7 @@ interface StatsCardProps {
   description: string;
   icon: React.ComponentType<{ className?: string }>;
   trend: "up" | "neutral" | "down";
+  loading?: boolean;
 }
 
 export default function StatsCard({
@@ -15,6 +16,7 @@ export default function StatsCard({
   description,
   icon,
   trend,
+  loading = false,
 }: StatsCardProps) {
   const IconComponent = icon;
 
@@ -30,15 +32,28 @@ export default function StatsCard({
         <IconComponent className="h-4 w-4 text-gray-600" />
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold text-gray-900">{value}</div>
-        <p
-          className={`text-xs ${
-            trend === "up" ? "text-green-600" : "text-gray-600"
-          } flex items-center gap-1`}
-        >
-          {trend === "up" && <TrendingUp className="h-3 w-3" />}
-          {description}
-        </p>
+        {loading ? (
+          <div className="space-y-2">
+            <div className="h-8 bg-gray-200 rounded animate-pulse"></div>
+            <div className="h-4 bg-gray-200 rounded animate-pulse w-3/4"></div>
+          </div>
+        ) : (
+          <>
+            <div className="text-2xl font-bold text-gray-900">{value}</div>
+            <p
+              className={`text-xs ${
+                trend === "up"
+                  ? "text-green-600"
+                  : trend === "down"
+                  ? "text-red-600"
+                  : "text-gray-600"
+              } flex items-center gap-1`}
+            >
+              {trend === "up" && <TrendingUp className="h-3 w-3" />}
+              {description}
+            </p>
+          </>
+        )}
       </CardContent>
     </Card>
   );

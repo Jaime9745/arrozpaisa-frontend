@@ -1,3 +1,5 @@
+import { apiClient } from "../api";
+
 export interface Table {
   id: string;
   number: number;
@@ -31,100 +33,100 @@ export interface ApiResponse<T> {
 }
 
 class TablesService {
-  private baseUrl: string;
-
-  constructor() {
-    if (!process.env.NEXT_PUBLIC_API_URL) {
-      throw new Error("NEXT_PUBLIC_API_URL environment variable is required");
-    }
-    this.baseUrl = process.env.NEXT_PUBLIC_API_URL;
-  }
-
-  private async makeRequest<T>(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<T> {
-    const token = localStorage.getItem("token");
-
-    const response = await fetch(`${this.baseUrl}${endpoint}`, {
-      ...options,
-      headers: {
-        "Content-Type": "application/json",
-        ...(token && { Authorization: `Bearer ${token}` }),
-        ...options.headers,
-      },
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(
-        errorData.message || `Error ${response.status}: ${response.statusText}`
-      );
-    }
-
-    return response.json();
-  }
+  private api = apiClient.getInstance();
 
   // Get all tables (admin and waiters)
   async getAllTables(): Promise<Table[]> {
-    const result = await this.makeRequest<ApiResponse<Table[]>>("/tables");
-    return result.data;
+    try {
+      const response = await this.api.get<ApiResponse<Table[]>>("/tables");
+      return response.data.data;
+    } catch (error) {
+      return apiClient.handleError(error);
+    }
   }
 
   // Get table by ID (admin and waiters)
   async getTableById(id: string): Promise<Table> {
-    const result = await this.makeRequest<ApiResponse<Table>>(`/tables/${id}`);
-    return result.data;
+    try {
+      const response = await this.api.get<ApiResponse<Table>>(`/tables/${id}`);
+      return response.data.data;
+    } catch (error) {
+      return apiClient.handleError(error);
+    }
   }
 
   // Get table by number (admin and waiters)
   async getTableByNumber(number: number): Promise<Table> {
-    const result = await this.makeRequest<ApiResponse<Table>>(
-      `/tables/number/${number}`
-    );
-    return result.data;
+    try {
+      const response = await this.api.get<ApiResponse<Table>>(
+        `/tables/number/${number}`
+      );
+      return response.data.data;
+    } catch (error) {
+      return apiClient.handleError(error);
+    }
   }
 
   // Get tables by status (admin and waiters)
   async getTablesByStatus(status: "libre" | "atendida"): Promise<Table[]> {
-    const result = await this.makeRequest<ApiResponse<Table[]>>(
-      `/tables/status/${status}`
-    );
-    return result.data;
+    try {
+      const response = await this.api.get<ApiResponse<Table[]>>(
+        `/tables/status/${status}`
+      );
+      return response.data.data;
+    } catch (error) {
+      return apiClient.handleError(error);
+    }
   }
 
   // Get available tables (admin and waiters)
   async getAvailableTables(): Promise<Table[]> {
-    const result = await this.makeRequest<ApiResponse<Table[]>>(
-      "/tables/available/tables"
-    );
-    return result.data;
+    try {
+      const response = await this.api.get<ApiResponse<Table[]>>(
+        "/tables/available/tables"
+      );
+      return response.data.data;
+    } catch (error) {
+      return apiClient.handleError(error);
+    }
   }
 
   // Get occupied tables (admin and waiters)
   async getOccupiedTables(): Promise<Table[]> {
-    const result = await this.makeRequest<ApiResponse<Table[]>>(
-      "/tables/occupied/tables"
-    );
-    return result.data;
+    try {
+      const response = await this.api.get<ApiResponse<Table[]>>(
+        "/tables/occupied/tables"
+      );
+      return response.data.data;
+    } catch (error) {
+      return apiClient.handleError(error);
+    }
   }
 
   // Create table (admin only)
   async createTable(tableData: CreateTableRequest): Promise<Table> {
-    const result = await this.makeRequest<ApiResponse<Table>>("/tables", {
-      method: "POST",
-      body: JSON.stringify(tableData),
-    });
-    return result.data;
+    try {
+      const response = await this.api.post<ApiResponse<Table>>(
+        "/tables",
+        tableData
+      );
+      return response.data.data;
+    } catch (error) {
+      return apiClient.handleError(error);
+    }
   }
 
   // Update table (admin only)
   async updateTable(id: string, tableData: UpdateTableRequest): Promise<Table> {
-    const result = await this.makeRequest<ApiResponse<Table>>(`/tables/${id}`, {
-      method: "PUT",
-      body: JSON.stringify(tableData),
-    });
-    return result.data;
+    try {
+      const response = await this.api.put<ApiResponse<Table>>(
+        `/tables/${id}`,
+        tableData
+      );
+      return response.data.data;
+    } catch (error) {
+      return apiClient.handleError(error);
+    }
   }
 
   // Update table status (admin and waiters)
@@ -132,21 +134,24 @@ class TablesService {
     id: string,
     status: "libre" | "atendida"
   ): Promise<Table> {
-    const result = await this.makeRequest<ApiResponse<Table>>(
-      `/tables/${id}/status`,
-      {
-        method: "PUT",
-        body: JSON.stringify({ status }),
-      }
-    );
-    return result.data;
+    try {
+      const response = await this.api.put<ApiResponse<Table>>(
+        `/tables/${id}/status`,
+        { status }
+      );
+      return response.data.data;
+    } catch (error) {
+      return apiClient.handleError(error);
+    }
   }
 
   // Delete table (admin only)
   async deleteTable(id: string): Promise<void> {
-    await this.makeRequest<{ message: string }>(`/tables/${id}`, {
-      method: "DELETE",
-    });
+    try {
+      await this.api.delete(`/tables/${id}`);
+    } catch (error) {
+      return apiClient.handleError(error);
+    }
   }
 
   // Helper method to get free tables (alias for available tables)

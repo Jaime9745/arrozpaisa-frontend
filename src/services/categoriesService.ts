@@ -1,3 +1,5 @@
+import { apiClient } from "../api";
+
 export interface Category {
   id: string;
   name: string;
@@ -12,80 +14,61 @@ interface CategoriesResponse {
 }
 
 class CategoriesService {
-  private baseUrl: string;
-
-  constructor() {
-    if (!process.env.NEXT_PUBLIC_API_URL) {
-      throw new Error("NEXT_PUBLIC_API_URL environment variable is required");
-    }
-    this.baseUrl = process.env.NEXT_PUBLIC_API_URL;
-  }
-
-  private async makeRequest<T>(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<T> {
-    const token = localStorage.getItem("token");
-
-    const response = await fetch(`${this.baseUrl}${endpoint}`, {
-      ...options,
-      headers: {
-        "Content-Type": "application/json",
-        ...(token && { Authorization: `Bearer ${token}` }),
-        ...options.headers,
-      },
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(
-        errorData.message || `Error ${response.status}: ${response.statusText}`
-      );
-    }
-
-    return response.json();
-  }
+  private api = apiClient.getInstance();
 
   async getAllCategories(): Promise<Category[]> {
-    const data = await this.makeRequest<CategoriesResponse | Category[]>(
-      "/categories"
-    );
+    try {
+      const response = await this.api.get<CategoriesResponse | Category[]>(
+        "/categories"
+      );
 
-    // Handle different response formats
-    if (Array.isArray(data)) {
-      return data;
-    } else if ("categories" in data && data.categories) {
-      return data.categories;
-    } else if ("data" in data && data.data) {
-      return data.data;
+      // Handle different response formats
+      if (Array.isArray(response.data)) {
+        return response.data;
+      } else if ("categories" in response.data && response.data.categories) {
+        return response.data.categories;
+      } else if ("data" in response.data && response.data.data) {
+        return response.data.data;
+      }
+
+      return [];
+    } catch (error) {
+      return apiClient.handleError(error);
     }
-
-    return [];
   }
 
   async createCategory(
     category: Omit<Category, "id" | "createdAt" | "updatedAt">
   ): Promise<Category> {
-    return this.makeRequest<Category>("/categories", {
-      method: "POST",
-      body: JSON.stringify(category),
-    });
+    try {
+      const response = await this.api.post<Category>("/categories", category);
+      return response.data;
+    } catch (error) {
+      return apiClient.handleError(error);
+    }
   }
 
   async updateCategory(
     id: string,
     category: Partial<Category>
   ): Promise<Category> {
-    return this.makeRequest<Category>(`/categories/${id}`, {
-      method: "PUT",
-      body: JSON.stringify(category),
-    });
+    try {
+      const response = await this.api.put<Category>(
+        `/categories/${id}`,
+        category
+      );
+      return response.data;
+    } catch (error) {
+      return apiClient.handleError(error);
+    }
   }
 
   async deleteCategory(id: string): Promise<void> {
-    await this.makeRequest<void>(`/categories/${id}`, {
-      method: "DELETE",
-    });
+    try {
+      await this.api.delete(`/categories/${id}`);
+    } catch (error) {
+      return apiClient.handleError(error);
+    }
   }
 }
 

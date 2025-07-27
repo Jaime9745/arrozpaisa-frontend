@@ -1,3 +1,5 @@
+import { apiClient } from "../api";
+
 interface Waiter {
   id: string;
   firstName: string;
@@ -16,67 +18,49 @@ interface WaitersResponse {
 }
 
 class WaitersService {
-  private baseUrl: string;
-
-  constructor() {
-    if (!process.env.NEXT_PUBLIC_API_URL) {
-      throw new Error("NEXT_PUBLIC_API_URL environment variable is required");
-    }
-    this.baseUrl = process.env.NEXT_PUBLIC_API_URL;
-  }
-
-  private async makeRequest<T>(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<T> {
-    const token = localStorage.getItem("token");
-
-    const response = await fetch(`${this.baseUrl}${endpoint}`, {
-      ...options,
-      headers: {
-        "Content-Type": "application/json",
-        ...(token && { Authorization: `Bearer ${token}` }),
-        ...options.headers,
-      },
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(
-        errorData.message || `HTTP error! status: ${response.status}`
-      );
-    }
-
-    return response.json();
-  }
+  private api = apiClient.getInstance();
 
   async getAllWaiters(): Promise<Waiter[]> {
-    const data = await this.makeRequest<WaitersResponse>("/waiters");
-    return data.data || [];
+    try {
+      const response = await this.api.get<WaitersResponse>("/waiters");
+      return response.data.data || [];
+    } catch (error) {
+      return apiClient.handleError(error);
+    }
   }
 
   async createWaiter(
     waiter: Omit<Waiter, "id" | "createdAt" | "updatedAt" | "password">
   ): Promise<Waiter> {
-    const result = await this.makeRequest<{ data: Waiter }>("/waiters", {
-      method: "POST",
-      body: JSON.stringify(waiter),
-    });
-    return result.data || result;
+    try {
+      const response = await this.api.post<{ data: Waiter }>(
+        "/waiters",
+        waiter
+      );
+      return response.data.data || response.data;
+    } catch (error) {
+      return apiClient.handleError(error);
+    }
   }
 
   async updateWaiter(id: string, waiter: Partial<Waiter>): Promise<Waiter> {
-    const result = await this.makeRequest<{ data: Waiter }>(`/waiters/${id}`, {
-      method: "PUT",
-      body: JSON.stringify(waiter),
-    });
-    return result.data || result;
+    try {
+      const response = await this.api.put<{ data: Waiter }>(
+        `/waiters/${id}`,
+        waiter
+      );
+      return response.data.data || response.data;
+    } catch (error) {
+      return apiClient.handleError(error);
+    }
   }
 
   async deleteWaiter(id: string): Promise<void> {
-    await this.makeRequest<void>(`/waiters/${id}`, {
-      method: "DELETE",
-    });
+    try {
+      await this.api.delete(`/waiters/${id}`);
+    } catch (error) {
+      return apiClient.handleError(error);
+    }
   }
 }
 

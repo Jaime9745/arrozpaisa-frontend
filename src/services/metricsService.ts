@@ -1,3 +1,4 @@
+import { apiClient } from "../api";
 import {
   TableMetrics,
   RealTimeMetrics,
@@ -13,42 +14,20 @@ import {
 
 // API Service Class
 export class MetricsService {
-  private baseUrl: string;
-
-  constructor() {
-    if (!process.env.NEXT_PUBLIC_API_URL) {
-      throw new Error("NEXT_PUBLIC_API_URL environment variable is required");
-    }
-    this.baseUrl = process.env.NEXT_PUBLIC_API_URL;
-  }
+  private api = apiClient.getInstance();
 
   private async makeRequest<T>(
     endpoint: string,
     params?: Record<string, string>
   ): Promise<T> {
-    const url = new URL(`${this.baseUrl}${endpoint}`);
-
-    if (params) {
-      Object.entries(params).forEach(([key, value]) => {
-        url.searchParams.append(key, value);
+    try {
+      const response = await this.api.get<T>(endpoint, {
+        params,
       });
+      return response.data;
+    } catch (error) {
+      return apiClient.handleError(error);
     }
-
-    const token = localStorage.getItem("token");
-
-    const response = await fetch(url.toString(), {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    return response.json();
   }
 
   // Get table metrics

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
-import { metricsService, SalesMetrics } from "@/services/metricsService";
+import { metricsService } from "@/services/metricsService";
+import { SalesMetrics } from "@/types/metrics";
 
 interface UseSalesMetricsProps {
   period: "day" | "week" | "month";

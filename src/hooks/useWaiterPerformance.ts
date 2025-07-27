@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
-import { metricsService, WaiterPerformance } from "@/services/metricsService";
+import { metricsService } from "@/services/metricsService";
+import { WaiterPerformance } from "@/types/metrics";
 
 interface UseWaiterPerformanceOptions {
   startDate: Date;

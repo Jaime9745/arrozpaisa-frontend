@@ -17,7 +17,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { WaiterPerformance } from "@/services/metricsService";
+import { WaiterPerformance } from "@/types/metrics";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { type DateRange } from "react-day-picker";

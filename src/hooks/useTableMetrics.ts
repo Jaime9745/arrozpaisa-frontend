@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
-import { metricsService, TableMetrics } from "@/services/metricsService";
+import { metricsService } from "@/services/metricsService";
+import { TableMetrics } from "@/types/metrics";
 
 export const useTableMetrics = (refreshInterval: number = 60000) => {
   const [data, setData] = useState<{

@@ -40,7 +40,6 @@ export function useCopyToClipboard(): UseCopyToClipboardReturn {
           });
         }, 2000);
       } catch (error) {
-        console.error("Failed to copy to clipboard:", error);
         // You could add a toast notification here to inform the user of the error
       }
     },

@@ -32,19 +32,12 @@ export function useMostSoldProduct({
     setError(null);
 
     try {
-      console.log("🔍 Fetching most sold product...", {
-        startDate: startDate.toISOString().split("T")[0],
-        endDate: endDate.toISOString().split("T")[0],
-      });
-
       const data = await metricsService.getMostSoldProduct(startDate, endDate);
 
-      console.log("✅ Most sold product data received:", data);
       setMostSoldProduct(data);
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Error desconocido";
-      console.error("❌ Error fetching most sold product:", err);
       setError(errorMessage);
       setMostSoldProduct(null);
     } finally {

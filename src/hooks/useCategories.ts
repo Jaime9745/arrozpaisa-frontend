@@ -16,7 +16,6 @@ export function useCategories() {
       setError(
         err instanceof Error ? err.message : "Error al cargar las categorías"
       );
-      console.error("Error fetching categories:", err);
     } finally {
       setLoading(false);
     }

@@ -75,12 +75,6 @@ export class MetricsService {
     const formattedStartDate = startDate.toISOString().split("T")[0];
     const formattedEndDate = endDate.toISOString().split("T")[0];
 
-    console.log(`🔍 getWaiterPerformance called for waiterId: ${waiterId}`, {
-      waiterId,
-      startDate: formattedStartDate,
-      endDate: formattedEndDate,
-    });
-
     try {
       const result = await this.makeRequest<WaiterPerformance>(
         "/metrics/waiters",
@@ -91,10 +85,8 @@ export class MetricsService {
         }
       );
 
-      console.log(`✅ API response for waiter ${waiterId}:`, result);
       return result;
     } catch (error) {
-      console.error(`❌ API error for waiter ${waiterId}:`, error);
       throw error;
     }
   }
@@ -132,7 +124,6 @@ export class MetricsService {
 
       return waiterPerformances;
     } catch (error) {
-      console.error("❌ Error in getAllWaitersPerformance:", error);
       throw error;
     }
   }
@@ -170,11 +161,6 @@ export class MetricsService {
     const formattedStartDate = startDate.toISOString().split("T")[0];
     const formattedEndDate = endDate.toISOString().split("T")[0];
 
-    console.log("🔍 getMostSoldProduct called", {
-      startDate: formattedStartDate,
-      endDate: formattedEndDate,
-    });
-
     try {
       const result = await this.makeRequest<MostSoldProduct>(
         "/metrics/most-sold-product",
@@ -184,10 +170,8 @@ export class MetricsService {
         }
       );
 
-      console.log("✅ Most sold product API response:", result);
       return result;
     } catch (error) {
-      console.error("❌ API error in getMostSoldProduct:", error);
       throw error;
     }
   }
@@ -200,11 +184,6 @@ export class MetricsService {
     const formattedStartDate = startDate.toISOString().split("T")[0];
     const formattedEndDate = endDate.toISOString().split("T")[0];
 
-    console.log("🔍 getLeastSoldProduct called", {
-      startDate: formattedStartDate,
-      endDate: formattedEndDate,
-    });
-
     try {
       const result = await this.makeRequest<LeastSoldProduct>(
         "/metrics/least-sold-product",
@@ -214,10 +193,8 @@ export class MetricsService {
         }
       );
 
-      console.log("✅ Least sold product API response:", result);
       return result;
     } catch (error) {
-      console.error("❌ API error in getLeastSoldProduct:", error);
       throw error;
     }
   }

@@ -27,7 +27,6 @@ export const useTables = (): UseTablesReturn => {
       setError(
         err instanceof Error ? err.message : "Error al cargar las mesas"
       );
-      console.error("Error fetching tables:", err);
     } finally {
       setLoading(false);
     }

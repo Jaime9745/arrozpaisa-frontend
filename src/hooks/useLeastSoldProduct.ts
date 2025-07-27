@@ -32,19 +32,12 @@ export function useLeastSoldProduct({
     setError(null);
 
     try {
-      console.log("🔍 Fetching least sold product...", {
-        startDate: startDate.toISOString().split("T")[0],
-        endDate: endDate.toISOString().split("T")[0],
-      });
-
       const data = await metricsService.getLeastSoldProduct(startDate, endDate);
 
-      console.log("✅ Least sold product data received:", data);
       setLeastSoldProduct(data);
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Error desconocido";
-      console.error("❌ Error fetching least sold product:", err);
       setError(errorMessage);
       setLeastSoldProduct(null);
     } finally {

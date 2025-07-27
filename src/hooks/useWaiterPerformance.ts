@@ -47,7 +47,6 @@ export function useWaiterPerformance({
           ? err.message
           : "Error fetching waiter performance";
       setError(errorMessage);
-      console.error("Error fetching waiter performance:", err);
     } finally {
       setLoading(false);
     }

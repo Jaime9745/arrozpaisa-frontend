@@ -25,7 +25,6 @@ export const useTableMetrics = (refreshInterval: number = 60000) => {
         error: null,
       });
     } catch (error) {
-      console.error("Error fetching table metrics:", error);
       setData((prev) => ({
         ...prev,
         loading: false,

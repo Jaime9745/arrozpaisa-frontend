@@ -38,17 +38,17 @@ const chartConfig = {
 
 export function ChartAreaDefault() {
   return (
-    <Card className="w-full max-w-[1200px]" style={{ borderRadius: "30px" }}>
+    <Card className="w-full" style={{ borderRadius: "30px" }}>
       <CardHeader>
         <CardTitle>Flujo de Atención por Franja Horaria</CardTitle>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig} className="h-[450px] w-full">
+        <ChartContainer config={chartConfig} className="h-[320px] w-full">
           <AreaChart
             accessibilityLayer
             data={chartData}
             width={458}
-            height={450}
+            height={320}
             margin={{
               left: 12,
               right: 12,

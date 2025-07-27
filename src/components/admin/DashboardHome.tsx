@@ -24,6 +24,8 @@ import { useTableMetrics } from "@/hooks/useTableMetrics";
 import { useWaiterPerformance } from "@/hooks/useWaiterPerformance";
 import { useSalesMetrics } from "@/hooks/useSalesMetrics";
 import { useProductMetrics } from "@/hooks/useProductMetrics";
+import { useMostSoldProduct } from "@/hooks/useMostSoldProduct";
+import { useLeastSoldProduct } from "@/hooks/useLeastSoldProduct";
 import { DateRangePicker } from "@/components/ui/date-range-picker";
 import Calendar04 from "../calendar-04";
 import { useState } from "react";
@@ -98,6 +100,30 @@ export default function DashboardHome() {
     loading: waiterLoading,
     error: waiterError,
   } = useWaiterPerformance({
+    startDate:
+      dateRange?.from || new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+    endDate: dateRange?.to || new Date(),
+    enabled: true,
+  });
+
+  // Get most sold product
+  const {
+    mostSoldProduct,
+    loading: mostSoldLoading,
+    error: mostSoldError,
+  } = useMostSoldProduct({
+    startDate:
+      dateRange?.from || new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+    endDate: dateRange?.to || new Date(),
+    enabled: true,
+  });
+
+  // Get least sold product
+  const {
+    leastSoldProduct,
+    loading: leastSoldLoading,
+    error: leastSoldError,
+  } = useLeastSoldProduct({
     startDate:
       dateRange?.from || new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
     endDate: dateRange?.to || new Date(),
@@ -226,7 +252,7 @@ export default function DashboardHome() {
   ];
 
   return (
-    <div className="p-4 space-y-6">
+    <div className="space-y-6">
       <div className="lg:hidden">
         <Button
           variant="ghost"
@@ -248,23 +274,129 @@ export default function DashboardHome() {
         ))}
       </div>
 
-      <div className="grid grid-cols-6 gap-6 auto-rows-[minmax(180px,auto)]">
-        <div className="col-span-6 lg:col-span-2 row-span-1">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-1">
           <Calendar04 dateRange={dateRange} onDateRangeChange={setDateRange} />
         </div>
 
-        <div className="col-span-6 lg:col-span-4 row-span-2">
+        <div className="lg:col-span-2">
           <ChartAreaDefault />
         </div>
+      </div>
 
-        <div className="col-span-6 lg:col-span-2 row-span-1">
-          <ChartPieDonut
-            waiterPerformance={waiterPerformance}
-            loading={waiterLoading}
-            error={waiterError}
-            dateRange={dateRange}
-          />
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Most Sold Product Card */}
+        <Card className="w-full h-[320px]" style={{ borderRadius: "30px" }}>
+          <CardHeader className="items-center pb-2">
+            <CardTitle className="text-sm">Producto más vendido</CardTitle>
+            <CardDescription className="text-xs">
+              Basado en el rango de fechas seleccionado
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex-1 pb-4 px-6">
+            <div className="flex flex-col items-center justify-center h-full space-y-4">
+              {mostSoldLoading ? (
+                <div className="text-muted-foreground text-sm">
+                  Cargando datos...
+                </div>
+              ) : mostSoldError || !mostSoldProduct ? (
+                <div className="text-red-600 text-sm">
+                  {mostSoldError || "Sin datos disponibles"}
+                </div>
+              ) : (
+                <>
+                  <div className="w-24 h-24 rounded-lg overflow-hidden bg-gray-100">
+                    <img
+                      src="/images/placeholder-dish.svg"
+                      alt={mostSoldProduct.productName}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="text-center">
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      {mostSoldProduct.productName}
+                    </h3>
+                    <p className="text-sm text-gray-500">
+                      {mostSoldProduct.category}
+                    </p>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-green-600">
+                      {mostSoldProduct.quantity}
+                    </div>
+                    <p className="text-xs text-gray-500">unidades vendidas</p>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-lg font-semibold text-gray-700">
+                      {formatCurrency(mostSoldProduct.totalSales)}
+                    </div>
+                    <p className="text-xs text-gray-500">ingresos generados</p>
+                  </div>
+                </>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Least Sold Product Card */}
+        <Card className="w-full h-[320px]" style={{ borderRadius: "30px" }}>
+          <CardHeader className="items-center pb-2">
+            <CardTitle className="text-sm">Producto menos vendido</CardTitle>
+            <CardDescription className="text-xs">
+              Basado en el rango de fechas seleccionado
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex-1 pb-4 px-6">
+            <div className="flex flex-col items-center justify-center h-full space-y-4">
+              {leastSoldLoading ? (
+                <div className="text-muted-foreground text-sm">
+                  Cargando datos...
+                </div>
+              ) : leastSoldError || !leastSoldProduct ? (
+                <div className="text-red-600 text-sm">
+                  {leastSoldError || "Sin datos disponibles"}
+                </div>
+              ) : (
+                <>
+                  <div className="w-24 h-24 rounded-lg overflow-hidden bg-gray-100">
+                    <img
+                      src="/images/placeholder-dish.svg"
+                      alt={leastSoldProduct.productName}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="text-center">
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      {leastSoldProduct.productName}
+                    </h3>
+                    <p className="text-sm text-gray-500">
+                      {leastSoldProduct.category}
+                    </p>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-orange-600">
+                      {leastSoldProduct.quantity}
+                    </div>
+                    <p className="text-xs text-gray-500">unidades vendidas</p>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-lg font-semibold text-gray-700">
+                      {formatCurrency(leastSoldProduct.totalSales)}
+                    </div>
+                    <p className="text-xs text-gray-500">ingresos generados</p>
+                  </div>
+                </>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        <ChartPieDonut
+          waiterPerformance={waiterPerformance}
+          loading={waiterLoading}
+          error={waiterError}
+          dateRange={dateRange}
+        />
       </div>
     </div>
   );

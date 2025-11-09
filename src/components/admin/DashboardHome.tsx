@@ -305,7 +305,7 @@ export default function DashboardHome() {
                 </div>
               ) : (
                 <>
-                  <div className="w-24 h-24 rounded-lg overflow-hidden bg-gray-100">
+                  <div className="w-32 h-32 rounded-lg overflow-hidden bg-gray-100">
                     <img
                       src={
                         mostSoldProduct.imageUrl ||

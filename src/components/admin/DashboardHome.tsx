@@ -319,21 +319,6 @@ export default function DashboardHome() {
                     <h3 className="text-lg font-semibold text-gray-900">
                       {mostSoldProduct.productName || mostSoldProduct.name}
                     </h3>
-                    <p className="text-sm text-gray-500">
-                      {mostSoldProduct.category || "Sin categoría"}
-                    </p>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-green-600">
-                      {mostSoldProduct.quantity || 0}
-                    </div>
-                    <p className="text-xs text-gray-500">unidades vendidas</p>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-lg font-semibold text-gray-700">
-                      {formatCurrency(mostSoldProduct.totalSales || 0)}
-                    </div>
-                    <p className="text-xs text-gray-500">ingresos generados</p>
                   </div>
                 </>
               )}
@@ -377,21 +362,6 @@ export default function DashboardHome() {
                     <h3 className="text-lg font-semibold text-gray-900">
                       {leastSoldProduct.productName || leastSoldProduct.name}
                     </h3>
-                    <p className="text-sm text-gray-500">
-                      {leastSoldProduct.category || "Sin categoría"}
-                    </p>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-orange-600">
-                      {leastSoldProduct.quantity || 0}
-                    </div>
-                    <p className="text-xs text-gray-500">unidades vendidas</p>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-lg font-semibold text-gray-700">
-                      {formatCurrency(leastSoldProduct.totalSales || 0)}
-                    </div>
-                    <p className="text-xs text-gray-500">ingresos generados</p>
                   </div>
                 </>
               )}

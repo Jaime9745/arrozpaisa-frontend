@@ -307,28 +307,31 @@ export default function DashboardHome() {
                 <>
                   <div className="w-24 h-24 rounded-lg overflow-hidden bg-gray-100">
                     <img
-                      src="/images/placeholder-dish.svg"
-                      alt={mostSoldProduct.productName}
+                      src={
+                        mostSoldProduct.imageUrl ||
+                        "/images/placeholder-dish.svg"
+                      }
+                      alt={mostSoldProduct.productName || mostSoldProduct.name}
                       className="w-full h-full object-cover"
                     />
                   </div>
                   <div className="text-center">
                     <h3 className="text-lg font-semibold text-gray-900">
-                      {mostSoldProduct.productName}
+                      {mostSoldProduct.productName || mostSoldProduct.name}
                     </h3>
                     <p className="text-sm text-gray-500">
-                      {mostSoldProduct.category}
+                      {mostSoldProduct.category || "Sin categoría"}
                     </p>
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-green-600">
-                      {mostSoldProduct.quantity}
+                      {mostSoldProduct.quantity || 0}
                     </div>
                     <p className="text-xs text-gray-500">unidades vendidas</p>
                   </div>
                   <div className="text-center">
                     <div className="text-lg font-semibold text-gray-700">
-                      {formatCurrency(mostSoldProduct.totalSales)}
+                      {formatCurrency(mostSoldProduct.totalSales || 0)}
                     </div>
                     <p className="text-xs text-gray-500">ingresos generados</p>
                   </div>
@@ -360,28 +363,33 @@ export default function DashboardHome() {
                 <>
                   <div className="w-24 h-24 rounded-lg overflow-hidden bg-gray-100">
                     <img
-                      src="/images/placeholder-dish.svg"
-                      alt={leastSoldProduct.productName}
+                      src={
+                        leastSoldProduct.imageUrl ||
+                        "/images/placeholder-dish.svg"
+                      }
+                      alt={
+                        leastSoldProduct.productName || leastSoldProduct.name
+                      }
                       className="w-full h-full object-cover"
                     />
                   </div>
                   <div className="text-center">
                     <h3 className="text-lg font-semibold text-gray-900">
-                      {leastSoldProduct.productName}
+                      {leastSoldProduct.productName || leastSoldProduct.name}
                     </h3>
                     <p className="text-sm text-gray-500">
-                      {leastSoldProduct.category}
+                      {leastSoldProduct.category || "Sin categoría"}
                     </p>
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-orange-600">
-                      {leastSoldProduct.quantity}
+                      {leastSoldProduct.quantity || 0}
                     </div>
                     <p className="text-xs text-gray-500">unidades vendidas</p>
                   </div>
                   <div className="text-center">
                     <div className="text-lg font-semibold text-gray-700">
-                      {formatCurrency(leastSoldProduct.totalSales)}
+                      {formatCurrency(leastSoldProduct.totalSales || 0)}
                     </div>
                     <p className="text-xs text-gray-500">ingresos generados</p>
                   </div>

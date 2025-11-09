@@ -156,12 +156,14 @@ export interface AllWaitersPerformanceDTO {
 
 // New interfaces for most and least sold products
 export interface MostSoldProduct {
-  productId: string;
-  productName: string;
-  category: string;
-  quantity: number;
-  totalSales: number;
-  percentageOfTotal: number;
+  productId?: string;
+  name: string; // Backend returns "name" not "productName"
+  productName?: string; // Keep for backwards compatibility
+  imageUrl?: string; // Backend includes imageUrl
+  category?: string;
+  quantity?: number;
+  totalSales?: number;
+  percentageOfTotal?: number;
   fromCache: boolean;
   cacheKey: string;
   cacheTTL: number;
@@ -169,12 +171,14 @@ export interface MostSoldProduct {
 }
 
 export interface LeastSoldProduct {
-  productId: string;
-  productName: string;
-  category: string;
-  quantity: number;
-  totalSales: number;
-  percentageOfTotal: number;
+  productId?: string;
+  name: string; // Backend returns "name" not "productName"
+  productName?: string; // Keep for backwards compatibility
+  imageUrl?: string; // Backend includes imageUrl
+  category?: string;
+  quantity?: number;
+  totalSales?: number;
+  percentageOfTotal?: number;
   fromCache: boolean;
   cacheKey: string;
   cacheTTL: number;

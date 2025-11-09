@@ -299,7 +299,7 @@ export default function DashboardHome() {
                 <div className="text-muted-foreground text-sm">
                   Cargando datos...
                 </div>
-              ) : mostSoldError || !mostSoldProduct ? (
+              ) : mostSoldError || !mostSoldProduct?.mostSoldProduct ? (
                 <div className="text-red-600 text-sm">
                   {mostSoldError || "Sin datos disponibles"}
                 </div>
@@ -308,17 +308,20 @@ export default function DashboardHome() {
                   <div className="w-32 h-32 rounded-lg overflow-hidden bg-gray-100">
                     <img
                       src={
-                        mostSoldProduct.imageUrl ||
+                        mostSoldProduct.mostSoldProduct.imageUrl ||
                         "/images/placeholder-dish.svg"
                       }
-                      alt={mostSoldProduct.productName || mostSoldProduct.name}
+                      alt={mostSoldProduct.mostSoldProduct.name}
                       className="w-full h-full object-cover"
                     />
                   </div>
                   <div className="text-center">
                     <h3 className="text-lg font-semibold text-gray-900">
-                      {mostSoldProduct.productName || mostSoldProduct.name}
+                      {mostSoldProduct.mostSoldProduct.name}
                     </h3>
+                    <p className="text-sm text-gray-600 mt-1">
+                      {mostSoldProduct.mostSoldProduct.totalSold} vendidos
+                    </p>
                   </div>
                 </>
               )}
@@ -340,7 +343,7 @@ export default function DashboardHome() {
                 <div className="text-muted-foreground text-sm">
                   Cargando datos...
                 </div>
-              ) : leastSoldError || !leastSoldProduct ? (
+              ) : leastSoldError || !leastSoldProduct?.leastSoldProduct ? (
                 <div className="text-red-600 text-sm">
                   {leastSoldError || "Sin datos disponibles"}
                 </div>
@@ -349,19 +352,20 @@ export default function DashboardHome() {
                   <div className="w-32 h-32 rounded-lg overflow-hidden bg-gray-100">
                     <img
                       src={
-                        leastSoldProduct.imageUrl ||
+                        leastSoldProduct.leastSoldProduct.imageUrl ||
                         "/images/placeholder-dish.svg"
                       }
-                      alt={
-                        leastSoldProduct.productName || leastSoldProduct.name
-                      }
+                      alt={leastSoldProduct.leastSoldProduct.name}
                       className="w-full h-full object-cover"
                     />
                   </div>
                   <div className="text-center">
                     <h3 className="text-lg font-semibold text-gray-900">
-                      {leastSoldProduct.productName || leastSoldProduct.name}
+                      {leastSoldProduct.leastSoldProduct.name}
                     </h3>
+                    <p className="text-sm text-gray-600 mt-1">
+                      {leastSoldProduct.leastSoldProduct.totalSold} vendidos
+                    </p>
                   </div>
                 </>
               )}

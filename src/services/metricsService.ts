@@ -10,6 +10,7 @@ import {
   AllWaitersPerformanceDTO,
   MostSoldProduct,
   LeastSoldProduct,
+  HourlyFlowMetrics,
 } from "@/types/metrics";
 
 // API Service Class
@@ -187,6 +188,29 @@ export class MetricsService {
     try {
       const result = await this.makeRequest<LeastSoldProduct>(
         "/metrics/least-sold-product",
+        {
+          startDate: formattedStartDate,
+          endDate: formattedEndDate,
+        }
+      );
+
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // Get hourly flow metrics (7am - 7pm)
+  async getHourlyFlowMetrics(
+    startDate: Date,
+    endDate: Date
+  ): Promise<HourlyFlowMetrics> {
+    const formattedStartDate = startDate.toISOString().split("T")[0];
+    const formattedEndDate = endDate.toISOString().split("T")[0];
+
+    try {
+      const result = await this.makeRequest<HourlyFlowMetrics>(
+        "/metrics/hourly-flow",
         {
           startDate: formattedStartDate,
           endDate: formattedEndDate,

@@ -280,7 +280,7 @@ export default function DashboardHome() {
         </div>
 
         <div className="lg:col-span-2">
-          <ChartAreaDefault />
+          <ChartAreaDefault dateRange={dateRange} />
         </div>
       </div>
 

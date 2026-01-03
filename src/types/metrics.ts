@@ -172,3 +172,23 @@ export interface LeastSoldProduct {
   };
   calculatedAt: string;
 }
+
+// Flujo de atención por franja horaria (7am - 7pm)
+export interface HourlyFlowMetrics {
+  date: string;
+  startHour: number;
+  endHour: number;
+  hourlyFlow: Array<{
+    hour: number;
+    hourLabel: string;
+    ordersCount: number;
+    customersServed: number;
+  }>;
+  totalOrdersInRange: number;
+  peakHour: number;
+  peakHourLabel: string;
+  fromCache: boolean;
+  cacheKey: string;
+  cacheTTL: number;
+  calculatedAt: string;
+}

@@ -145,7 +145,7 @@ export function DataTable<TData, TValue>({
                           {headerText}
                         </div>
 
-                        <div className="break-words">
+                        <div className="wrap-break-word">
                           {flexRender(
                             cell.column.columnDef.cell,
                             cell.getContext()

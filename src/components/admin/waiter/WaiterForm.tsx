@@ -97,7 +97,7 @@ export default function WaiterForm({
   return (
     <div className="w-full">
       <Card
-        className="border-0 lg:sticky lg:top-6 h-auto lg:h-[calc(100vh-160px)] sm:lg:h-[calc(100vh-140px)] md:lg:h-[calc(100vh-120px)] lg:h-[calc(100vh-100px)] transform transition-all duration-300 ease-in-out animate-in slide-in-from-top-4 lg:slide-in-from-right-4 fade-in"
+        className="border-0 lg:sticky lg:top-6 h-auto sm:lg:h-[calc(100vh-140px)] md:lg:h-[calc(100vh-120px)] lg:h-[calc(100vh-100px)] transform transition-all duration-300 ease-in-out animate-in slide-in-from-top-4 lg:slide-in-from-right-4 fade-in"
         style={{ borderRadius: "30px", backgroundColor: "#fcfeff" }}
       >
         <CardHeader className="pb-4">

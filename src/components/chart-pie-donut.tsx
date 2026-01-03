@@ -90,7 +90,7 @@ export function ChartPieDonut({
 
   if (loading) {
     return (
-      <Card className="w-full h-[320px]" style={{ borderRadius: "30px" }}>
+      <Card className="w-full h-80" style={{ borderRadius: "30px" }}>
         <CardHeader className="items-center pb-2">
           <CardTitle className="text-sm">Productividad del Mesero</CardTitle>
           <CardDescription className="text-xs">
@@ -98,7 +98,7 @@ export function ChartPieDonut({
           </CardDescription>
         </CardHeader>
         <CardContent className="flex-1 pb-0">
-          <div className="flex items-center justify-center h-[220px]">
+          <div className="flex items-center justify-center h-55">
             <div className="text-muted-foreground text-sm">
               Cargando datos...
             </div>
@@ -110,7 +110,7 @@ export function ChartPieDonut({
 
   if (error) {
     return (
-      <Card className="w-full h-[320px]" style={{ borderRadius: "30px" }}>
+      <Card className="w-full h-80" style={{ borderRadius: "30px" }}>
         <CardHeader className="items-center pb-2">
           <CardTitle className="text-sm">Productividad del Mesero</CardTitle>
           <CardDescription className="text-xs">
@@ -118,7 +118,7 @@ export function ChartPieDonut({
           </CardDescription>
         </CardHeader>
         <CardContent className="flex-1 pb-0">
-          <div className="flex flex-col items-center justify-center h-[220px] space-y-2">
+          <div className="flex flex-col items-center justify-center h-55 space-y-2">
             <div className="text-red-600 text-sm">Error: {error}</div>
             <div className="text-xs text-muted-foreground">
               Mostrando datos de ejemplo
@@ -128,8 +128,28 @@ export function ChartPieDonut({
       </Card>
     );
   }
+
+  // Show "no data" message if there are no waiters with orders
+  if (waiterPerformance.length === 0 || chartData.length === 0) {
+    return (
+      <Card className="w-full h-80" style={{ borderRadius: "30px" }}>
+        <CardHeader className="items-center pb-2">
+          <CardTitle className="text-sm">Productividad del Mesero</CardTitle>
+          <CardDescription className="text-xs">
+            Órdenes atendidas por mesero
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex-1 pb-4 px-6">
+          <div className="flex flex-col items-center justify-center h-full space-y-4">
+            <div className="text-red-600 text-sm">Sin datos disponibles</div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
-    <Card className="w-full h-[320px]" style={{ borderRadius: "30px" }}>
+    <Card className="w-full h-80" style={{ borderRadius: "30px" }}>
       <CardHeader className="items-center pb-2">
         <CardTitle className="text-sm">Productividad del Mesero</CardTitle>
         <CardDescription className="text-xs">
@@ -150,12 +170,12 @@ export function ChartPieDonut({
                 className="flex items-center gap-2 text-xs"
               >
                 <div
-                  className="w-2 h-2 rounded-full flex-shrink-0"
+                  className="w-2 h-2 rounded-full shrink-0"
                   style={{
                     backgroundColor: chartColors[index % chartColors.length],
                   }}
                 />
-                <span className="truncate max-w-[90px]" title={item.waiterName}>
+                <span className="truncate max-w-22.5" title={item.waiterName}>
                   {item.waiterName}
                 </span>
                 <span className="text-muted-foreground ml-auto text-xs">
@@ -166,7 +186,7 @@ export function ChartPieDonut({
           </div>
 
           <div className="flex items-center justify-center w-full xl:flex-1 order-2 xl:order-2">
-            <div className="w-[120px] h-[120px] sm:w-[150px] sm:h-[150px] lg:w-[180px] lg:h-[180px] xl:w-[200px] xl:h-[200px]">
+            <div className="w-30 h-30 sm:w-37.5 sm:h-37.5 lg:w-45 lg:h-45 xl:w-50 xl:h-50">
               <ChartContainer config={chartConfig} className="w-full h-full">
                 <PieChart>
                   <ChartTooltip

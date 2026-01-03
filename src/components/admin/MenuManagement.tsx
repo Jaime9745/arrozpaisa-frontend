@@ -162,7 +162,7 @@ export default function MenuManagement() {
           <div
             className={`lg:order-2 lg:w-1/3 w-full transition-all duration-300 ${
               (showCreateForm || showEditForm) && !isClosing
-                ? "max-h-[1000px] opacity-100"
+                ? "max-h-250 opacity-100"
                 : "max-h-0 opacity-0 overflow-hidden"
             }`}
           >

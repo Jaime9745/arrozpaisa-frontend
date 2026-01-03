@@ -37,14 +37,14 @@ export default function ProductCard({
   return (
     <Card
       key={product.id}
-      className="transition-colors duration-200 relative min-h-[120px] py-2"
+      className="transition-colors duration-200 relative min-h-30 py-2"
       style={{
         borderRadius: "30px",
         backgroundColor: "#F1EFEF",
       }}
     >
       <div className="flex">
-        <div className="w-32 h-32 flex-shrink-0 pl-3 pr-1 py-2">
+        <div className="w-32 h-32 shrink-0 pl-3 pr-1 py-2">
           <Image
             src={product.imageUrl}
             alt={product.name}

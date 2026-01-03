@@ -286,7 +286,7 @@ export default function DashboardHome() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {/* Most Sold Product Card */}
-        <Card className="w-full h-[320px]" style={{ borderRadius: "30px" }}>
+        <Card className="w-full h-80" style={{ borderRadius: "30px" }}>
           <CardHeader className="items-center pb-2">
             <CardTitle className="text-sm">Producto más vendido</CardTitle>
             <CardDescription className="text-xs">
@@ -330,7 +330,7 @@ export default function DashboardHome() {
         </Card>
 
         {/* Least Sold Product Card */}
-        <Card className="w-full h-[320px]" style={{ borderRadius: "30px" }}>
+        <Card className="w-full h-80" style={{ borderRadius: "30px" }}>
           <CardHeader className="items-center pb-2">
             <CardTitle className="text-sm">Producto menos vendido</CardTitle>
             <CardDescription className="text-xs">

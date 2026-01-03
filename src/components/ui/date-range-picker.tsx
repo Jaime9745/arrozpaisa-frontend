@@ -101,13 +101,13 @@ export function DateRangePicker({
             id="date"
             variant={"outline"}
             className={cn(
-              "w-[200px] justify-center text-center font-normal rounded-[30px] h-10 px-4 flex items-center",
+              "w-50 justify-center text-center font-normal rounded-[30px] h-10 px-4 flex items-center",
               !dateRange && "text-muted-foreground"
             )}
           >
-            <CalendarIcon className="mr-2 h-4 w-4 flex-shrink-0" />
+            <CalendarIcon className="mr-2 h-4 w-4 shrink-0" />
             <span className="flex-1 text-center">{getDisplayText()}</span>
-            <ChevronDown className="ml-2 h-4 w-4 flex-shrink-0" />
+            <ChevronDown className="ml-2 h-4 w-4 shrink-0" />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">

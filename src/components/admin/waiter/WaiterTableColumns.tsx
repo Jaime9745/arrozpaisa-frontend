@@ -129,7 +129,7 @@ export function useWaiterTableColumns({
         return (
           <div className="flex items-center gap-2 group flex-wrap sm:flex-nowrap">
             <span
-              className="font-mono text-sm bg-gray-100 px-2 py-1 rounded cursor-pointer flex-shrink-0"
+              className="font-mono text-sm bg-gray-100 px-2 py-1 rounded cursor-pointer shrink-0"
               onClick={() => onCopyToClipboard(password, "password")}
               title="Hacer clic para copiar contraseña"
             >

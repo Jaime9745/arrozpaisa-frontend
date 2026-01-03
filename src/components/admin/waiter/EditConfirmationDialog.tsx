@@ -23,7 +23,7 @@ export default function EditConfirmationDialog({
   return (
     <AlertDialog open={isOpen} onOpenChange={onClose}>
       <AlertDialogContent
-        className="sm:max-w-[425px] max-w-[90vw] fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50"
+        className="sm:max-w-106.25 max-w-[90vw] fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50"
         style={{ borderRadius: "20px" }}
       >
         <AlertDialogHeader>

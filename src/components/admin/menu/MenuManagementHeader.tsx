@@ -42,7 +42,7 @@ export default function MenuManagementHeader({
         </div>
       </div>
       <Button
-        className="px-8 py-3 w-full sm:min-w-[180px] sm:w-auto text-white flex items-center gap-2 justify-center font-normal transition-all duration-200 hover:shadow-lg hover:brightness-110"
+        className="px-8 py-3 w-full sm:min-w-45 sm:w-auto text-white flex items-center gap-2 justify-center font-normal transition-all duration-200 hover:shadow-lg hover:brightness-110"
         style={{ background: "#EB3123" }}
         onClick={onAddProduct}
       >

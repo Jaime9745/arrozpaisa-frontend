@@ -19,7 +19,7 @@ export default function Calendar04({
 }: Calendar04Props) {
   return (
     <Card
-      className="w-full h-[408px] flex flex-col"
+      className="w-full h-102 flex flex-col"
       style={{ borderRadius: "30px" }}
     >
       <CardContent className="flex-1 flex items-center justify-center overflow-hidden p-6">

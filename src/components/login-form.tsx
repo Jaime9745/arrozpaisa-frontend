@@ -44,7 +44,7 @@ export function LoginForm({
     <div className={cn("flex flex-col gap-4 sm:gap-6", className)} {...props}>
       {" "}
       <Card
-        className="min-h-[500px] sm:min-h-[600px] w-full shadow-lg border-0"
+        className="min-h-125 sm:min-h-150 w-full shadow-lg border-0"
         style={{ borderRadius: "20px" }}
       >
         <CardHeader className="text-center px-4 sm:px-6 py-6 sm:py-8">
@@ -73,7 +73,7 @@ export function LoginForm({
         <CardContent className="px-4 sm:px-6 pb-6 sm:pb-8">
           <form onSubmit={handleSubmit}>
             <div className="grid gap-6 sm:gap-8">
-              <div className="grid gap-4 sm:gap-6 mx-auto w-full max-w-[380px] sm:max-w-[420px]">
+              <div className="grid gap-4 sm:gap-6 mx-auto w-full max-w-95 sm:max-w-105">
                 {error && (
                   <div className="text-red-500 text-center text-sm bg-red-50 p-3 rounded-lg">
                     {error}
@@ -137,7 +137,7 @@ export function LoginForm({
                 <Button
                   type="submit"
                   disabled={isLoading}
-                  className="h-10 sm:h-12 text-lg sm:text-xl font-semibold mt-4 sm:mt-6 mx-auto w-full sm:w-[280px] md:w-[300px]"
+                  className="h-10 sm:h-12 text-lg sm:text-xl font-semibold mt-4 sm:mt-6 mx-auto w-full sm:w-70 md:w-75"
                   style={{
                     backgroundColor: "#F3FF18",
                     color: "#000",

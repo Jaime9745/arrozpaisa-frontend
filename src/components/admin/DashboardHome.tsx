@@ -200,19 +200,19 @@ export default function DashboardHome() {
       trend: "up" as const,
     },
     {
-      title: "Producto Más Vendido",
-      value: productLoading
+      title: "Número de Meseros",
+      value: waiterLoading
         ? "Cargando..."
-        : productError
+        : waiterError
         ? "Error"
-        : topProduct.name,
-      description: productLoading
+        : (waiterPerformance?.length || 0).toString(),
+      description: waiterLoading
         ? "Obteniendo datos..."
-        : productError
+        : waiterError
         ? "Error al cargar datos"
-        : `${topProduct.orders} unidades vendidas`,
-      icon: TrendingUp,
-      trend: "up" as const,
+        : "Meseros activos en el período",
+      icon: Users,
+      trend: "neutral" as const,
     },
     {
       title: "Propinas Recaudadas",

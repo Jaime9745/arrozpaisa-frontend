@@ -63,6 +63,7 @@ export default function ProductForm({
 
   const [imagePreview, setImagePreview] = useState<string>("");
   const [imageError, setImageError] = useState<string>("");
+  const [categoryError, setCategoryError] = useState<string>("");
   const [isImageLoading, setIsImageLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { categories, loading: categoriesLoading } = useCategories();
@@ -96,7 +97,7 @@ export default function ProductForm({
     ) {
       // Verify the categoryId exists in the loaded categories
       const categoryExists = categories.some(
-        (cat) => cat.id === initialData.categoryId
+        (cat) => cat.id === initialData.categoryId,
       );
       if (categoryExists && formData.categoryId !== initialData.categoryId) {
         setFormData((prev) => ({
@@ -108,7 +109,7 @@ export default function ProductForm({
   }, [categories, categoriesLoading, mode, initialData]);
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
 
@@ -129,6 +130,7 @@ export default function ProductForm({
   };
 
   const handleSelectChange = (value: string) => {
+    setCategoryError(""); // Limpiar error al seleccionar
     setFormData((prev) => ({
       ...prev,
       categoryId: value,
@@ -178,10 +180,19 @@ export default function ProductForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    let hasError = false;
+
     if (!formData.imageUrl) {
       setImageError("La imagen es requerida");
-      return;
+      hasError = true;
     }
+
+    if (!formData.categoryId) {
+      setCategoryError("La categoría es requerida");
+      hasError = true;
+    }
+
+    if (hasError) return;
 
     await onSubmit(formData);
 
@@ -213,6 +224,7 @@ export default function ProductForm({
     });
     setImagePreview("");
     setImageError("");
+    setCategoryError("");
     setPriceInput("");
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
@@ -385,6 +397,9 @@ export default function ProductForm({
                   )}
                 </SelectContent>
               </Select>
+              {categoryError && (
+                <p className="text-sm text-red-600 mt-1">{categoryError}</p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -403,7 +418,6 @@ export default function ProductForm({
                 placeholder="0"
                 required
                 min="0"
-                step="100"
                 style={{
                   background: "#f7f7f8",
                   borderRadius: "20px",

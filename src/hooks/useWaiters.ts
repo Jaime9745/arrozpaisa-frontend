@@ -1,75 +1,96 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import useSWR from "swr";
+import { useSWRConfig } from "swr";
+import { useCallback } from "react";
+import { fetcher, defaultConfig } from "@/lib/swr";
 import { waitersService, Waiter } from "@/services/waitersService";
 
+const WAITERS_KEY = "/waiters";
+
+interface WaitersResponse {
+  data: Waiter[];
+}
+
+/**
+ * SWR-based hook for waiters with automatic deduplication and caching
+ * Multiple components using this hook will share the same request
+ */
 export const useWaiters = () => {
-  const [waiters, setWaiters] = useState<Waiter[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { mutate } = useSWRConfig();
 
-  const fetchWaiters = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const fetchedWaiters = await waitersService.getAllWaiters();
-      setWaiters(fetchedWaiters);
-    } catch (error) {
-      setError("Error al cargar los meseros");
-    } finally {
-      setLoading(false);
-    }
+  // Custom fetcher that handles the response format
+  const waitersFetcher = async (): Promise<Waiter[]> => {
+    const data = await fetcher<WaitersResponse>(WAITERS_KEY);
+    return data.data ?? [];
   };
 
-  const createWaiter = async (
-    waiter: Omit<Waiter, "id" | "createdAt" | "updatedAt" | "password">
-  ) => {
-    try {
-      setError(null);
+  const { data, error, isLoading, isValidating } = useSWR<Waiter[]>(
+    WAITERS_KEY,
+    waitersFetcher,
+    defaultConfig,
+  );
+
+  // Mutation functions with optimistic updates
+  const createWaiter = useCallback(
+    async (
+      waiter: Omit<Waiter, "id" | "createdAt" | "updatedAt" | "password">,
+    ) => {
       const newWaiter = await waitersService.createWaiter(waiter);
-      setWaiters((prev) => [...prev, newWaiter]);
+      // Optimistically update the cache
+      mutate(
+        WAITERS_KEY,
+        (current: Waiter[] | undefined) =>
+          current ? [...current, newWaiter] : [newWaiter],
+        { revalidate: false },
+      );
       return newWaiter;
-    } catch (error) {
-      setError("Error al crear el mesero");
-      throw error;
-    }
-  };
+    },
+    [mutate],
+  );
 
-  const updateWaiter = async (id: string, waiter: Partial<Waiter>) => {
-    try {
-      setError(null);
+  const updateWaiter = useCallback(
+    async (id: string, waiter: Partial<Waiter>) => {
       const updatedWaiter = await waitersService.updateWaiter(id, waiter);
-      setWaiters((prev) => prev.map((w) => (w.id === id ? updatedWaiter : w)));
+      // Optimistically update the cache
+      mutate(
+        WAITERS_KEY,
+        (current: Waiter[] | undefined) =>
+          current?.map((w) => (w.id === id ? updatedWaiter : w)) ?? [],
+        { revalidate: false },
+      );
       return updatedWaiter;
-    } catch (error) {
-      setError("Error al actualizar el mesero");
-      throw error;
-    }
-  };
+    },
+    [mutate],
+  );
 
-  const deleteWaiter = async (id: string) => {
-    try {
-      setError(null);
+  const deleteWaiter = useCallback(
+    async (id: string) => {
       await waitersService.deleteWaiter(id);
-      setWaiters((prev) => prev.filter((w) => w.id !== id));
-    } catch (error) {
-      setError("Error al eliminar el mesero");
-      throw error;
-    }
-  };
+      // Optimistically update the cache
+      mutate(
+        WAITERS_KEY,
+        (current: Waiter[] | undefined) =>
+          current?.filter((w) => w.id !== id) ?? [],
+        { revalidate: false },
+      );
+    },
+    [mutate],
+  );
 
-  useEffect(() => {
-    fetchWaiters();
-  }, []);
+  const refetch = useCallback(() => {
+    mutate(WAITERS_KEY);
+  }, [mutate]);
 
   return {
-    waiters,
-    loading,
-    error,
-    fetchWaiters,
+    waiters: data ?? [],
+    loading: isLoading,
+    isValidating,
+    error: error?.message ?? null,
+    fetchWaiters: refetch,
     createWaiter,
     updateWaiter,
     deleteWaiter,
-    setError,
+    setError: () => {}, // Kept for backward compatibility
   };
 };

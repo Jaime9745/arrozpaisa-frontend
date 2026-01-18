@@ -1,70 +1,60 @@
-import { useState, useEffect } from "react";
+"use client";
+
+import useSWR from "swr";
+import { useSWRConfig } from "swr";
+import { useCallback } from "react";
+import { fetcher, realtimeConfig } from "@/lib/swr";
 import { tablesService, Table } from "@/services/tablesService";
 
-export interface UseTablesReturn {
-  tables: Table[];
-  loading: boolean;
-  error: string | null;
-  refreshTables: () => Promise<void>;
-  updateTableStatus: (
-    id: string,
-    status: "libre" | "atendida"
-  ) => Promise<void>;
+const TABLES_KEY = "/tables";
+
+interface TablesResponse {
+  data: Table[];
 }
 
-export const useTables = (): UseTablesReturn => {
-  const [tables, setTables] = useState<Table[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+/**
+ * SWR-based hook for tables with automatic deduplication and caching
+ * Uses realtime config for frequent updates (table status changes)
+ */
+export const useTables = () => {
+  const { mutate } = useSWRConfig();
 
-  const fetchTables = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const tablesData = await tablesService.getAllTables();
-      setTables(tablesData);
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Error al cargar las mesas"
-      );
-    } finally {
-      setLoading(false);
-    }
+  // Custom fetcher that handles the response format
+  const tablesFetcher = async (): Promise<Table[]> => {
+    const data = await fetcher<TablesResponse>(TABLES_KEY);
+    return data.data ?? [];
   };
 
-  const refreshTables = async () => {
-    await fetchTables();
-  };
+  const { data, error, isLoading, isValidating } = useSWR<Table[]>(
+    TABLES_KEY,
+    tablesFetcher,
+    realtimeConfig,
+  );
 
-  const updateTableStatus = async (
-    id: string,
-    status: "libre" | "atendida"
-  ) => {
-    try {
+  const refreshTables = useCallback(async () => {
+    await mutate(TABLES_KEY);
+  }, [mutate]);
+
+  const updateTableStatus = useCallback(
+    async (id: string, status: "libre" | "atendida") => {
       const updatedTable = await tablesService.updateTableStatus(id, status);
-
-      // Update the table in the local state
-      setTables((prevTables) =>
-        prevTables.map((table) => (table.id === id ? updatedTable : table))
+      // Optimistically update the cache
+      mutate(
+        TABLES_KEY,
+        (current: Table[] | undefined) =>
+          current?.map((table) => (table.id === id ? updatedTable : table)) ??
+          [],
+        { revalidate: false },
       );
-    } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Error al actualizar el estado de la mesa"
-      );
-      throw err;
-    }
-  };
-
-  useEffect(() => {
-    fetchTables();
-  }, []);
+    },
+    [mutate],
+  );
 
   return {
-    tables,
-    loading,
-    error,
+    tables: data ?? [],
+    loading: isLoading,
+    isValidating,
+    error: error?.message ?? null,
     refreshTables,
     updateTableStatus,
   };

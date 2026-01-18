@@ -25,7 +25,7 @@ export default function ProductGrid({
     (product) =>
       product.isActive &&
       (product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.description.toLowerCase().includes(searchTerm.toLowerCase()))
+        product.description.toLowerCase().includes(searchTerm.toLowerCase())),
   );
 
   // Format price for display
@@ -37,10 +37,12 @@ export default function ProductGrid({
     }).format(price);
   };
 
-  // Get category name by ID
+  // Build category index map for O(1) lookups (Rule 7.2)
+  const categoryMap = new Map(categories.map((c) => [c.id, c.name]));
+
+  // Get category name by ID - O(1) lookup
   const getCategoryName = (categoryId: string) => {
-    const category = categories.find((cat) => cat.id === categoryId);
-    return category ? category.name : "Sin categoría";
+    return categoryMap.get(categoryId) ?? "Sin categoría";
   };
 
   if (loading) {

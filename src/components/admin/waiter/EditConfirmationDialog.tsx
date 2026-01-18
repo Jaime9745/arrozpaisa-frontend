@@ -43,7 +43,7 @@ export default function EditConfirmationDialog({
         <AlertDialogFooter className="gap-3">
           <AlertDialogAction
             onClick={onClose}
-            className="flex-1 text-white transition-all duration-200 hover:scale-105 active:scale-95"
+            className="flex-1 text-white transition-[background-color,transform] duration-200 hover:scale-105 active:scale-95"
             style={{ background: "#DFAA30", borderRadius: "15px" }}
           >
             Aceptar

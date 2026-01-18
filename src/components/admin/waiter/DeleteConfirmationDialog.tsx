@@ -41,7 +41,7 @@ export default function DeleteConfirmationDialog({
         </AlertDialogHeader>
         <AlertDialogFooter className="gap-3">
           <AlertDialogCancel
-            className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50 transition-all duration-200 hover:scale-105 active:scale-95"
+            className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50 transition-[background-color,transform] duration-200 hover:scale-105 active:scale-95"
             style={{ borderRadius: "15px" }}
             disabled={isDeleting}
           >
@@ -50,10 +50,10 @@ export default function DeleteConfirmationDialog({
           <AlertDialogAction
             onClick={onConfirm}
             disabled={isDeleting}
-            className="flex-1 text-white transition-all duration-200 hover:scale-105 active:scale-95"
+            className="flex-1 text-white transition-[background-color,transform] duration-200 hover:scale-105 active:scale-95"
             style={{ background: "#E71D36", borderRadius: "15px" }}
           >
-            {isDeleting ? "Eliminando..." : "Eliminar"}
+            {isDeleting ? "Eliminando…" : "Eliminar"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

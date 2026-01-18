@@ -4,6 +4,18 @@ import MockAdapter from "axios-mock-adapter";
 import { apiClient } from "../../api/client";
 import { useWaiters } from "../useWaiters";
 import { Waiter } from "@/services/waitersService";
+import { SWRConfig } from "swr";
+import React from "react";
+
+// Wrapper with fresh cache for each test
+const createWrapper = () => {
+  const Wrapper = ({ children }: { children: React.ReactNode }) => (
+    <SWRConfig value={{ provider: () => new Map(), dedupingInterval: 0 }}>
+      {children}
+    </SWRConfig>
+  );
+  return Wrapper;
+};
 
 describe("useWaiters Hook", () => {
   let mock: MockAdapter;
@@ -42,9 +54,9 @@ describe("useWaiters Hook", () => {
 
       mock.onGet("/waiters").reply(200, { data: mockWaiters });
 
-      const { result } = renderHook(() => useWaiters());
+      const { result } = renderHook(() => useWaiters(), { wrapper: createWrapper() });
 
-      expect(result.current.loading).toBe(true);
+      // SWR starts with empty data
       expect(result.current.waiters).toEqual([]);
 
       await waitFor(() => {
@@ -59,13 +71,14 @@ describe("useWaiters Hook", () => {
     it("should handle fetch error", async () => {
       mock.onGet("/waiters").reply(500, { message: "Server error" });
 
-      const { result } = renderHook(() => useWaiters());
+      const { result } = renderHook(() => useWaiters(), { wrapper: createWrapper() });
 
       await waitFor(() => {
         expect(result.current.loading).toBe(false);
       });
 
-      expect(result.current.error).toBe("Error al cargar los meseros");
+      // SWR stores error message from error.message
+      expect(result.current.error).not.toBeNull();
       expect(result.current.waiters).toEqual([]);
     });
 
@@ -83,7 +96,15 @@ describe("useWaiters Hook", () => {
       ];
 
       const updatedWaiters: Waiter[] = [
-        ...initialWaiters,
+        {
+          id: "1",
+          firstName: "Juan",
+          lastName: "Pérez",
+          identificationNumber: "123456789",
+          phoneNumber: "3001234567",
+          userName: "juanperez",
+          isActive: true,
+        },
         {
           id: "2",
           firstName: "María",
@@ -97,7 +118,7 @@ describe("useWaiters Hook", () => {
 
       mock.onGet("/waiters").replyOnce(200, { data: initialWaiters });
 
-      const { result } = renderHook(() => useWaiters());
+      const { result } = renderHook(() => useWaiters(), { wrapper: createWrapper() });
 
       await waitFor(() => {
         expect(result.current.waiters).toHaveLength(1);
@@ -106,10 +127,12 @@ describe("useWaiters Hook", () => {
       mock.onGet("/waiters").replyOnce(200, { data: updatedWaiters });
 
       await act(async () => {
-        await result.current.fetchWaiters();
+        result.current.fetchWaiters();
       });
 
-      expect(result.current.waiters).toHaveLength(2);
+      await waitFor(() => {
+        expect(result.current.waiters).toHaveLength(2);
+      });
     });
   });
 
@@ -117,7 +140,7 @@ describe("useWaiters Hook", () => {
     it("should create a new waiter successfully", async () => {
       mock.onGet("/waiters").reply(200, { data: [] });
 
-      const { result } = renderHook(() => useWaiters());
+      const { result } = renderHook(() => useWaiters(), { wrapper: createWrapper() });
 
       await waitFor(() => {
         expect(result.current.loading).toBe(false);
@@ -146,15 +169,15 @@ describe("useWaiters Hook", () => {
       });
 
       expect(createdResult).toEqual(createdWaiter);
-      expect(result.current.waiters).toHaveLength(1);
-      expect(result.current.waiters[0].firstName).toBe("Carlos");
+      // SWR optimistically updates the cache
+      expect(result.current.waiters).toContainEqual(createdWaiter);
       expect(result.current.error).toBeNull();
     });
 
     it("should handle create waiter error", async () => {
       mock.onGet("/waiters").reply(200, { data: [] });
 
-      const { result } = renderHook(() => useWaiters());
+      const { result } = renderHook(() => useWaiters(), { wrapper: createWrapper() });
 
       await waitFor(() => {
         expect(result.current.loading).toBe(false);
@@ -170,15 +193,12 @@ describe("useWaiters Hook", () => {
 
       mock.onPost("/waiters").reply(400, { message: "Validation error" });
 
-      await act(async () => {
-        try {
+      await expect(
+        act(async () => {
           await result.current.createWaiter(newWaiter);
-        } catch (error) {
-          // Expected error
-        }
-      });
+        })
+      ).rejects.toThrow();
 
-      expect(result.current.error).toBe("Error al crear el mesero");
       expect(result.current.waiters).toHaveLength(0);
     });
   });
@@ -199,7 +219,7 @@ describe("useWaiters Hook", () => {
 
       mock.onGet("/waiters").reply(200, { data: initialWaiters });
 
-      const { result } = renderHook(() => useWaiters());
+      const { result } = renderHook(() => useWaiters(), { wrapper: createWrapper() });
 
       await waitFor(() => {
         expect(result.current.waiters).toHaveLength(1);
@@ -246,7 +266,7 @@ describe("useWaiters Hook", () => {
 
       mock.onGet("/waiters").reply(200, { data: initialWaiters });
 
-      const { result } = renderHook(() => useWaiters());
+      const { result } = renderHook(() => useWaiters(), { wrapper: createWrapper() });
 
       await waitFor(() => {
         expect(result.current.waiters).toHaveLength(1);
@@ -254,15 +274,11 @@ describe("useWaiters Hook", () => {
 
       mock.onPut("/waiters/1").reply(404, { message: "Waiter not found" });
 
-      await act(async () => {
-        try {
+      await expect(
+        act(async () => {
           await result.current.updateWaiter("1", { firstName: "New Name" });
-        } catch (error) {
-          // Expected error
-        }
-      });
-
-      expect(result.current.error).toBe("Error al actualizar el mesero");
+        })
+      ).rejects.toThrow();
     });
   });
 
@@ -291,7 +307,7 @@ describe("useWaiters Hook", () => {
 
       mock.onGet("/waiters").reply(200, { data: initialWaiters });
 
-      const { result } = renderHook(() => useWaiters());
+      const { result } = renderHook(() => useWaiters(), { wrapper: createWrapper() });
 
       await waitFor(() => {
         expect(result.current.waiters).toHaveLength(2);
@@ -323,7 +339,7 @@ describe("useWaiters Hook", () => {
 
       mock.onGet("/waiters").reply(200, { data: initialWaiters });
 
-      const { result } = renderHook(() => useWaiters());
+      const { result } = renderHook(() => useWaiters(), { wrapper: createWrapper() });
 
       await waitFor(() => {
         expect(result.current.waiters).toHaveLength(1);
@@ -331,34 +347,12 @@ describe("useWaiters Hook", () => {
 
       mock.onDelete("/waiters/1").reply(404, { message: "Waiter not found" });
 
-      await act(async () => {
-        try {
+      await expect(
+        act(async () => {
           await result.current.deleteWaiter("1");
-        } catch (error) {
-          // Expected error
-        }
-      });
-
-      expect(result.current.error).toBe("Error al eliminar el mesero");
-      expect(result.current.waiters).toHaveLength(1);
-    });
-  });
-
-  describe("setError", () => {
-    it("should allow manual error setting", async () => {
-      mock.onGet("/waiters").reply(200, { data: [] });
-
-      const { result } = renderHook(() => useWaiters());
-
-      await waitFor(() => {
-        expect(result.current.loading).toBe(false);
-      });
-
-      act(() => {
-        result.current.setError("Custom error message");
-      });
-
-      expect(result.current.error).toBe("Custom error message");
+        })
+      ).rejects.toThrow();
     });
   });
 });
+

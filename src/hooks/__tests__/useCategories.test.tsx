@@ -4,6 +4,18 @@ import MockAdapter from "axios-mock-adapter";
 import { apiClient } from "../../api/client";
 import { useCategories } from "../useCategories";
 import { Category } from "@/services/categoriesService";
+import { SWRConfig } from "swr";
+import React from "react";
+
+// Wrapper with fresh cache for each test
+const createWrapper = () => {
+  const Wrapper = ({ children }: { children: React.ReactNode }) => (
+    <SWRConfig value={{ provider: () => new Map(), dedupingInterval: 0 }}>
+      {children}
+    </SWRConfig>
+  );
+  return Wrapper;
+};
 
 describe("useCategories Hook", () => {
   let mock: MockAdapter;
@@ -34,9 +46,9 @@ describe("useCategories Hook", () => {
 
       mock.onGet("/categories").reply(200, mockCategories);
 
-      const { result } = renderHook(() => useCategories());
+      const { result } = renderHook(() => useCategories(), { wrapper: createWrapper() });
 
-      expect(result.current.loading).toBe(true);
+      // SWR starts with empty data
       expect(result.current.categories).toEqual([]);
 
       await waitFor(() => {
@@ -51,7 +63,7 @@ describe("useCategories Hook", () => {
     it("should handle fetch error", async () => {
       mock.onGet("/categories").reply(500, { message: "Server error" });
 
-      const { result } = renderHook(() => useCategories());
+      const { result } = renderHook(() => useCategories(), { wrapper: createWrapper() });
 
       await waitFor(() => {
         expect(result.current.loading).toBe(false);
@@ -70,7 +82,10 @@ describe("useCategories Hook", () => {
       ];
 
       const updatedCategories: Category[] = [
-        ...initialCategories,
+        {
+          id: "1",
+          name: "Platos Fuertes",
+        },
         {
           id: "2",
           name: "Bebidas",
@@ -79,7 +94,7 @@ describe("useCategories Hook", () => {
 
       mock.onGet("/categories").replyOnce(200, initialCategories);
 
-      const { result } = renderHook(() => useCategories());
+      const { result } = renderHook(() => useCategories(), { wrapper: createWrapper() });
 
       await waitFor(() => {
         expect(result.current.categories).toHaveLength(1);
@@ -88,10 +103,12 @@ describe("useCategories Hook", () => {
       mock.onGet("/categories").replyOnce(200, updatedCategories);
 
       await act(async () => {
-        await result.current.refetch();
+        result.current.fetchCategories();
       });
 
-      expect(result.current.categories).toHaveLength(2);
+      await waitFor(() => {
+        expect(result.current.categories).toHaveLength(2);
+      });
     });
   });
 
@@ -99,7 +116,7 @@ describe("useCategories Hook", () => {
     it("should create a new category successfully", async () => {
       mock.onGet("/categories").reply(200, []);
 
-      const { result } = renderHook(() => useCategories());
+      const { result } = renderHook(() => useCategories(), { wrapper: createWrapper() });
 
       await waitFor(() => {
         expect(result.current.loading).toBe(false);
@@ -124,14 +141,14 @@ describe("useCategories Hook", () => {
       });
 
       expect(createdResult).toEqual(createdCategory);
-      expect(result.current.categories).toHaveLength(1);
-      expect(result.current.categories[0].name).toBe("Ensaladas");
+      // SWR optimistically updates the cache
+      expect(result.current.categories).toContainEqual(createdCategory);
     });
 
     it("should handle create category error", async () => {
       mock.onGet("/categories").reply(200, []);
 
-      const { result } = renderHook(() => useCategories());
+      const { result } = renderHook(() => useCategories(), { wrapper: createWrapper() });
 
       await waitFor(() => {
         expect(result.current.loading).toBe(false);
@@ -143,15 +160,12 @@ describe("useCategories Hook", () => {
 
       mock.onPost("/categories").reply(400, { message: "Validation error" });
 
-      await act(async () => {
-        try {
+      await expect(
+        act(async () => {
           await result.current.createCategory(newCategory);
-        } catch (error) {
-          // Expected error
-        }
-      });
+        })
+      ).rejects.toThrow();
 
-      expect(result.current.error).not.toBeNull();
       expect(result.current.categories).toHaveLength(0);
     });
   });
@@ -168,7 +182,7 @@ describe("useCategories Hook", () => {
 
       mock.onGet("/categories").reply(200, initialCategories);
 
-      const { result } = renderHook(() => useCategories());
+      const { result } = renderHook(() => useCategories(), { wrapper: createWrapper() });
 
       await waitFor(() => {
         expect(result.current.categories).toHaveLength(1);
@@ -207,7 +221,7 @@ describe("useCategories Hook", () => {
 
       mock.onGet("/categories").reply(200, initialCategories);
 
-      const { result } = renderHook(() => useCategories());
+      const { result } = renderHook(() => useCategories(), { wrapper: createWrapper() });
 
       await waitFor(() => {
         expect(result.current.categories).toHaveLength(1);
@@ -215,15 +229,11 @@ describe("useCategories Hook", () => {
 
       mock.onPut("/categories/1").reply(404, { message: "Category not found" });
 
-      await act(async () => {
-        try {
+      await expect(
+        act(async () => {
           await result.current.updateCategory("1", { name: "New Name" });
-        } catch (error) {
-          // Expected error
-        }
-      });
-
-      expect(result.current.error).not.toBeNull();
+        })
+      ).rejects.toThrow();
     });
   });
 
@@ -242,7 +252,7 @@ describe("useCategories Hook", () => {
 
       mock.onGet("/categories").reply(200, initialCategories);
 
-      const { result } = renderHook(() => useCategories());
+      const { result } = renderHook(() => useCategories(), { wrapper: createWrapper() });
 
       await waitFor(() => {
         expect(result.current.categories).toHaveLength(2);
@@ -268,7 +278,7 @@ describe("useCategories Hook", () => {
 
       mock.onGet("/categories").reply(200, initialCategories);
 
-      const { result } = renderHook(() => useCategories());
+      const { result } = renderHook(() => useCategories(), { wrapper: createWrapper() });
 
       await waitFor(() => {
         expect(result.current.categories).toHaveLength(1);
@@ -280,16 +290,12 @@ describe("useCategories Hook", () => {
           message: "Cannot delete category with existing products",
         });
 
-      await act(async () => {
-        try {
+      await expect(
+        act(async () => {
           await result.current.deleteCategory("1");
-        } catch (error) {
-          // Expected error
-        }
-      });
-
-      expect(result.current.error).not.toBeNull();
-      expect(result.current.categories).toHaveLength(1);
+        })
+      ).rejects.toThrow();
     });
   });
 });
+

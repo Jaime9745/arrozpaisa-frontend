@@ -38,7 +38,7 @@ export function LoginForm({
         setIsLoading(false);
       }
     },
-    [login, userName, password]
+    [login, userName, password],
   );
   return (
     <div className={cn("flex flex-col gap-4 sm:gap-6", className)} {...props}>
@@ -90,7 +90,7 @@ export function LoginForm({
                   <Input
                     id="userName"
                     type="text"
-                    placeholder="Ingresa tu usuario"
+                    placeholder="Ingresa tu usuario…"
                     className="text-base sm:text-lg px-3 sm:px-4"
                     style={{
                       background: "#B0BAC366",
@@ -102,6 +102,8 @@ export function LoginForm({
                     }}
                     value={userName}
                     onChange={(e) => setUserName(e.target.value)}
+                    autoComplete="username"
+                    spellCheck={false}
                     required
                   />
                 </div>
@@ -118,7 +120,7 @@ export function LoginForm({
                   <Input
                     id="password"
                     type="password"
-                    placeholder="Ingresa tu contraseña"
+                    placeholder="Ingresa tu contraseña…"
                     className="text-base sm:text-lg px-3 sm:px-4"
                     style={{
                       background: "#B0BAC366",
@@ -130,6 +132,7 @@ export function LoginForm({
                     }}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    autoComplete="current-password"
                     required
                   />
                 </div>
@@ -143,7 +146,7 @@ export function LoginForm({
                     color: "#000",
                   }}
                 >
-                  {isLoading ? "Ingresando..." : "Ingresar"}
+                  {isLoading ? "Ingresando…" : "Ingresar"}
                 </Button>
               </div>
             </div>

@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp } from "lucide-react";
+import { memo } from "react";
 
 interface StatsCardProps {
   title: string;
@@ -10,7 +11,7 @@ interface StatsCardProps {
   loading?: boolean;
 }
 
-export default function StatsCard({
+function StatsCardComponent({
   title,
   value,
   description,
@@ -45,11 +46,11 @@ export default function StatsCard({
                 trend === "up"
                   ? "text-green-600"
                   : trend === "down"
-                  ? "text-red-600"
-                  : "text-gray-600"
+                    ? "text-red-600"
+                    : "text-gray-600"
               } flex items-center gap-1`}
             >
-              {trend === "up" && <TrendingUp className="h-3 w-3" />}
+              {trend === "up" ? <TrendingUp className="h-3 w-3" /> : null}
               {description}
             </p>
           </>
@@ -58,3 +59,6 @@ export default function StatsCard({
     </Card>
   );
 }
+
+// React.memo prevents re-renders when props haven't changed
+export default memo(StatsCardComponent);

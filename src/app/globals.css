@@ -152,3 +152,16 @@
     border-radius: 20px;
   }
 }
+
+/* Performance optimizations for long lists */
+@layer utilities {
+  .content-auto {
+    content-visibility: auto;
+    contain-intrinsic-size: 0 80px;
+  }
+
+  .content-auto-lg {
+    content-visibility: auto;
+    contain-intrinsic-size: 0 120px;
+  }
+}

@@ -54,14 +54,15 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
     if (path.includes("/admin/table")) return "estados-mesa";
     return "inicio";
   };
-  const [activeSection, setActiveSection] = useState(
-    getActiveSectionFromPath(pathname)
+  // Use lazy initialization to avoid recalculating on every render
+  const [activeSection, setActiveSection] = useState(() =>
+    getActiveSectionFromPath(pathname),
   );
   const [searchTerm, setSearchTerm] = useState("");
 
   // Update active section when path changes
   useEffect(() => {
-    setActiveSection(getActiveSectionFromPath(pathname));
+    setActiveSection(() => getActiveSectionFromPath(pathname));
   }, [pathname]);
 
   // Handle section change by navigating using router.push for client-side navigation

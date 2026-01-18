@@ -1,82 +1,104 @@
-import { useState, useEffect } from "react";
-import { Category, categoriesService } from "@/services/categoriesService";
+"use client";
 
-export function useCategories() {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+import useSWR from "swr";
+import { useSWRConfig } from "swr";
+import { useCallback } from "react";
+import { fetcher, immutableConfig } from "@/lib/swr";
+import { categoriesService, Category } from "@/services/categoriesService";
 
-  const fetchCategories = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const fetchedCategories = await categoriesService.getAllCategories();
-      setCategories(fetchedCategories);
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Error al cargar las categorías"
-      );
-    } finally {
-      setLoading(false);
+const CATEGORIES_KEY = "/categories";
+
+interface CategoriesResponse {
+  categories?: Category[];
+  data?: Category[];
+}
+
+/**
+ * SWR-based hook for categories with automatic deduplication and caching
+ * Uses immutable config since categories rarely change
+ */
+export const useCategories = () => {
+  const { mutate } = useSWRConfig();
+
+  // Custom fetcher that handles the response format
+  const categoriesFetcher = async (): Promise<Category[]> => {
+    const data = await fetcher<CategoriesResponse | Category[]>(CATEGORIES_KEY);
+    if (Array.isArray(data)) {
+      return data;
+    } else if ("categories" in data && data.categories) {
+      return data.categories;
+    } else if ("data" in data && data.data) {
+      return data.data;
     }
+    return [];
   };
 
-  const createCategory = async (
-    category: Omit<Category, "id" | "createdAt" | "updatedAt">
-  ) => {
-    try {
+  const { data, error, isLoading, isValidating } = useSWR<Category[]>(
+    CATEGORIES_KEY,
+    categoriesFetcher,
+    immutableConfig,
+  );
+
+  // Mutation functions with optimistic updates
+  const createCategory = useCallback(
+    async (category: Omit<Category, "id" | "createdAt" | "updatedAt">) => {
       const newCategory = await categoriesService.createCategory(category);
-      setCategories((prev) => [...prev, newCategory]);
+      // Optimistically update the cache
+      mutate(
+        CATEGORIES_KEY,
+        (current: Category[] | undefined) =>
+          current ? [...current, newCategory] : [newCategory],
+        { revalidate: false },
+      );
       return newCategory;
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Error al crear la categoría";
-      setError(errorMessage);
-      throw new Error(errorMessage);
-    }
-  };
+    },
+    [mutate],
+  );
 
-  const updateCategory = async (id: string, category: Partial<Category>) => {
-    try {
+  const updateCategory = useCallback(
+    async (id: string, category: Partial<Category>) => {
       const updatedCategory = await categoriesService.updateCategory(
         id,
-        category
+        category,
       );
-      setCategories((prev) =>
-        prev.map((c) => (c.id === id ? updatedCategory : c))
+      // Optimistically update the cache
+      mutate(
+        CATEGORIES_KEY,
+        (current: Category[] | undefined) =>
+          current?.map((c) => (c.id === id ? updatedCategory : c)) ?? [],
+        { revalidate: false },
       );
       return updatedCategory;
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Error al actualizar la categoría";
-      setError(errorMessage);
-      throw new Error(errorMessage);
-    }
-  };
+    },
+    [mutate],
+  );
 
-  const deleteCategory = async (id: string) => {
-    try {
+  const deleteCategory = useCallback(
+    async (id: string) => {
       await categoriesService.deleteCategory(id);
-      setCategories((prev) => prev.filter((c) => c.id !== id));
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Error al eliminar la categoría";
-      setError(errorMessage);
-      throw new Error(errorMessage);
-    }
-  };
+      // Optimistically update the cache
+      mutate(
+        CATEGORIES_KEY,
+        (current: Category[] | undefined) =>
+          current?.filter((c) => c.id !== id) ?? [],
+        { revalidate: false },
+      );
+    },
+    [mutate],
+  );
 
-  useEffect(() => {
-    fetchCategories();
-  }, []);
+  const refetch = useCallback(() => {
+    mutate(CATEGORIES_KEY);
+  }, [mutate]);
 
   return {
-    categories,
-    loading,
-    error,
+    categories: data ?? [],
+    loading: isLoading,
+    isValidating,
+    error: error?.message ?? null,
+    fetchCategories: refetch,
     createCategory,
     updateCategory,
     deleteCategory,
-    refetch: fetchCategories,
   };
-}
+};

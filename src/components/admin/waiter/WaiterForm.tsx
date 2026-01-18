@@ -93,11 +93,11 @@ export default function WaiterForm({
   // Dynamic text based on mode
   const title = mode === "add" ? "Añadir Mesero" : "Editar Mesero";
   const buttonText = mode === "add" ? "Añadir Mesero" : "Guardar Cambios";
-  const submittingText = mode === "add" ? "Creando..." : "Guardando...";
+  const submittingText = mode === "add" ? "Creando…" : "Guardando…";
   return (
     <div className="w-full">
       <Card
-        className="border-0 lg:sticky lg:top-6 h-auto sm:lg:h-[calc(100vh-140px)] md:lg:h-[calc(100vh-120px)] lg:h-[calc(100vh-100px)] transform transition-all duration-300 ease-in-out animate-in slide-in-from-top-4 lg:slide-in-from-right-4 fade-in"
+        className="border-0 lg:sticky lg:top-6 h-auto sm:lg:h-[calc(100vh-140px)] md:lg:h-[calc(100vh-120px)] lg:h-[calc(100vh-100px)] transform transition-[transform,opacity] duration-300 ease-in-out animate-in slide-in-from-top-4 lg:slide-in-from-right-4 fade-in"
         style={{ borderRadius: "30px", backgroundColor: "#fcfeff" }}
       >
         <CardHeader className="pb-4">
@@ -109,7 +109,8 @@ export default function WaiterForm({
               variant="ghost"
               size="icon"
               onClick={handleClose}
-              className="h-10 w-10 text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-all duration-200 hover:scale-110 active:scale-95"
+              aria-label="Cerrar formulario"
+              className="h-10 w-10 text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-[background-color,transform] duration-200 hover:scale-110 active:scale-95"
             >
               <Image
                 src="/images/icons/closeCardIcon.svg"
@@ -234,7 +235,7 @@ export default function WaiterForm({
             type="submit"
             form="waiter-form"
             disabled={isSubmitting}
-            className="flex-1 text-white font-normal transition-all duration-200 hover:scale-105 active:scale-95 hover:shadow-lg disabled:hover:scale-100"
+            className="flex-1 text-white font-normal transition-[background-color,transform,box-shadow] duration-200 hover:scale-105 active:scale-95 hover:shadow-lg disabled:hover:scale-100"
             style={{
               background: "#EB3123",
               borderRadius: "30px",

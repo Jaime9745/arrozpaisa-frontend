@@ -66,6 +66,7 @@ export default function AdminSidebar({
             variant="ghost"
             size="icon"
             onClick={() => setIsMobileOpen(false)}
+            aria-label="Cerrar menú de navegación"
             className="lg:hidden absolute top-4 right-4 h-10 w-10 z-10"
           >
             <Image

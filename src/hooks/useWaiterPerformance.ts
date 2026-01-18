@@ -1,6 +1,9 @@
-import { useState, useEffect, useCallback } from "react";
+"use client";
+
+import useSWR from "swr";
 import { metricsService } from "@/services/metricsService";
 import { WaiterPerformance } from "@/types/metrics";
+import { defaultConfig } from "@/lib/swr";
 
 interface UseWaiterPerformanceOptions {
   startDate: Date;
@@ -15,59 +18,41 @@ interface UseWaiterPerformanceReturn {
   refetch: () => Promise<void>;
 }
 
+/**
+ * SWR-based hook for waiter performance with automatic deduplication and caching
+ */
 export function useWaiterPerformance({
   startDate,
   endDate,
   enabled = true,
 }: UseWaiterPerformanceOptions): UseWaiterPerformanceReturn {
-  const [waiterPerformance, setWaiterPerformance] = useState<
-    WaiterPerformance[]
-  >([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  // Use timestamps for stable dependencies
+  // Use timestamps for stable cache keys
   const startTime = startDate.getTime();
   const endTime = endDate.getTime();
+  // Use null key to disable fetching when not enabled
+  const cacheKey = enabled
+    ? `metrics/waiter-performance/${startTime}/${endTime}`
+    : null;
 
-  const fetchWaiterPerformance = useCallback(async () => {
-    if (!enabled) {
-      setWaiterPerformance([]);
-      setLoading(false);
-      return;
-    }
+  const fetcher = async (): Promise<WaiterPerformance[]> => {
+    return metricsService.getAllWaitersPerformance(
+      new Date(startTime),
+      new Date(endTime),
+    );
+  };
 
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await metricsService.getAllWaitersPerformance(
-        new Date(startTime),
-        new Date(endTime),
-      );
-      setWaiterPerformance(data);
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error
-          ? err.message
-          : "Error fetching waiter performance";
-      setError(errorMessage);
-    } finally {
-      setLoading(false);
-    }
-  }, [startTime, endTime, enabled]);
-
-  const refetch = useCallback(async () => {
-    await fetchWaiterPerformance();
-  }, [fetchWaiterPerformance]);
-
-  useEffect(() => {
-    fetchWaiterPerformance();
-  }, [fetchWaiterPerformance]);
+  const { data, error, isLoading, mutate } = useSWR<WaiterPerformance[]>(
+    cacheKey,
+    fetcher,
+    defaultConfig,
+  );
 
   return {
-    waiterPerformance,
-    loading,
-    error,
-    refetch,
+    waiterPerformance: data ?? [],
+    loading: isLoading,
+    error: error?.message ?? null,
+    refetch: async () => {
+      await mutate();
+    },
   };
 }

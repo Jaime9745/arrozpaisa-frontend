@@ -1,54 +1,34 @@
-import { useState, useEffect, useCallback } from "react";
+"use client";
+
+import useSWR from "swr";
 import { metricsService } from "@/services/metricsService";
 import { TableMetrics } from "@/types/metrics";
+import { realtimeConfig } from "@/lib/swr";
 
+const TABLE_METRICS_KEY = "metrics/tables";
+
+/**
+ * SWR-based hook for table metrics with automatic deduplication and caching
+ * Uses real-time config for frequent updates
+ */
 export const useTableMetrics = (refreshInterval: number = 60000) => {
-  const [data, setData] = useState<{
-    tableMetrics: TableMetrics | null;
-    loading: boolean;
-    error: string | null;
-  }>({
-    tableMetrics: null,
-    loading: true,
-    error: null,
-  });
+  const fetcher = async (): Promise<TableMetrics> => {
+    return metricsService.getTableMetrics();
+  };
 
-  const fetchTableMetrics = useCallback(async () => {
-    try {
-      setData((prev) => ({ ...prev, loading: true, error: null }));
-
-      const tableMetrics = await metricsService.getTableMetrics();
-
-      setData({
-        tableMetrics,
-        loading: false,
-        error: null,
-      });
-    } catch (error) {
-      setData((prev) => ({
-        ...prev,
-        loading: false,
-        error:
-          error instanceof Error ? error.message : "An unknown error occurred",
-      }));
-    }
-  }, []);
-
-  const refetch = useCallback(() => {
-    fetchTableMetrics();
-  }, [fetchTableMetrics]);
-
-  useEffect(() => {
-    fetchTableMetrics();
-
-    // Set up polling
-    const interval = setInterval(fetchTableMetrics, refreshInterval);
-
-    return () => clearInterval(interval);
-  }, [fetchTableMetrics, refreshInterval]);
+  const { data, error, isLoading, mutate } = useSWR<TableMetrics>(
+    TABLE_METRICS_KEY,
+    fetcher,
+    {
+      ...realtimeConfig,
+      refreshInterval,
+    },
+  );
 
   return {
-    ...data,
-    refetch,
+    tableMetrics: data ?? null,
+    loading: isLoading,
+    error: error?.message ?? null,
+    refetch: () => mutate(),
   };
 };

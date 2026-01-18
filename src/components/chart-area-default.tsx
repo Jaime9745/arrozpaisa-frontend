@@ -45,7 +45,7 @@ export function ChartAreaDefault({ dateRange }: ChartAreaDefaultProps) {
           <CardTitle>Flujo de Atención por Franja Horaria</CardTitle>
         </CardHeader>
         <CardContent className="flex items-center justify-center h-80">
-          <p className="text-muted-foreground">Cargando datos...</p>
+          <p className="text-muted-foreground">Cargando datos…</p>
         </CardContent>
       </Card>
     );

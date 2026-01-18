@@ -18,8 +18,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { useSidebar } from "@/contexts/SidebarContext";
 import StatsCard from "./StatsCard";
-import { ChartAreaDefault } from "../chart-area-default";
-import { ChartPieDonut } from "../chart-pie-donut";
 import { useTableMetrics } from "@/hooks/useTableMetrics";
 import { useWaiterPerformance } from "@/hooks/useWaiterPerformance";
 import { useSalesMetrics } from "@/hooks/useSalesMetrics";
@@ -28,8 +26,31 @@ import { useMostSoldProduct } from "@/hooks/useMostSoldProduct";
 import { useLeastSoldProduct } from "@/hooks/useLeastSoldProduct";
 import { DateRangePicker } from "@/components/ui/date-range-picker";
 import Calendar04 from "../calendar-04";
+import Image from "next/image";
 import { useState, useMemo } from "react";
 import { type DateRange } from "react-day-picker";
+import dynamic from "next/dynamic";
+
+// Dynamic imports for heavy chart components (best practice: code-split heavy deps)
+const ChartAreaDefault = dynamic(
+  () => import("../chart-area-default").then((mod) => mod.ChartAreaDefault),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-64 w-full animate-pulse bg-gray-200 rounded-lg" />
+    ),
+  },
+);
+
+const ChartPieDonut = dynamic(
+  () => import("../chart-pie-donut").then((mod) => mod.ChartPieDonut),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-64 w-full animate-pulse bg-gray-200 rounded-lg" />
+    ),
+  },
+);
 
 export default function DashboardHome() {
   const { toggleSidebar } = useSidebar();
@@ -56,20 +77,15 @@ export default function DashboardHome() {
   const startDate = dateRange?.from ?? defaultStartDate;
   const endDate = dateRange?.to ?? defaultEndDate;
 
-  // Calculate period based on date range
-  const calculatePeriod = (
-    startDate: Date,
-    endDate: Date,
-  ): "day" | "week" | "month" => {
+  // Memoize period calculation to avoid recalculating on every render
+  const currentPeriod = useMemo((): "day" | "week" | "month" => {
     const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
     if (diffDays <= 1) return "day";
     if (diffDays <= 7) return "week";
     return "month";
-  };
-
-  const currentPeriod = calculatePeriod(startDate, endDate);
+  }, [startDate, endDate]);
 
   // Calculate period for product metrics (only week or month supported)
   const getProductPeriod = (
@@ -147,7 +163,7 @@ export default function DashboardHome() {
   const getTopProduct = () => {
     if (productLoading) {
       return {
-        name: "Cargando...",
+        name: "Cargando…",
         orders: 0,
       };
     }
@@ -190,12 +206,12 @@ export default function DashboardHome() {
     {
       title: `Ventas ${getPeriodDisplayName(currentPeriod)}`,
       value: salesLoading
-        ? "Cargando..."
+        ? "Cargando…"
         : salesError
           ? "Error"
           : formatCurrency(salesMetrics?.totalSales || 0),
       description: salesLoading
-        ? "Obteniendo datos..."
+        ? "Obteniendo datos…"
         : salesError
           ? "Error al cargar datos"
           : `Total de ${salesMetrics?.totalOrders || 0} órdenes`,
@@ -205,12 +221,12 @@ export default function DashboardHome() {
     {
       title: "Número de Meseros",
       value: waiterLoading
-        ? "Cargando..."
+        ? "Cargando…"
         : waiterError
           ? "Error"
           : (waiterPerformance?.length || 0).toString(),
       description: waiterLoading
-        ? "Obteniendo datos..."
+        ? "Obteniendo datos…"
         : waiterError
           ? "Error al cargar datos"
           : "Meseros activos en el período",
@@ -220,12 +236,12 @@ export default function DashboardHome() {
     {
       title: "Propinas Recaudadas",
       value: salesLoading
-        ? "Cargando..."
+        ? "Cargando…"
         : salesError
           ? "Error"
           : formatCurrency(salesMetrics?.totalTips || 0),
       description: salesLoading
-        ? "Obteniendo datos..."
+        ? "Obteniendo datos…"
         : salesError
           ? "Error al cargar datos"
           : `${(
@@ -239,12 +255,12 @@ export default function DashboardHome() {
     {
       title: "Número de Pedidos",
       value: salesLoading
-        ? "Cargando..."
+        ? "Cargando…"
         : salesError
           ? "Error"
           : (salesMetrics?.totalOrders || 0).toString(),
       description: salesLoading
-        ? "Obteniendo datos..."
+        ? "Obteniendo datos…"
         : salesError
           ? "Error al cargar datos"
           : `Valor promedio: ${formatCurrency(
@@ -262,7 +278,8 @@ export default function DashboardHome() {
           variant="ghost"
           size="icon"
           onClick={toggleSidebar}
-          className="h-auto py-3 w-12 bg-white border-gray-200 hover:bg-gray-50 transition-all duration-200 shadow-sm"
+          aria-label="Abrir menú de navegación"
+          className="h-auto py-3 w-12 bg-white border-gray-200 hover:bg-gray-50 transition-colors duration-200 shadow-sm"
         >
           <Menu className="h-6 w-6 text-gray-800" />
         </Button>
@@ -301,7 +318,7 @@ export default function DashboardHome() {
             <div className="flex flex-col items-center justify-center h-full space-y-4">
               {mostSoldLoading ? (
                 <div className="text-muted-foreground text-sm">
-                  Cargando datos...
+                  Cargando datos…
                 </div>
               ) : mostSoldError || !mostSoldProduct?.mostSoldProduct ? (
                 <div className="text-red-600 text-sm">
@@ -309,14 +326,16 @@ export default function DashboardHome() {
                 </div>
               ) : (
                 <>
-                  <div className="w-32 h-32 rounded-lg overflow-hidden bg-gray-100">
-                    <img
+                  <div className="w-32 h-32 rounded-lg overflow-hidden bg-gray-100 relative">
+                    <Image
                       src={
                         mostSoldProduct.mostSoldProduct.imageUrl ||
                         "/images/placeholder-dish.svg"
                       }
                       alt={mostSoldProduct.mostSoldProduct.name}
-                      className="w-full h-full object-cover"
+                      fill
+                      sizes="128px"
+                      className="object-cover"
                     />
                   </div>
                   <div className="text-center">
@@ -345,7 +364,7 @@ export default function DashboardHome() {
             <div className="flex flex-col items-center justify-center h-full space-y-4">
               {leastSoldLoading ? (
                 <div className="text-muted-foreground text-sm">
-                  Cargando datos...
+                  Cargando datos…
                 </div>
               ) : leastSoldError || !leastSoldProduct?.leastSoldProduct ? (
                 <div className="text-red-600 text-sm">
@@ -353,14 +372,16 @@ export default function DashboardHome() {
                 </div>
               ) : (
                 <>
-                  <div className="w-32 h-32 rounded-lg overflow-hidden bg-gray-100">
-                    <img
+                  <div className="w-32 h-32 rounded-lg overflow-hidden bg-gray-100 relative">
+                    <Image
                       src={
                         leastSoldProduct.leastSoldProduct.imageUrl ||
                         "/images/placeholder-dish.svg"
                       }
                       alt={leastSoldProduct.leastSoldProduct.name}
-                      className="w-full h-full object-cover"
+                      fill
+                      sizes="128px"
+                      className="object-cover"
                     />
                   </div>
                   <div className="text-center">

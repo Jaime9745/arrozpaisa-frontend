@@ -57,12 +57,12 @@ export function ChartPieDonut({
   error = null,
   dateRange,
 }: ChartPieDonutProps) {
-  // Prepare chart data from waiter performance
+  // Prepare chart data from waiter performance (Rule 7.12: use toSorted for immutability)
   const chartData =
     waiterPerformance.length > 0
       ? waiterPerformance
           .filter((waiter) => waiter.totalOrders > 0) // Only show waiters with orders
-          .sort((a, b) => b.totalOrders - a.totalOrders) // Sort by orders descending
+          .toSorted((a, b) => b.totalOrders - a.totalOrders) // Sort by orders descending (immutable)
           .map((waiter, index) => ({
             waiterName: waiter.waiterName,
             orders: waiter.totalOrders,
@@ -85,7 +85,7 @@ export function ChartPieDonut({
     },
     {
       orders: { label: "Órdenes" },
-    } as ChartConfig
+    } as ChartConfig,
   );
 
   if (loading) {
@@ -99,9 +99,7 @@ export function ChartPieDonut({
         </CardHeader>
         <CardContent className="flex-1 pb-0">
           <div className="flex items-center justify-center h-55">
-            <div className="text-muted-foreground text-sm">
-              Cargando datos...
-            </div>
+            <div className="text-muted-foreground text-sm">Cargando datos…</div>
           </div>
         </CardContent>
       </Card>

@@ -27,8 +27,8 @@ export default function TableStatus() {
     }
   };
 
-  // Sort tables by number in descending order (14 to 1)
-  const sortedTables = [...tables].sort((a, b) => b.number - a.number);
+  // Sort tables by number in descending order (14 to 1) - toSorted() is immutable
+  const sortedTables = tables.toSorted((a, b) => b.number - a.number);
 
   if (loading) {
     return (
@@ -38,14 +38,15 @@ export default function TableStatus() {
             variant="ghost"
             size="icon"
             onClick={toggleSidebar}
-            className="lg:hidden h-12 w-12 bg-white border-gray-200 hover:bg-gray-50 transition-all duration-200 shadow-sm"
+            aria-label="Abrir menú de navegación"
+            className="lg:hidden h-12 w-12 bg-white border-gray-200 hover:bg-gray-50 transition-colors duration-200 shadow-sm"
           >
             <Menu className="h-6 w-6 text-gray-800" />
           </Button>
           <Card className="py-2 px-6 border-0 flex-1">
             <CardContent className="p-0">
               <div className="flex items-center justify-center h-16">
-                <div className="text-lg text-gray-500">Cargando mesas...</div>
+                <div className="text-lg text-gray-500">Cargando mesas…</div>
               </div>
             </CardContent>
           </Card>
@@ -61,7 +62,8 @@ export default function TableStatus() {
           variant="ghost"
           size="icon"
           onClick={toggleSidebar}
-          className="lg:hidden h-12 w-12 bg-white border-gray-200 hover:bg-gray-50 transition-all duration-200 shadow-sm"
+          aria-label="Abrir menú de navegación"
+          className="lg:hidden h-12 w-12 bg-white border-gray-200 hover:bg-gray-50 transition-colors duration-200 shadow-sm"
         >
           <Menu className="h-6 w-6 text-gray-800" />
         </Button>
@@ -105,7 +107,8 @@ export default function TableStatus() {
                 variant="ghost"
                 size="icon"
                 onClick={refreshTables}
-                className="h-10 w-10 text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-all duration-200"
+                aria-label="Actualizar estado de mesas"
+                className="h-10 w-10 text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors duration-200"
                 disabled={loading}
               >
                 <RefreshCw

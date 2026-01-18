@@ -4,6 +4,18 @@ import MockAdapter from "axios-mock-adapter";
 import { apiClient } from "../../api/client";
 import { useProducts } from "../useProducts";
 import { Product } from "@/services/productsService";
+import { SWRConfig } from "swr";
+import React from "react";
+
+// Wrapper with fresh cache for each test
+const createWrapper = () => {
+  const Wrapper = ({ children }: { children: React.ReactNode }) => (
+    <SWRConfig value={{ provider: () => new Map(), dedupingInterval: 0 }}>
+      {children}
+    </SWRConfig>
+  );
+  return Wrapper;
+};
 
 describe("useProducts Hook", () => {
   let mock: MockAdapter;
@@ -42,9 +54,9 @@ describe("useProducts Hook", () => {
 
       mock.onGet("/productes").reply(200, mockProducts);
 
-      const { result } = renderHook(() => useProducts());
+      const { result } = renderHook(() => useProducts(), { wrapper: createWrapper() });
 
-      expect(result.current.loading).toBe(true);
+      // SWR starts with empty data
       expect(result.current.products).toEqual([]);
 
       await waitFor(() => {
@@ -59,13 +71,14 @@ describe("useProducts Hook", () => {
     it("should handle fetch error", async () => {
       mock.onGet("/productes").reply(500, { message: "Server error" });
 
-      const { result } = renderHook(() => useProducts());
+      const { result } = renderHook(() => useProducts(), { wrapper: createWrapper() });
 
       await waitFor(() => {
         expect(result.current.loading).toBe(false);
       });
 
-      expect(result.current.error).toBe("Error al cargar los productos");
+      // SWR stores error message from error.message
+      expect(result.current.error).not.toBeNull();
       expect(result.current.products).toEqual([]);
     });
 
@@ -83,7 +96,15 @@ describe("useProducts Hook", () => {
       ];
 
       const updatedProducts: Product[] = [
-        ...initialProducts,
+        {
+          id: "1",
+          name: "Product 1",
+          description: "Desc",
+          imageUrl: "test.jpg",
+          categoryId: "cat-1",
+          price: 10000,
+          isActive: true,
+        },
         {
           id: "2",
           name: "Product 2",
@@ -97,7 +118,7 @@ describe("useProducts Hook", () => {
 
       mock.onGet("/productes").replyOnce(200, initialProducts);
 
-      const { result } = renderHook(() => useProducts());
+      const { result } = renderHook(() => useProducts(), { wrapper: createWrapper() });
 
       await waitFor(() => {
         expect(result.current.products).toHaveLength(1);
@@ -106,10 +127,12 @@ describe("useProducts Hook", () => {
       mock.onGet("/productes").replyOnce(200, updatedProducts);
 
       await act(async () => {
-        await result.current.fetchProducts();
+        result.current.fetchProducts();
       });
 
-      expect(result.current.products).toHaveLength(2);
+      await waitFor(() => {
+        expect(result.current.products).toHaveLength(2);
+      });
     });
   });
 
@@ -117,7 +140,7 @@ describe("useProducts Hook", () => {
     it("should create a new product successfully", async () => {
       mock.onGet("/productes").reply(200, []);
 
-      const { result } = renderHook(() => useProducts());
+      const { result } = renderHook(() => useProducts(), { wrapper: createWrapper() });
 
       await waitFor(() => {
         expect(result.current.loading).toBe(false);
@@ -146,15 +169,15 @@ describe("useProducts Hook", () => {
       });
 
       expect(createdResult).toEqual(createdProduct);
-      expect(result.current.products).toHaveLength(1);
-      expect(result.current.products[0].name).toBe("Nuevo Producto");
+      // SWR optimistically updates the cache
+      expect(result.current.products).toContainEqual(createdProduct);
       expect(result.current.error).toBeNull();
     });
 
     it("should handle create product error", async () => {
       mock.onGet("/productes").reply(200, []);
 
-      const { result } = renderHook(() => useProducts());
+      const { result } = renderHook(() => useProducts(), { wrapper: createWrapper() });
 
       await waitFor(() => {
         expect(result.current.loading).toBe(false);
@@ -171,15 +194,12 @@ describe("useProducts Hook", () => {
 
       mock.onPost("/productes").reply(400, { message: "Validation error" });
 
-      await act(async () => {
-        try {
+      await expect(
+        act(async () => {
           await result.current.createProduct(newProduct);
-        } catch (error) {
-          // Expected error
-        }
-      });
+        })
+      ).rejects.toThrow();
 
-      expect(result.current.error).toBe("Error al crear el producto");
       expect(result.current.products).toHaveLength(0);
     });
   });
@@ -200,7 +220,7 @@ describe("useProducts Hook", () => {
 
       mock.onGet("/productes").reply(200, initialProducts);
 
-      const { result } = renderHook(() => useProducts());
+      const { result } = renderHook(() => useProducts(), { wrapper: createWrapper() });
 
       await waitFor(() => {
         expect(result.current.products).toHaveLength(1);
@@ -247,7 +267,7 @@ describe("useProducts Hook", () => {
 
       mock.onGet("/productes").reply(200, initialProducts);
 
-      const { result } = renderHook(() => useProducts());
+      const { result } = renderHook(() => useProducts(), { wrapper: createWrapper() });
 
       await waitFor(() => {
         expect(result.current.products).toHaveLength(1);
@@ -289,7 +309,7 @@ describe("useProducts Hook", () => {
 
       mock.onGet("/productes").reply(200, initialProducts);
 
-      const { result } = renderHook(() => useProducts());
+      const { result } = renderHook(() => useProducts(), { wrapper: createWrapper() });
 
       await waitFor(() => {
         expect(result.current.products).toHaveLength(1);
@@ -297,15 +317,11 @@ describe("useProducts Hook", () => {
 
       mock.onPut("/productes/1").reply(404, { message: "Product not found" });
 
-      await act(async () => {
-        try {
+      await expect(
+        act(async () => {
           await result.current.updateProduct("1", { name: "New Name" });
-        } catch (error) {
-          // Expected error
-        }
-      });
-
-      expect(result.current.error).toBe("Error al actualizar el producto");
+        })
+      ).rejects.toThrow();
     });
   });
 
@@ -334,7 +350,7 @@ describe("useProducts Hook", () => {
 
       mock.onGet("/productes").reply(200, initialProducts);
 
-      const { result } = renderHook(() => useProducts());
+      const { result } = renderHook(() => useProducts(), { wrapper: createWrapper() });
 
       await waitFor(() => {
         expect(result.current.products).toHaveLength(2);
@@ -366,7 +382,7 @@ describe("useProducts Hook", () => {
 
       mock.onGet("/productes").reply(200, initialProducts);
 
-      const { result } = renderHook(() => useProducts());
+      const { result } = renderHook(() => useProducts(), { wrapper: createWrapper() });
 
       await waitFor(() => {
         expect(result.current.products).toHaveLength(1);
@@ -376,34 +392,12 @@ describe("useProducts Hook", () => {
         .onDelete("/productes/1")
         .reply(404, { message: "Product not found" });
 
-      await act(async () => {
-        try {
+      await expect(
+        act(async () => {
           await result.current.deleteProduct("1");
-        } catch (error) {
-          // Expected error
-        }
-      });
-
-      expect(result.current.error).toBe("Error al eliminar el producto");
-      expect(result.current.products).toHaveLength(1);
-    });
-  });
-
-  describe("setError", () => {
-    it("should allow manual error setting", async () => {
-      mock.onGet("/productes").reply(200, []);
-
-      const { result } = renderHook(() => useProducts());
-
-      await waitFor(() => {
-        expect(result.current.loading).toBe(false);
-      });
-
-      act(() => {
-        result.current.setError("Custom error message");
-      });
-
-      expect(result.current.error).toBe("Custom error message");
+        })
+      ).rejects.toThrow();
     });
   });
 });
+

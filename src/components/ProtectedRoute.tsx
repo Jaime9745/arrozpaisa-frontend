@@ -29,7 +29,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg">Cargando...</div>
+        <div className="text-lg">Cargando…</div>
       </div>
     );
   }
@@ -38,8 +38,11 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     return null;
   }
 
-  // Double-check role
-  const role = localStorage.getItem("role");
+  // Double-check role (with SSR safety)
+  if (typeof window === "undefined") {
+    return null;
+  }
+  const role = window.localStorage.getItem("role");
   if (role !== "admin") {
     return null;
   }

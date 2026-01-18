@@ -31,9 +31,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const router = useRouter();
 
   useEffect(() => {
+    // Check if we're on the client side (SSR safety)
+    if (typeof window === "undefined") {
+      setLoading(false);
+      return;
+    }
+
     // Check if user is already authenticated on app load
     const token = loginService.getToken();
-    const savedRole = localStorage.getItem("role");
+    // Cache localStorage read for role
+    const savedRole = window.localStorage.getItem("role");
 
     if (token && savedRole) {
       // Only set as authenticated if user is admin
@@ -42,7 +49,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       } else {
         // Clear invalid data
         loginService.logout();
-        localStorage.removeItem("role");
+        window.localStorage.removeItem("role");
       }
     }
 
@@ -61,7 +68,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // Check if user is admin
       if (response.user.role !== "admin") {
         throw new Error(
-          "Acceso denegado. Solo los administradores pueden acceder."
+          "Acceso denegado. Solo los administradores pueden acceder.",
         );
       }
 

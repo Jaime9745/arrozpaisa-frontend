@@ -1,6 +1,9 @@
-import { useState, useEffect, useCallback } from "react";
+"use client";
+
+import useSWR from "swr";
 import { metricsService } from "@/services/metricsService";
 import { SalesMetrics } from "@/types/metrics";
+import { defaultConfig } from "@/lib/swr";
 
 interface UseSalesMetricsProps {
   period: "day" | "week" | "month";
@@ -9,70 +12,41 @@ interface UseSalesMetricsProps {
   refreshInterval?: number;
 }
 
+/**
+ * SWR-based hook for sales metrics with automatic deduplication and caching
+ */
 export const useSalesMetrics = ({
   period,
   startDate,
   endDate,
   refreshInterval = 300000, // 5 minutes default
 }: UseSalesMetricsProps) => {
-  const [data, setData] = useState<{
-    salesMetrics: SalesMetrics | null;
-    loading: boolean;
-    error: string | null;
-  }>({
-    salesMetrics: null,
-    loading: true,
-    error: null,
-  });
-
-  // Use timestamps for stable dependencies
+  // Use timestamps for stable cache keys
   const startTime = startDate.getTime();
   const endTime = endDate.getTime();
+  const cacheKey = `metrics/sales/${period}/${startTime}/${endTime}`;
 
-  const fetchSalesMetrics = useCallback(async () => {
-    try {
-      setData((prev) => ({ ...prev, loading: true, error: null }));
+  const fetcher = async (): Promise<SalesMetrics> => {
+    return metricsService.getSalesMetrics(
+      period,
+      new Date(startTime),
+      new Date(endTime),
+    );
+  };
 
-      const salesMetrics = await metricsService.getSalesMetrics(
-        period,
-        new Date(startTime),
-        new Date(endTime),
-      );
-
-      setData({
-        salesMetrics,
-        loading: false,
-        error: null,
-      });
-    } catch (error) {
-      setData((prev) => ({
-        ...prev,
-        loading: false,
-        error:
-          error instanceof Error ? error.message : "An unknown error occurred",
-      }));
-    }
-  }, [period, startTime, endTime]);
-
-  const refetch = useCallback(() => {
-    fetchSalesMetrics();
-  }, [fetchSalesMetrics]);
-
-  useEffect(() => {
-    fetchSalesMetrics();
-
-    // Set up polling
-    const interval = setInterval(() => {
-      fetchSalesMetrics();
-    }, refreshInterval);
-
-    return () => clearInterval(interval);
-  }, [fetchSalesMetrics, refreshInterval]);
+  const { data, error, isLoading, mutate } = useSWR<SalesMetrics>(
+    cacheKey,
+    fetcher,
+    {
+      ...defaultConfig,
+      refreshInterval,
+    },
+  );
 
   return {
-    salesMetrics: data.salesMetrics,
-    loading: data.loading,
-    error: data.error,
-    refetch,
+    salesMetrics: data ?? null,
+    loading: isLoading,
+    error: error?.message ?? null,
+    refetch: () => mutate(),
   };
 };

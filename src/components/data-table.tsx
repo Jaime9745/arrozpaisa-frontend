@@ -39,7 +39,7 @@ export function DataTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
+    [],
   );
   const table = useReactTable({
     data,
@@ -96,7 +96,7 @@ export function DataTable<TData, TValue>({
                     >
                       {flexRender(
                         header.column.columnDef.header,
-                        header.getContext()
+                        header.getContext(),
                       )}
                     </span>
                     {header.column.getCanSort() && getSortIcon(header.column)}
@@ -110,7 +110,7 @@ export function DataTable<TData, TValue>({
               table.getRowModel().rows.map((row) => (
                 <div
                   key={row.id}
-                  className="rounded-xl shadow-sm p-4 sm:p-6 space-y-3 sm:space-y-0 sm:flex sm:items-center"
+                  className="content-auto rounded-xl shadow-sm p-4 sm:p-6 space-y-3 sm:space-y-0 sm:flex sm:items-center"
                   style={{ backgroundColor: "#ffffff" }}
                 >
                   {row.getVisibleCells().map((cell, index) => {
@@ -123,7 +123,7 @@ export function DataTable<TData, TValue>({
                         >
                           {flexRender(
                             cell.column.columnDef.cell,
-                            cell.getContext()
+                            cell.getContext(),
                           )}
                         </div>
                       );
@@ -148,7 +148,7 @@ export function DataTable<TData, TValue>({
                         <div className="wrap-break-word">
                           {flexRender(
                             cell.column.columnDef.cell,
-                            cell.getContext()
+                            cell.getContext(),
                           )}
                         </div>
                       </div>
@@ -183,7 +183,7 @@ export function DataTable<TData, TValue>({
                             <span>
                               {flexRender(
                                 header.column.columnDef.header,
-                                header.getContext()
+                                header.getContext(),
                               )}
                             </span>
                             {header.column.getCanSort() &&
@@ -207,7 +207,7 @@ export function DataTable<TData, TValue>({
                       <TableCell key={cell.id}>
                         {flexRender(
                           cell.column.columnDef.cell,
-                          cell.getContext()
+                          cell.getContext(),
                         )}
                       </TableCell>
                     ))}

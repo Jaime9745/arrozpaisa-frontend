@@ -160,7 +160,7 @@ export default function MenuManagement() {
       <div className="space-y-6 lg:space-y-0 lg:flex lg:gap-6">
         {(showCreateForm || showEditForm || isClosing) && (
           <div
-            className={`lg:order-2 lg:w-1/3 w-full transition-all duration-300 ${
+            className={`lg:order-2 lg:w-1/3 w-full transition-[max-height,opacity] duration-300 ${
               (showCreateForm || showEditForm) && !isClosing
                 ? "max-h-250 opacity-100"
                 : "max-h-0 opacity-0 overflow-hidden"
@@ -168,7 +168,7 @@ export default function MenuManagement() {
           >
             {showCreateForm && (
               <div
-                className={`transform transition-all duration-300 ease-in-out ${
+                className={`transform transition-[transform,opacity] duration-300 ease-in-out ${
                   isClosing
                     ? "scale-95 opacity-0 -translate-y-4 lg:translate-y-0 lg:translate-x-4"
                     : "scale-100 opacity-100 translate-y-0 lg:translate-x-0"
@@ -185,7 +185,7 @@ export default function MenuManagement() {
 
             {showEditForm && editingProduct && (
               <div
-                className={`transform transition-all duration-300 ease-in-out ${
+                className={`transform transition-[transform,opacity] duration-300 ease-in-out ${
                   isClosing
                     ? "scale-95 opacity-0 -translate-y-4 lg:translate-y-0 lg:translate-x-4"
                     : "scale-100 opacity-100 translate-y-0 lg:translate-x-0"
@@ -210,14 +210,14 @@ export default function MenuManagement() {
         )}
 
         <div
-          className={`lg:order-1 transition-all duration-300 ${
+          className={`lg:order-1 transition-[width] duration-300 ${
             (showCreateForm || showEditForm) && !isClosing
               ? "lg:w-2/3 w-full"
               : "w-full"
           }`}
         >
           <Card
-            className={`p-6 border-0 transition-all duration-300 ${
+            className={`p-6 border-0 transition-[height] duration-300 ${
               (showCreateForm || showEditForm) && !isClosing
                 ? "h-[calc(100vh-500px)] sm:h-[calc(100vh-480px)] md:h-[calc(100vh-460px)] lg:h-[calc(100vh-100px)]"
                 : "h-[calc(100vh-160px)] sm:h-[calc(100vh-140px)] md:h-[calc(100vh-120px)] lg:h-[calc(100vh-100px)]"

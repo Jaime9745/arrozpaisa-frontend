@@ -22,8 +22,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <head></head>
+    <html lang="es">
+      <head>
+        <link
+          rel="preconnect"
+          href={process.env.NEXT_PUBLIC_API_URL}
+          crossOrigin="anonymous"
+        />
+      </head>
       <body className={`${poppins.variable} antialiased font-sans`}>
         <AuthProvider>{children}</AuthProvider>
       </body>

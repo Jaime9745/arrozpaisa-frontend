@@ -2,7 +2,7 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { DataTable } from "@/components/data-table";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Waiter } from "@/services/waitersService";
 import { useWaiters } from "@/hooks/useWaiters";
 import { useSidebar } from "@/contexts/SidebarContext";
@@ -16,7 +16,7 @@ import { useWaiterTableColumns } from "./waiter/WaiterTableColumns";
 export default function WaiterManagement() {
   const [searchTerm, setSearchTerm] = useState("");
   const [visiblePasswords, setVisiblePasswords] = useState<Set<string>>(
-    new Set()
+    new Set(),
   );
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
@@ -132,16 +132,20 @@ export default function WaiterManagement() {
       setEditingWaiter(null);
       setIsClosing(false);
     }, 300); // Match animation duration
-  }; // Toggle password visibility
-  const togglePasswordVisibility = (waiterId: string) => {
-    const newVisiblePasswords = new Set(visiblePasswords);
-    if (newVisiblePasswords.has(waiterId)) {
-      newVisiblePasswords.delete(waiterId);
-    } else {
-      newVisiblePasswords.add(waiterId);
-    }
-    setVisiblePasswords(newVisiblePasswords);
   };
+
+  // Toggle password visibility (Rule 5.5: functional setState with useCallback)
+  const togglePasswordVisibility = useCallback((waiterId: string) => {
+    setVisiblePasswords((prev) => {
+      const next = new Set(prev);
+      if (next.has(waiterId)) {
+        next.delete(waiterId);
+      } else {
+        next.add(waiterId);
+      }
+      return next;
+    });
+  }, []);
 
   // Get table columns
   const columns = useWaiterTableColumns({
@@ -176,7 +180,7 @@ export default function WaiterManagement() {
         {" "}
         {(showCreateForm || showEditForm || isClosing) && (
           <div
-            className={`lg:order-2 lg:w-1/3 w-full transition-all duration-300 ${
+            className={`lg:order-2 lg:w-1/3 w-full transition-[max-height,opacity] duration-300 ${
               (showCreateForm || showEditForm) && !isClosing
                 ? "max-h-250 opacity-100"
                 : "max-h-0 opacity-0 overflow-hidden"
@@ -184,7 +188,7 @@ export default function WaiterManagement() {
           >
             {showCreateForm && (
               <div
-                className={`transform transition-all duration-300 ease-in-out ${
+                className={`transform transition-[transform,opacity] duration-300 ease-in-out ${
                   isClosing
                     ? "scale-95 opacity-0 -translate-y-4 lg:translate-y-0 lg:translate-x-4"
                     : "scale-100 opacity-100 translate-y-0 lg:translate-x-0"
@@ -201,7 +205,7 @@ export default function WaiterManagement() {
 
             {showEditForm && editingWaiter && (
               <div
-                className={`transform transition-all duration-300 ease-in-out ${
+                className={`transform transition-[transform,opacity] duration-300 ease-in-out ${
                   isClosing
                     ? "scale-95 opacity-0 -translate-y-4 lg:translate-y-0 lg:translate-x-4"
                     : "scale-100 opacity-100 translate-y-0 lg:translate-x-0"
@@ -224,14 +228,14 @@ export default function WaiterManagement() {
           </div>
         )}
         <div
-          className={`lg:order-1 transition-all duration-300 ${
+          className={`lg:order-1 transition-[width] duration-300 ${
             (showCreateForm || showEditForm) && !isClosing
               ? "lg:w-2/3 w-full"
               : "w-full"
           }`}
         >
           <Card
-            className={`border-0 transition-all duration-300 ${
+            className={`border-0 transition-[height] duration-300 ${
               (showCreateForm || showEditForm) && !isClosing
                 ? "h-[calc(100vh-500px)] sm:h-[calc(100vh-480px)] md:h-[calc(100vh-460px)] lg:h-[calc(100vh-100px)]"
                 : "h-[calc(100vh-160px)] sm:h-[calc(100vh-140px)] md:h-[calc(100vh-120px)] lg:h-[calc(100vh-100px)]"
@@ -241,9 +245,7 @@ export default function WaiterManagement() {
             <CardContent className="h-full overflow-hidden p-4 sm:p-6">
               {loading ? (
                 <div className="flex items-center justify-center h-full">
-                  <div className="text-lg text-gray-500">
-                    Cargando meseros...
-                  </div>
+                  <div className="text-lg text-gray-500">Cargando meseros…</div>
                 </div>
               ) : (
                 <div className="h-full overflow-x-auto">

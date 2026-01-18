@@ -1,6 +1,9 @@
-import { useState, useEffect, useCallback } from "react";
+"use client";
+
+import useSWR from "swr";
 import { metricsService } from "@/services/metricsService";
 import { ProductMetrics } from "@/types/metrics";
+import { defaultConfig } from "@/lib/swr";
 
 interface UseProductMetricsProps {
   period: "week" | "month";
@@ -9,70 +12,41 @@ interface UseProductMetricsProps {
   refreshInterval?: number;
 }
 
+/**
+ * SWR-based hook for product metrics with automatic deduplication and caching
+ */
 export const useProductMetrics = ({
   period,
   startDate,
   endDate,
   refreshInterval = 300000, // 5 minutes default
 }: UseProductMetricsProps) => {
-  const [data, setData] = useState<{
-    productMetrics: ProductMetrics | null;
-    loading: boolean;
-    error: string | null;
-  }>({
-    productMetrics: null,
-    loading: true,
-    error: null,
-  });
-
-  // Use timestamps for stable dependencies
+  // Use timestamps for stable cache keys
   const startTime = startDate.getTime();
   const endTime = endDate.getTime();
+  const cacheKey = `metrics/products/${period}/${startTime}/${endTime}`;
 
-  const fetchProductMetrics = useCallback(async () => {
-    try {
-      setData((prev) => ({ ...prev, loading: true, error: null }));
+  const fetcher = async (): Promise<ProductMetrics> => {
+    return metricsService.getProductMetrics(
+      period,
+      new Date(startTime),
+      new Date(endTime),
+    );
+  };
 
-      const productMetrics = await metricsService.getProductMetrics(
-        period,
-        new Date(startTime),
-        new Date(endTime),
-      );
-
-      setData({
-        productMetrics,
-        loading: false,
-        error: null,
-      });
-    } catch (error) {
-      setData((prev) => ({
-        ...prev,
-        loading: false,
-        error:
-          error instanceof Error ? error.message : "An unknown error occurred",
-      }));
-    }
-  }, [period, startTime, endTime]);
-
-  const refetch = useCallback(() => {
-    fetchProductMetrics();
-  }, [fetchProductMetrics]);
-
-  useEffect(() => {
-    fetchProductMetrics();
-
-    // Set up polling
-    const interval = setInterval(() => {
-      fetchProductMetrics();
-    }, refreshInterval);
-
-    return () => clearInterval(interval);
-  }, [fetchProductMetrics, refreshInterval]);
+  const { data, error, isLoading, mutate } = useSWR<ProductMetrics>(
+    cacheKey,
+    fetcher,
+    {
+      ...defaultConfig,
+      refreshInterval,
+    },
+  );
 
   return {
-    productMetrics: data.productMetrics,
-    loading: data.loading,
-    error: data.error,
-    refetch,
+    productMetrics: data ?? null,
+    loading: isLoading,
+    error: error?.message ?? null,
+    refetch: () => mutate(),
   };
 };

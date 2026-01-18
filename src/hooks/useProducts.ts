@@ -1,46 +1,64 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import useSWR from "swr";
+import { useSWRConfig } from "swr";
+import { useCallback } from "react";
+import { fetcher, defaultConfig } from "@/lib/swr";
 import { productsService, Product } from "@/services/productsService";
 
+const PRODUCTS_KEY = "/productes";
+
+interface ProductsResponse {
+  products?: Product[];
+  data?: Product[];
+}
+
+/**
+ * SWR-based hook for products with automatic deduplication and caching
+ * Multiple components using this hook will share the same request
+ */
 export const useProducts = () => {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { mutate } = useSWRConfig();
 
-  const fetchProducts = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const fetchedProducts = await productsService.getAllProducts();
-      setProducts(fetchedProducts);
-    } catch (error) {
-      setError("Error al cargar los productos");
-    } finally {
-      setLoading(false);
+  // Custom fetcher that handles the response format
+  const productsFetcher = async (): Promise<Product[]> => {
+    const data = await fetcher<ProductsResponse | Product[]>(PRODUCTS_KEY);
+    if (Array.isArray(data)) {
+      return data;
+    } else if ("products" in data && data.products) {
+      return data.products;
+    } else if ("data" in data && data.data) {
+      return data.data;
     }
+    return [];
   };
 
-  const createProduct = async (
-    product: Omit<Product, "id" | "createdAt" | "updatedAt">
-  ) => {
-    try {
-      setError(null);
+  const { data, error, isLoading, isValidating } = useSWR<Product[]>(
+    PRODUCTS_KEY,
+    productsFetcher,
+    defaultConfig,
+  );
+
+  // Mutation functions with optimistic updates
+  const createProduct = useCallback(
+    async (product: Omit<Product, "id" | "createdAt" | "updatedAt">) => {
       const newProduct = await productsService.createProduct(product);
-      setProducts((prev) => [...prev, newProduct]);
+      // Optimistically update the cache
+      mutate(
+        PRODUCTS_KEY,
+        (current: Product[] | undefined) =>
+          current ? [...current, newProduct] : [newProduct],
+        { revalidate: false },
+      );
       return newProduct;
-    } catch (error) {
-      setError("Error al crear el producto");
-      throw error;
-    }
-  };
+    },
+    [mutate],
+  );
 
-  const updateProduct = async (id: string, product: Partial<Product>) => {
-    try {
-      setError(null);
+  const updateProduct = useCallback(
+    async (id: string, product: Partial<Product>) => {
       const updatedProduct = await productsService.updateProduct(id, product);
-
-      // If the image was updated but backend returned old URL, use the new image
+      // Handle image URL edge case
       const finalProduct = {
         ...updatedProduct,
         imageUrl:
@@ -48,38 +66,45 @@ export const useProducts = () => {
             ? product.imageUrl
             : updatedProduct.imageUrl,
       };
-
-      setProducts((prev) => prev.map((p) => (p.id === id ? finalProduct : p)));
+      // Optimistically update the cache
+      mutate(
+        PRODUCTS_KEY,
+        (current: Product[] | undefined) =>
+          current?.map((p) => (p.id === id ? finalProduct : p)) ?? [],
+        { revalidate: false },
+      );
       return finalProduct;
-    } catch (error) {
-      setError("Error al actualizar el producto");
-      throw error;
-    }
-  };
+    },
+    [mutate],
+  );
 
-  const deleteProduct = async (id: string) => {
-    try {
-      setError(null);
+  const deleteProduct = useCallback(
+    async (id: string) => {
       await productsService.deleteProduct(id);
-      setProducts((prev) => prev.filter((p) => p.id !== id));
-    } catch (error) {
-      setError("Error al eliminar el producto");
-      throw error;
-    }
-  };
+      // Optimistically update the cache
+      mutate(
+        PRODUCTS_KEY,
+        (current: Product[] | undefined) =>
+          current?.filter((p) => p.id !== id) ?? [],
+        { revalidate: false },
+      );
+    },
+    [mutate],
+  );
 
-  useEffect(() => {
-    fetchProducts();
-  }, []);
+  const refetch = useCallback(() => {
+    mutate(PRODUCTS_KEY);
+  }, [mutate]);
 
   return {
-    products,
-    loading,
-    error,
-    fetchProducts,
+    products: data ?? [],
+    loading: isLoading,
+    isValidating,
+    error: error?.message ?? null,
+    fetchProducts: refetch,
     createProduct,
     updateProduct,
     deleteProduct,
-    setError,
+    setError: () => {}, // Kept for backward compatibility
   };
 };

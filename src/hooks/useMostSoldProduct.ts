@@ -1,6 +1,9 @@
-import { useState, useEffect, useCallback } from "react";
+"use client";
+
+import useSWR from "swr";
 import { metricsService } from "@/services/metricsService";
 import { MostSoldProduct } from "@/types/metrics";
+import { defaultConfig } from "@/lib/swr";
 
 interface UseMostSoldProductParams {
   startDate: Date;
@@ -15,53 +18,41 @@ interface UseMostSoldProductReturn {
   refetch: () => Promise<void>;
 }
 
+/**
+ * SWR-based hook for most sold product with automatic deduplication and caching
+ */
 export function useMostSoldProduct({
   startDate,
   endDate,
   enabled = true,
 }: UseMostSoldProductParams): UseMostSoldProductReturn {
-  const [mostSoldProduct, setMostSoldProduct] =
-    useState<MostSoldProduct | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-
-  // Use timestamps for stable dependencies
+  // Use timestamps for stable cache keys
   const startTime = startDate.getTime();
   const endTime = endDate.getTime();
+  // Use null key to disable fetching when not enabled
+  const cacheKey = enabled
+    ? `metrics/most-sold-product/${startTime}/${endTime}`
+    : null;
 
-  const fetchMostSoldProduct = useCallback(async () => {
-    if (!enabled) return;
+  const fetcher = async (): Promise<MostSoldProduct> => {
+    return metricsService.getMostSoldProduct(
+      new Date(startTime),
+      new Date(endTime),
+    );
+  };
 
-    setLoading(true);
-    setError(null);
-
-    try {
-      const data = await metricsService.getMostSoldProduct(
-        new Date(startTime),
-        new Date(endTime),
-      );
-
-      setMostSoldProduct(data);
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Error desconocido";
-      setError(errorMessage);
-      setMostSoldProduct(null);
-    } finally {
-      setLoading(false);
-    }
-  }, [startTime, endTime, enabled]);
-
-  useEffect(() => {
-    if (enabled) {
-      fetchMostSoldProduct();
-    }
-  }, [fetchMostSoldProduct, enabled]);
+  const { data, error, isLoading, mutate } = useSWR<MostSoldProduct>(
+    cacheKey,
+    fetcher,
+    defaultConfig,
+  );
 
   return {
-    mostSoldProduct,
-    loading,
-    error,
-    refetch: fetchMostSoldProduct,
+    mostSoldProduct: data ?? null,
+    loading: isLoading,
+    error: error?.message ?? null,
+    refetch: async () => {
+      await mutate();
+    },
   };
 }

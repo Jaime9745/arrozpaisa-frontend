@@ -1,6 +1,9 @@
-import { useState, useEffect, useCallback } from "react";
+"use client";
+
+import useSWR from "swr";
 import { metricsService } from "@/services/metricsService";
 import { LeastSoldProduct } from "@/types/metrics";
+import { defaultConfig } from "@/lib/swr";
 
 interface UseLeastSoldProductParams {
   startDate: Date;
@@ -15,53 +18,41 @@ interface UseLeastSoldProductReturn {
   refetch: () => Promise<void>;
 }
 
+/**
+ * SWR-based hook for least sold product with automatic deduplication and caching
+ */
 export function useLeastSoldProduct({
   startDate,
   endDate,
   enabled = true,
 }: UseLeastSoldProductParams): UseLeastSoldProductReturn {
-  const [leastSoldProduct, setLeastSoldProduct] =
-    useState<LeastSoldProduct | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-
-  // Use timestamps for stable dependencies
+  // Use timestamps for stable cache keys
   const startTime = startDate.getTime();
   const endTime = endDate.getTime();
+  // Use null key to disable fetching when not enabled
+  const cacheKey = enabled
+    ? `metrics/least-sold-product/${startTime}/${endTime}`
+    : null;
 
-  const fetchLeastSoldProduct = useCallback(async () => {
-    if (!enabled) return;
+  const fetcher = async (): Promise<LeastSoldProduct> => {
+    return metricsService.getLeastSoldProduct(
+      new Date(startTime),
+      new Date(endTime),
+    );
+  };
 
-    setLoading(true);
-    setError(null);
-
-    try {
-      const data = await metricsService.getLeastSoldProduct(
-        new Date(startTime),
-        new Date(endTime),
-      );
-
-      setLeastSoldProduct(data);
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Error desconocido";
-      setError(errorMessage);
-      setLeastSoldProduct(null);
-    } finally {
-      setLoading(false);
-    }
-  }, [startTime, endTime, enabled]);
-
-  useEffect(() => {
-    if (enabled) {
-      fetchLeastSoldProduct();
-    }
-  }, [fetchLeastSoldProduct, enabled]);
+  const { data, error, isLoading, mutate } = useSWR<LeastSoldProduct>(
+    cacheKey,
+    fetcher,
+    defaultConfig,
+  );
 
   return {
-    leastSoldProduct,
-    loading,
-    error,
-    refetch: fetchLeastSoldProduct,
+    leastSoldProduct: data ?? null,
+    loading: isLoading,
+    error: error?.message ?? null,
+    refetch: async () => {
+      await mutate();
+    },
   };
 }

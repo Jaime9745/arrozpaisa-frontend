@@ -24,14 +24,15 @@ export default function MenuManagementHeader({
           variant="ghost"
           size="icon"
           onClick={onToggleSidebar}
-          className="lg:hidden h-auto py-3 w-12 bg-white border-gray-200 hover:bg-gray-50 transition-all duration-200 shadow-sm"
+          aria-label="Abrir menú de navegación"
+          className="lg:hidden h-auto py-3 w-12 bg-white border-gray-200 hover:bg-gray-50 transition-colors duration-200 shadow-sm"
         >
           <Menu className="h-6 w-6 text-gray-800" />
         </Button>
         <div className="flex-1 relative">
           <Input
             type="text"
-            placeholder="Buscar por nombre o descripción..."
+            placeholder="Buscar por nombre o descripción…"
             value={searchTerm}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               onSearchChange(e.target.value)
@@ -42,7 +43,7 @@ export default function MenuManagementHeader({
         </div>
       </div>
       <Button
-        className="px-8 py-3 w-full sm:min-w-45 sm:w-auto text-white flex items-center gap-2 justify-center font-normal transition-all duration-200 hover:shadow-lg hover:brightness-110"
+        className="px-8 py-3 w-full sm:min-w-45 sm:w-auto text-white flex items-center gap-2 justify-center font-normal transition-[background-color,box-shadow,filter] duration-200 hover:shadow-lg hover:brightness-110"
         style={{ background: "#EB3123" }}
         onClick={onAddProduct}
       >

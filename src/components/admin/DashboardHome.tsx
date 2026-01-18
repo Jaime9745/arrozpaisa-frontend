@@ -28,7 +28,7 @@ import { useMostSoldProduct } from "@/hooks/useMostSoldProduct";
 import { useLeastSoldProduct } from "@/hooks/useLeastSoldProduct";
 import { DateRangePicker } from "@/components/ui/date-range-picker";
 import Calendar04 from "../calendar-04";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { type DateRange } from "react-day-picker";
 
 export default function DashboardHome() {
@@ -40,15 +40,26 @@ export default function DashboardHome() {
   } = useTableMetrics();
 
   // Date range state for metrics
-  const [dateRange, setDateRange] = useState<DateRange | undefined>({
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(() => ({
     from: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 7 days ago
     to: new Date(), // today
-  });
+  }));
+
+  // Memoize default dates to avoid creating new objects on every render
+  const defaultStartDate = useMemo(
+    () => new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+    [],
+  );
+  const defaultEndDate = useMemo(() => new Date(), []);
+
+  // Stable date references
+  const startDate = dateRange?.from ?? defaultStartDate;
+  const endDate = dateRange?.to ?? defaultEndDate;
 
   // Calculate period based on date range
   const calculatePeriod = (
     startDate: Date,
-    endDate: Date
+    endDate: Date,
   ): "day" | "week" | "month" => {
     const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -58,14 +69,11 @@ export default function DashboardHome() {
     return "month";
   };
 
-  const currentPeriod = calculatePeriod(
-    dateRange?.from || new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-    dateRange?.to || new Date()
-  );
+  const currentPeriod = calculatePeriod(startDate, endDate);
 
   // Calculate period for product metrics (only week or month supported)
   const getProductPeriod = (
-    period: "day" | "week" | "month"
+    period: "day" | "week" | "month",
   ): "week" | "month" => {
     return period === "month" ? "month" : "week";
   };
@@ -77,9 +85,8 @@ export default function DashboardHome() {
     error: salesError,
   } = useSalesMetrics({
     period: currentPeriod,
-    startDate:
-      dateRange?.from || new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-    endDate: dateRange?.to || new Date(),
+    startDate,
+    endDate,
   });
 
   // Get product metrics
@@ -89,9 +96,8 @@ export default function DashboardHome() {
     error: productError,
   } = useProductMetrics({
     period: getProductPeriod(currentPeriod),
-    startDate:
-      dateRange?.from || new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-    endDate: dateRange?.to || new Date(),
+    startDate,
+    endDate,
   });
 
   // Get all waiters performance
@@ -100,9 +106,8 @@ export default function DashboardHome() {
     loading: waiterLoading,
     error: waiterError,
   } = useWaiterPerformance({
-    startDate:
-      dateRange?.from || new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-    endDate: dateRange?.to || new Date(),
+    startDate,
+    endDate,
     enabled: true,
   });
 
@@ -112,9 +117,8 @@ export default function DashboardHome() {
     loading: mostSoldLoading,
     error: mostSoldError,
   } = useMostSoldProduct({
-    startDate:
-      dateRange?.from || new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-    endDate: dateRange?.to || new Date(),
+    startDate,
+    endDate,
     enabled: true,
   });
 
@@ -124,9 +128,8 @@ export default function DashboardHome() {
     loading: leastSoldLoading,
     error: leastSoldError,
   } = useLeastSoldProduct({
-    startDate:
-      dateRange?.from || new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-    endDate: dateRange?.to || new Date(),
+    startDate,
+    endDate,
     enabled: true,
   });
 
@@ -158,7 +161,7 @@ export default function DashboardHome() {
 
     // Get the product with the highest quantity
     const topProduct = productMetrics.topProducts.reduce((prev, current) =>
-      current.quantity > prev.quantity ? current : prev
+      current.quantity > prev.quantity ? current : prev,
     );
 
     return {
@@ -189,13 +192,13 @@ export default function DashboardHome() {
       value: salesLoading
         ? "Cargando..."
         : salesError
-        ? "Error"
-        : formatCurrency(salesMetrics?.totalSales || 0),
+          ? "Error"
+          : formatCurrency(salesMetrics?.totalSales || 0),
       description: salesLoading
         ? "Obteniendo datos..."
         : salesError
-        ? "Error al cargar datos"
-        : `Total de ${salesMetrics?.totalOrders || 0} órdenes`,
+          ? "Error al cargar datos"
+          : `Total de ${salesMetrics?.totalOrders || 0} órdenes`,
       icon: DollarSign,
       trend: "up" as const,
     },
@@ -204,13 +207,13 @@ export default function DashboardHome() {
       value: waiterLoading
         ? "Cargando..."
         : waiterError
-        ? "Error"
-        : (waiterPerformance?.length || 0).toString(),
+          ? "Error"
+          : (waiterPerformance?.length || 0).toString(),
       description: waiterLoading
         ? "Obteniendo datos..."
         : waiterError
-        ? "Error al cargar datos"
-        : "Meseros activos en el período",
+          ? "Error al cargar datos"
+          : "Meseros activos en el período",
       icon: Users,
       trend: "neutral" as const,
     },
@@ -219,16 +222,17 @@ export default function DashboardHome() {
       value: salesLoading
         ? "Cargando..."
         : salesError
-        ? "Error"
-        : formatCurrency(salesMetrics?.totalTips || 0),
+          ? "Error"
+          : formatCurrency(salesMetrics?.totalTips || 0),
       description: salesLoading
         ? "Obteniendo datos..."
         : salesError
-        ? "Error al cargar datos"
-        : `${(
-            ((salesMetrics?.totalTips || 0) / (salesMetrics?.totalSales || 1)) *
-            100
-          ).toFixed(1)}% del total`,
+          ? "Error al cargar datos"
+          : `${(
+              ((salesMetrics?.totalTips || 0) /
+                (salesMetrics?.totalSales || 1)) *
+              100
+            ).toFixed(1)}% del total`,
       icon: Gift,
       trend: "up" as const,
     },
@@ -237,15 +241,15 @@ export default function DashboardHome() {
       value: salesLoading
         ? "Cargando..."
         : salesError
-        ? "Error"
-        : (salesMetrics?.totalOrders || 0).toString(),
+          ? "Error"
+          : (salesMetrics?.totalOrders || 0).toString(),
       description: salesLoading
         ? "Obteniendo datos..."
         : salesError
-        ? "Error al cargar datos"
-        : `Valor promedio: ${formatCurrency(
-            salesMetrics?.averageOrderValue || 0
-          )}`,
+          ? "Error al cargar datos"
+          : `Valor promedio: ${formatCurrency(
+              salesMetrics?.averageOrderValue || 0,
+            )}`,
       icon: ShoppingBag,
       trend: "neutral" as const,
     },

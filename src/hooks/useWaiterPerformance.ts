@@ -26,6 +26,10 @@ export function useWaiterPerformance({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Use timestamps for stable dependencies
+  const startTime = startDate.getTime();
+  const endTime = endDate.getTime();
+
   const fetchWaiterPerformance = useCallback(async () => {
     if (!enabled) {
       setWaiterPerformance([]);
@@ -37,8 +41,8 @@ export function useWaiterPerformance({
       setLoading(true);
       setError(null);
       const data = await metricsService.getAllWaitersPerformance(
-        startDate,
-        endDate
+        new Date(startTime),
+        new Date(endTime),
       );
       setWaiterPerformance(data);
     } catch (err) {
@@ -50,7 +54,7 @@ export function useWaiterPerformance({
     } finally {
       setLoading(false);
     }
-  }, [startDate, endDate, enabled]);
+  }, [startTime, endTime, enabled]);
 
   const refetch = useCallback(async () => {
     await fetchWaiterPerformance();

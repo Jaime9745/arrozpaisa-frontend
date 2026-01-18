@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { metricsService } from "@/services/metricsService";
 import { LeastSoldProduct } from "@/types/metrics";
 
@@ -25,14 +25,21 @@ export function useLeastSoldProduct({
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchLeastSoldProduct = async () => {
+  // Use timestamps for stable dependencies
+  const startTime = startDate.getTime();
+  const endTime = endDate.getTime();
+
+  const fetchLeastSoldProduct = useCallback(async () => {
     if (!enabled) return;
 
     setLoading(true);
     setError(null);
 
     try {
-      const data = await metricsService.getLeastSoldProduct(startDate, endDate);
+      const data = await metricsService.getLeastSoldProduct(
+        new Date(startTime),
+        new Date(endTime),
+      );
 
       setLeastSoldProduct(data);
     } catch (err) {
@@ -43,13 +50,13 @@ export function useLeastSoldProduct({
     } finally {
       setLoading(false);
     }
-  };
+  }, [startTime, endTime, enabled]);
 
   useEffect(() => {
     if (enabled) {
       fetchLeastSoldProduct();
     }
-  }, [startDate, endDate, enabled]);
+  }, [fetchLeastSoldProduct, enabled]);
 
   return {
     leastSoldProduct,

@@ -25,14 +25,18 @@ export const useProductMetrics = ({
     error: null,
   });
 
+  // Use timestamps for stable dependencies
+  const startTime = startDate.getTime();
+  const endTime = endDate.getTime();
+
   const fetchProductMetrics = useCallback(async () => {
     try {
       setData((prev) => ({ ...prev, loading: true, error: null }));
 
       const productMetrics = await metricsService.getProductMetrics(
         period,
-        startDate,
-        endDate
+        new Date(startTime),
+        new Date(endTime),
       );
 
       setData({
@@ -48,7 +52,7 @@ export const useProductMetrics = ({
           error instanceof Error ? error.message : "An unknown error occurred",
       }));
     }
-  }, [period, startDate, endDate]);
+  }, [period, startTime, endTime]);
 
   const refetch = useCallback(() => {
     fetchProductMetrics();

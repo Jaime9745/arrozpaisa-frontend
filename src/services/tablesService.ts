@@ -3,7 +3,7 @@ import { apiClient } from "../api";
 export interface Table {
   id: string;
   number: number;
-  status: "libre" | "atendida";
+  status: "libre" | "atendida" | "ocupada";
   capacity?: number;
   location?: string;
   createdAt?: string;
@@ -20,11 +20,11 @@ export interface UpdateTableRequest {
   number?: number;
   capacity?: number;
   location?: string;
-  status?: "libre" | "atendida";
+  status?: "libre" | "atendida" | "ocupada";
 }
 
 export interface UpdateTableStatusRequest {
-  status: "libre" | "atendida";
+  status: "libre" | "atendida" | "ocupada";
 }
 
 export interface ApiResponse<T> {
@@ -59,7 +59,7 @@ class TablesService {
   async getTableByNumber(number: number): Promise<Table> {
     try {
       const response = await this.api.get<ApiResponse<Table>>(
-        `/tables/number/${number}`
+        `/tables/number/${number}`,
       );
       return response.data.data;
     } catch (error) {
@@ -71,7 +71,7 @@ class TablesService {
   async getTablesByStatus(status: "libre" | "atendida"): Promise<Table[]> {
     try {
       const response = await this.api.get<ApiResponse<Table[]>>(
-        `/tables/status/${status}`
+        `/tables/status/${status}`,
       );
       return response.data.data;
     } catch (error) {
@@ -83,7 +83,7 @@ class TablesService {
   async getAvailableTables(): Promise<Table[]> {
     try {
       const response = await this.api.get<ApiResponse<Table[]>>(
-        "/tables/available/tables"
+        "/tables/available/tables",
       );
       return response.data.data;
     } catch (error) {
@@ -95,7 +95,7 @@ class TablesService {
   async getOccupiedTables(): Promise<Table[]> {
     try {
       const response = await this.api.get<ApiResponse<Table[]>>(
-        "/tables/occupied/tables"
+        "/tables/occupied/tables",
       );
       return response.data.data;
     } catch (error) {
@@ -108,7 +108,7 @@ class TablesService {
     try {
       const response = await this.api.post<ApiResponse<Table>>(
         "/tables",
-        tableData
+        tableData,
       );
       return response.data.data;
     } catch (error) {
@@ -121,7 +121,7 @@ class TablesService {
     try {
       const response = await this.api.put<ApiResponse<Table>>(
         `/tables/${id}`,
-        tableData
+        tableData,
       );
       return response.data.data;
     } catch (error) {
@@ -132,12 +132,12 @@ class TablesService {
   // Update table status (admin and waiters)
   async updateTableStatus(
     id: string,
-    status: "libre" | "atendida"
+    status: "libre" | "atendida",
   ): Promise<Table> {
     try {
       const response = await this.api.put<ApiResponse<Table>>(
         `/tables/${id}/status`,
-        { status }
+        { status },
       );
       return response.data.data;
     } catch (error) {

@@ -16,12 +16,14 @@ export default function TableStatus() {
   const { tables, loading, error, refreshTables } = useTables();
 
   // Map backend status to display status
-  const getDisplayStatus = (status: "libre" | "atendida") => {
+  const getDisplayStatus = (status: "libre" | "atendida" | "ocupada") => {
     switch (status) {
       case "libre":
         return "Libre";
       case "atendida":
         return "Servida";
+      case "ocupada":
+        return "Ocupada";
       default:
         return "Libre";
     }
@@ -88,7 +90,8 @@ export default function TableStatus() {
                     style={{ backgroundColor: "#ec3224" }}
                   ></div>
                   <span className="text-sm font-medium text-gray-700">
-                    Mesas Ocupadas (0)
+                    Mesas Ocupadas (
+                    {tables.filter((t) => t.status === "ocupada").length})
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -148,6 +151,8 @@ export default function TableStatus() {
                       return "/images/tables/tableFree.webp";
                     case "atendida":
                       return "/images/tables/tableServed.webp";
+                    case "ocupada":
+                      return "/images/tables/tableOccupied.webp";
                     default:
                       return "/images/tables/tableFree.webp";
                   }
@@ -193,6 +198,10 @@ export default function TableStatus() {
                       return useSmall
                         ? "/images/tables/tableServedSmall.webp"
                         : "/images/tables/tableServed.webp";
+                    case "ocupada":
+                      return useSmall
+                        ? "/images/tables/tableOccupiedSmall.webp"
+                        : "/images/tables/tableOccupied.webp";
                     default:
                       return useSmall
                         ? "/images/tables/tableFreeSmall.webp"
@@ -245,6 +254,8 @@ export default function TableStatus() {
                       return "/images/tables/tableFree.webp";
                     case "atendida":
                       return "/images/tables/tableServed.webp";
+                    case "ocupada":
+                      return "/images/tables/tableOccupied.webp";
                     default:
                       return "/images/tables/tableFree.webp";
                   }

@@ -92,6 +92,7 @@ export default function ProductCard({
                 alt="Menu"
                 width={48}
                 height={48}
+                style={{ width: "auto", height: "auto" }}
               />
             </Button>
           </DropdownMenuTrigger>

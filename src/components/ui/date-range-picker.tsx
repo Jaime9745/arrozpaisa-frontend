@@ -85,7 +85,7 @@ export function DateRangePicker({
       return `${format(dateRange.from, "dd/MM", { locale: es })} - ${format(
         dateRange.to,
         "dd/MM",
-        { locale: es }
+        { locale: es },
       )}`;
     }
 
@@ -102,7 +102,7 @@ export function DateRangePicker({
             variant={"outline"}
             className={cn(
               "w-50 justify-center text-center font-normal rounded-[30px] h-10 px-4 flex items-center",
-              !dateRange && "text-muted-foreground"
+              !dateRange && "text-muted-foreground",
             )}
           >
             <CalendarIcon className="mr-2 h-4 w-4 shrink-0" />

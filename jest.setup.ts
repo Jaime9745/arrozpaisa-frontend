@@ -30,9 +30,6 @@ jest.mock("next/image", () => ({
   },
 }));
 
-// Set environment variables for tests
-process.env.NEXT_PUBLIC_API_URL = "https://api.example.com";
-
 // Suppress console.error during tests to reduce noise
 const originalError = console.error;
 beforeAll(() => {

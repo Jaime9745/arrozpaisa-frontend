@@ -34,5 +34,3 @@ jobs:
 
       - name: Run tests
         run: pnpm test
-        env:
-          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}

@@ -23,13 +23,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
-      <head>
-        <link
-          rel="preconnect"
-          href={process.env.NEXT_PUBLIC_API_URL}
-          crossOrigin="anonymous"
-        />
-      </head>
       <body className={`${poppins.variable} antialiased font-sans`}>
         <AuthProvider>{children}</AuthProvider>
       </body>

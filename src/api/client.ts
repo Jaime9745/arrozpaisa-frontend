@@ -7,12 +7,8 @@ class ApiClient {
   private api: AxiosInstance;
 
   constructor() {
-    if (!process.env.NEXT_PUBLIC_API_URL) {
-      throw new Error("NEXT_PUBLIC_API_URL environment variable is required");
-    }
-
     this.api = axios.create({
-      baseURL: process.env.NEXT_PUBLIC_API_URL,
+      baseURL: "/api",
       timeout: 10000,
       headers: {
         "Content-Type": "application/json",

@@ -1,11 +1,12 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { LoginForm } from "../login-form";
 
-// Mock the useAuth hook
-const mockLogin = jest.fn();
-const mockLogout = jest.fn();
+const { mockLogin, mockLogout } = vi.hoisted(() => ({
+  mockLogin: vi.fn(),
+  mockLogout: vi.fn(),
+}));
 
-jest.mock("@/contexts/AuthContext", () => ({
+vi.mock("@/contexts/AuthContext", () => ({
   useAuth: () => ({
     isAuthenticated: false,
     login: mockLogin,
@@ -14,8 +15,7 @@ jest.mock("@/contexts/AuthContext", () => ({
   }),
 }));
 
-// Mock Next.js Image component
-jest.mock("next/image", () => ({
+vi.mock("next/image", () => ({
   __esModule: true,
   default: (props: any) => {
     // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
@@ -25,7 +25,7 @@ jest.mock("next/image", () => ({
 
 describe("LoginForm Component", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   const renderLoginForm = () => {
@@ -118,7 +118,7 @@ describe("LoginForm Component", () => {
       const form = screen
         .getByRole("button", { name: /Ingresar/i })
         .closest("form");
-      const mockPreventDefault = jest.fn();
+      const mockPreventDefault = vi.fn();
 
       if (form) {
         fireEvent.submit(form, { preventDefault: mockPreventDefault });

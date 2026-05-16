@@ -61,17 +61,19 @@ describe("imageUtils", () => {
 
       // Mock FileReader to simulate an error
       const originalFileReader = global.FileReader;
-      global.FileReader = jest.fn().mockImplementation(() => ({
-        readAsDataURL: jest.fn(function (this: any) {
-          this.onerror?.();
-        }),
-        onerror: null,
-        onload: null,
-        result: null,
-      })) as any;
+      global.FileReader = vi.fn().mockImplementation(function (this: any) {
+        return {
+          readAsDataURL: vi.fn(function (this: any) {
+            this.onerror?.();
+          }),
+          onerror: null,
+          onload: null,
+          result: null,
+        };
+      }) as any;
 
       await expect(convertImageToBase64(file)).rejects.toThrow(
-        "Error reading file"
+        "Error reading file",
       );
 
       // Restore original FileReader

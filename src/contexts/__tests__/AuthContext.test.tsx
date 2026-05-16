@@ -1,28 +1,29 @@
 import { renderHook, waitFor, act } from "@testing-library/react";
+import type { Mock } from "vitest";
 import { AuthProvider, useAuth } from "../AuthContext";
 import { loginService } from "@/services/loginService";
 import { useRouter } from "next/navigation";
 
 // Mock Next.js router
-const mockPush = jest.fn();
-jest.mock("next/navigation", () => ({
-  useRouter: jest.fn(),
+const { mockPush } = vi.hoisted(() => ({ mockPush: vi.fn() }));
+vi.mock("next/navigation", () => ({
+  useRouter: vi.fn(),
 }));
 
 // Mock loginService
-jest.mock("@/services/loginService", () => ({
+vi.mock("@/services/loginService", () => ({
   loginService: {
-    login: jest.fn(),
-    logout: jest.fn(),
-    getToken: jest.fn(),
+    login: vi.fn(),
+    logout: vi.fn(),
+    getToken: vi.fn(),
   },
 }));
 
 describe("AuthContext", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     localStorage.clear();
-    (useRouter as jest.Mock).mockReturnValue({
+    (useRouter as Mock).mockReturnValue({
       push: mockPush,
     });
   });
@@ -31,7 +32,7 @@ describe("AuthContext", () => {
     it("should throw error when used outside AuthProvider", () => {
       // Suppress console.error for this test
       const originalError = console.error;
-      console.error = jest.fn();
+      console.error = vi.fn();
 
       expect(() => {
         renderHook(() => useAuth());
@@ -55,7 +56,7 @@ describe("AuthContext", () => {
 
   describe("AuthProvider initialization", () => {
     it("should start with loading true and then set to false", async () => {
-      (loginService.getToken as jest.Mock).mockReturnValue(null);
+      (loginService.getToken as Mock).mockReturnValue(null);
 
       const { result } = renderHook(() => useAuth(), {
         wrapper: AuthProvider,
@@ -69,7 +70,7 @@ describe("AuthContext", () => {
     });
 
     it("should restore authentication if valid token and admin role exist", async () => {
-      (loginService.getToken as jest.Mock).mockReturnValue("valid-token");
+      (loginService.getToken as Mock).mockReturnValue("valid-token");
       localStorage.setItem("role", "admin");
 
       const { result } = renderHook(() => useAuth(), {
@@ -84,7 +85,7 @@ describe("AuthContext", () => {
     });
 
     it("should not authenticate if token exists but role is not admin", async () => {
-      (loginService.getToken as jest.Mock).mockReturnValue("valid-token");
+      (loginService.getToken as Mock).mockReturnValue("valid-token");
       localStorage.setItem("role", "waiter");
 
       const { result } = renderHook(() => useAuth(), {
@@ -101,7 +102,7 @@ describe("AuthContext", () => {
     });
 
     it("should not authenticate if no token exists", async () => {
-      (loginService.getToken as jest.Mock).mockReturnValue(null);
+      (loginService.getToken as Mock).mockReturnValue(null);
 
       const { result } = renderHook(() => useAuth(), {
         wrapper: AuthProvider,
@@ -117,8 +118,8 @@ describe("AuthContext", () => {
 
   describe("login function", () => {
     it("should login successfully with admin credentials", async () => {
-      (loginService.getToken as jest.Mock).mockReturnValue(null);
-      (loginService.login as jest.Mock).mockResolvedValue({
+      (loginService.getToken as Mock).mockReturnValue(null);
+      (loginService.login as Mock).mockResolvedValue({
         token: "new-token",
         user: { role: "admin" },
       });
@@ -146,8 +147,8 @@ describe("AuthContext", () => {
     });
 
     it("should reject login if user is not admin", async () => {
-      (loginService.getToken as jest.Mock).mockReturnValue(null);
-      (loginService.login as jest.Mock).mockResolvedValue({
+      (loginService.getToken as Mock).mockReturnValue(null);
+      (loginService.login as Mock).mockResolvedValue({
         token: "waiter-token",
         user: { role: "waiter" },
       });
@@ -172,8 +173,8 @@ describe("AuthContext", () => {
     });
 
     it("should handle login error when no user info returned", async () => {
-      (loginService.getToken as jest.Mock).mockReturnValue(null);
-      (loginService.login as jest.Mock).mockResolvedValue({
+      (loginService.getToken as Mock).mockReturnValue(null);
+      (loginService.login as Mock).mockResolvedValue({
         token: "token",
         // No user property
       });
@@ -196,8 +197,8 @@ describe("AuthContext", () => {
     });
 
     it("should handle login service errors", async () => {
-      (loginService.getToken as jest.Mock).mockReturnValue(null);
-      (loginService.login as jest.Mock).mockRejectedValue(
+      (loginService.getToken as Mock).mockReturnValue(null);
+      (loginService.login as Mock).mockRejectedValue(
         new Error("Invalid credentials")
       );
 
@@ -219,8 +220,8 @@ describe("AuthContext", () => {
     });
 
     it("should handle network errors during login", async () => {
-      (loginService.getToken as jest.Mock).mockReturnValue(null);
-      (loginService.login as jest.Mock).mockRejectedValue(
+      (loginService.getToken as Mock).mockReturnValue(null);
+      (loginService.login as Mock).mockRejectedValue(
         new Error("Network error")
       );
 
@@ -242,7 +243,7 @@ describe("AuthContext", () => {
 
   describe("logout function", () => {
     it("should logout successfully and clear authentication", async () => {
-      (loginService.getToken as jest.Mock).mockReturnValue("valid-token");
+      (loginService.getToken as Mock).mockReturnValue("valid-token");
       localStorage.setItem("token", "valid-token");
       localStorage.setItem("role", "admin");
 
@@ -266,7 +267,7 @@ describe("AuthContext", () => {
     });
 
     it("should logout even when not authenticated", async () => {
-      (loginService.getToken as jest.Mock).mockReturnValue(null);
+      (loginService.getToken as Mock).mockReturnValue(null);
 
       const { result } = renderHook(() => useAuth(), {
         wrapper: AuthProvider,
@@ -287,8 +288,8 @@ describe("AuthContext", () => {
 
   describe("authentication flow", () => {
     it("should handle complete login and logout flow", async () => {
-      (loginService.getToken as jest.Mock).mockReturnValue(null);
-      (loginService.login as jest.Mock).mockResolvedValue({
+      (loginService.getToken as Mock).mockReturnValue(null);
+      (loginService.login as Mock).mockResolvedValue({
         token: "new-token",
         user: { role: "admin" },
       });
